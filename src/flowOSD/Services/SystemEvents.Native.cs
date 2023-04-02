@@ -19,6 +19,7 @@
 namespace flowOSD.Services;
 
 using System.Runtime.InteropServices;
+using Windows.UI;
 
 partial class SystemEvents
 {
@@ -44,7 +45,7 @@ partial class SystemEvents
           GetImmersiveColorTypeFromName(Marshal.StringToHGlobalUni("ImmersiveStartSelectionBackground")),
           false, 0);
 
-        return Color.FromArgb(
+        return Color.FromArgb(255,
             (byte)(0xFFFFFF & colorSetEx),
             (byte)((0xFFFFFF & colorSetEx) >> 8),
             (byte)((0xFFFFFF & colorSetEx) >> 16));

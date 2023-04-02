@@ -21,25 +21,25 @@ namespace flowOSD.Services;
 using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.UI.Commands;
 
-sealed class CommandService : ICommandService
+sealed class CommandService : ICommandService, IDisposable
 {
     private IConfig config;
     private IHardwareService hardwareService;
     private IKeysSender keysSender;
     private IUpdater updater;
 
-    private Dictionary<string, CommandBase> names = new Dictionary<string, CommandBase>();
+    private Dictionary<string, Lazy<CommandBase>> instances = new Dictionary<string, Lazy<CommandBase>>();
 
     public CommandService(
-        IConfig config, 
-        IHardwareService hardwareService, 
-        IKeysSender keysSender, 
-        ISystemEvents systemEvents, 
+        IConfig config,
+        IHardwareService hardwareService,
+        IKeysSender keysSender,
+        ISystemEvents systemEvents,
         IUpdater updater,
         IOsd osd)
     {
@@ -48,40 +48,68 @@ sealed class CommandService : ICommandService
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
         this.updater = updater ?? throw new ArgumentNullException(nameof(updater));
 
-        Register(
-            new DisplayRefreshRateCommand(
-                hardwareService.ResolveNotNull<IPowerManagement>(),
-                hardwareService.ResolveNotNull<IDisplay>(),
-                config.Common),
-            new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()),
-            new KeyboardBacklightCommand(config, osd, hardwareService.ResolveNotNull<IKeyboardBacklight>()),
-            new TouchPadCommand(hardwareService.ResolveNotNull<ITouchPad>()),
-            new MicrophoneCommand(config, osd, hardwareService.ResolveNotNull<IMicrophone>()),
-            new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()),
-            new GpuCommand(hardwareService.ResolveNotNull<IAtk>(), config),
-            new PerformanceModeCommand(hardwareService.ResolveNotNull<IAtk>()),
-            new PowerModeCommand(hardwareService.ResolveNotNull<IPowerManagement>()),
-            new SuspendCommand(),
-            new SettingsCommand(config, this, systemEvents, hardwareService),
-            new ExitCommand(),
-            new PrintScreenCommand(keysSender),
-            new ClipboardCopyPlainTextCommand(keysSender),
-            new ClipboardPastePlainTextCommand(keysSender));
+        /*  Register(
+              new SettingsCommand(config, this, systemEvents, hardwareService),
+              new ExitCommand(),
+              new PrintScreenCommand(keysSender),
+              new ClipboardCopyPlainTextCommand(keysSender),
+              new ClipboardPastePlainTextCommand(keysSender));*/
+
+        Register(() => new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
+        Register(() => new PerformanceModeCommand(config, hardwareService.ResolveNotNull<IAtk>()));
+        Register(() => new PowerModeCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
+        Register(() => new GpuCommand(hardwareService.ResolveNotNull<IAtk>(), config));
+        Register(() => new TouchPadCommand(hardwareService.ResolveNotNull<ITouchPad>()));
+        Register(() => new MicrophoneCommand(config, osd, hardwareService.ResolveNotNull<IMicrophone>()));
+        Register(() => new DisplayRefreshRateCommand(
+            hardwareService.ResolveNotNull<IPowerManagement>(),
+            hardwareService.ResolveNotNull<IDisplay>(),
+            config.Common));
+
+        Register(() => new ConfigCommand(config, systemEvents, this, hardwareService));
+        Register(()=>new MainUICommand(this.config, systemEvents, this, hardwareService));
+        Register(() => new ExitCommand());
+
+
+        Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
+        Register(() => new KeyboardBacklightCommand(config, osd, hardwareService.ResolveNotNull<IKeyboardBacklight>()));
+        Register(() => new SuspendCommand());
+
+        Register(new NotifyMenuCommand(this.config, systemEvents, this));
+    }
+
+    public void Dispose()
+    {
+        foreach (var i in instances)
+        {
+            if (i.Value.IsValueCreated && i.Value is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            instances.Clear();
+        }
+    }
+
+    public void Register<T>(Func<T> commandFactory) where T : CommandBase
+    {
+        instances[typeof(T).Name] = new Lazy<CommandBase>(commandFactory, isThreadSafe: false);
     }
 
     public void Register(CommandBase command, params CommandBase[] commands)
     {
-        names[command.Name] = command;
+        instances[command.GetType().Name] = new Lazy<CommandBase>(command);
 
         foreach (var c in commands)
         {
-            names[c.Name] = c;
+            instances[c.GetType().Name] = new Lazy<CommandBase>(c);
         }
     }
 
     public CommandBase? Resolve(string? commandName)
     {
-        return !string.IsNullOrEmpty(commandName) && names.TryGetValue(commandName, out CommandBase? command) ? command : null;
+        return !string.IsNullOrEmpty(commandName) && instances.TryGetValue(commandName, out Lazy<CommandBase>? lazyCommand)
+            ? lazyCommand.Value : null;
     }
 
     public T? Resolve<T>() where T : CommandBase
@@ -100,5 +128,5 @@ sealed class CommandService : ICommandService
         return command != null;
     }
 
-    public IList<CommandBase> Commands => names.Values.Where(i => i.CanExecuteWithHotKey).ToArray();
+    public IList<CommandBase> Commands => instances.Values.Select(i => i.Value).Where(i => i.CanExecuteWithHotKey).ToArray();
 }

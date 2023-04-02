@@ -22,14 +22,14 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
 using flowOSD.Extensions;
-using flowOSD.Hardware;
-using flowOSD.Hardware.Hid;
+using flowOSD.Services.Hardware;
 using flowOSD.Native;
+using flowOSD.Services.Hardware.Hid;
 using Microsoft.Win32;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 
 sealed class HardwareService : IDisposable, IHardwareService
 {

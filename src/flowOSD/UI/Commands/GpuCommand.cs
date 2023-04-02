@@ -22,9 +22,9 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using static flowOSD.Extensions.Common;
 
@@ -47,8 +47,6 @@ sealed class GpuCommand : CommandBase
         Enabled = true;
     }
 
-    public override string Name => nameof(GpuCommand);
-
     public async override void Execute(object? parameter = null)
     {
         var isGpuEnabled = await atk.GpuMode.FirstAsync() == GpuMode.dGpu;
@@ -69,11 +67,12 @@ sealed class GpuCommand : CommandBase
 
     private bool Confirm(bool isGpuEnabled)
     {
-        return !config.Common.ConfirmGpuModeChange || DialogResult.Yes == MessageBox.Show(
-            isGpuEnabled ? "Do you want to turn off dGPU?" : "Do you want to turn on dGPU?",
-            "Discrete GPU",
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Question);
+        return true;
+        //return !config.Common.ConfirmGpuModeChange || DialogResult.Yes == MessageBox.Show(
+        //    isGpuEnabled ? "Do you want to turn off dGPU?" : "Do you want to turn on dGPU?",
+        //    "Discrete GPU",
+        //    MessageBoxButtons.YesNo,
+        //    MessageBoxIcon.Question);
     }
 
     private void Update(GpuMode gpuMode)

@@ -21,14 +21,14 @@ namespace flowOSD;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Services;
 using flowOSD.UI;
 using flowOSD.UI.Commands;
-using flowOSD.UI.Components;
 using static flowOSD.Extensions.Common;
 using static flowOSD.Native.User32;
 
@@ -148,15 +148,15 @@ sealed class NotificationService : IDisposable
         switch (performanceMode)
         {
             case PerformanceMode.Default:
-                osd.Show(new OsdData(UIImages.Performance_Default, $"{performanceMode.ToText()} performance mode"));
+                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Performance_Default));
                 break;
 
             case PerformanceMode.Turbo:
-                osd.Show(new OsdData(UIImages.Performance_Turbo, $"{performanceMode.ToText()} performance mode"));
+                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Performance_Turbo));
                 break;
 
             case PerformanceMode.Silent:
-                osd.Show(new OsdData(UIImages.Performance_Silent, $"{performanceMode.ToText()} performance mode"));
+                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Performance_Silent));
                 break;
         }
     }
@@ -171,15 +171,15 @@ sealed class NotificationService : IDisposable
         switch (powerMode)
         {
             case PowerMode.BestPowerEfficiency:
-                osd.Show(new OsdData(UIImages.Power_BestPowerEfficiency, $"{powerMode.ToText()} power mode"));
+                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Power_BestPowerEfficiency));
                 break;
 
             case PowerMode.Balanced:
-                osd.Show(new OsdData(UIImages.Power_Balanced, $"{powerMode.ToText()} power mode"));
+                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Power_Balanced));
                 break;
 
             case PowerMode.BestPerformance:
-                osd.Show(new OsdData(UIImages.Power_BestPerformance, $"{powerMode.ToText()} power mode"));
+                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Power_BestPerformance));
                 break;
         }
     }
@@ -191,9 +191,9 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdData(
-            powerSource == PowerSource.Battery ? UIImages.Hardware_DC : UIImages.Hardware_AC,
-            powerSource == PowerSource.Battery ? "On Battery" : "Plugged In"));
+        osd.Show(new OsdMessage(
+            powerSource == PowerSource.Battery ? "On Battery" : "Plugged In",
+            powerSource == PowerSource.Battery ? Images.Hardware_DC : Images.Hardware_AC));
     }
 
     private void ShowDisplayRefreshRateNotification(uint refreshRate)
@@ -203,7 +203,7 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdData(UIImages.Hardware_Screen, DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate"));
+        osd.Show(new OsdMessage(DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate", Images.Hardware_Screen));
     }
 
     private void ShowBoostNotification(bool isEnabled)
@@ -213,7 +213,7 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdData(UIImages.Hardware_Cpu, isEnabled ? "Boost Mode is on" : "Boost Mode is off"));
+        osd.Show(new OsdMessage(isEnabled ? "Boost Mode is on" : "Boost Mode is off", Images.Hardware_Cpu));
     }
 
     private void ShowTouchPadNotification(DeviceState state)
@@ -223,7 +223,7 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdData(UIImages.Hardware_TouchPad, state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off"));
+        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", Images.Hardware_TouchPad));
     }
 
     private void ShowGpuNotification(GpuMode gpuMode)
@@ -233,6 +233,6 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdData(UIImages.Hardware_Gpu, gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off"));
+        osd.Show(new OsdMessage(gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", Images.Hardware_Gpu));
     }
 }

@@ -22,8 +22,8 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using static flowOSD.Extensions.Common;
 
@@ -43,8 +43,6 @@ sealed class TouchPadCommand : CommandBase
         Description = "Toggle TouchPad";
         Enabled = true;
     }
-
-    public override string Name => nameof(TouchPadCommand);
 
     public override void Execute(object? parameter = null)
     {

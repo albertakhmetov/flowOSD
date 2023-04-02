@@ -17,31 +17,106 @@
  *
  */
 namespace flowOSD.UI.Commands;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Extensions;
+using flowOSD.Native;
+using flowOSD.UI.Main;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using static flowOSD.Native.Kernel32;
+using static flowOSD.Native.User32;
 
-using System.ComponentModel;
-using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
-using flowOSD.Api;
 
 sealed class MainUICommand : CommandBase
 {
-    private MainUI mainUI;
+    private IConfig config;
+    private ISystemEvents systemEvents;
+    private MainWindow? window;
 
-    public MainUICommand(MainUI mainUI)
+    private uint deactivateTime;
+
+    public MainUICommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService, IHardwareService hardwareService)
     {
-        this.mainUI = mainUI ?? throw new ArgumentNullException(nameof(mainUI));
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
-        Text = $"Show {Application.ProductName}";
+        window = new MainWindow(this.systemEvents, new MainViewModel(config, commandService, hardwareService).DisposeWith(Disposable!))
+            .DisposeWith(Disposable!);
+        window.Activated += OnWindowActivated;
+
+        var presenter = OverlappedPresenter.CreateForDialog();
+        presenter.SetBorderAndTitleBar(true, false);
+        presenter.IsAlwaysOnTop = true;
+
+        window.AppWindow.Closing += OnWindowClosing;
+        window.AppWindow.SetPresenter(presenter);
+
+        Dwmapi.SetCornerPreference(window.GetHandle(), Dwmapi.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND);
+
+        Text = $"Show {this.config.ProductName}";
         Description = Text;
         Enabled = true;
     }
 
-    public override string Name => nameof(MainUICommand);
-
     public override bool CanExecuteWithHotKey => true;
 
-    public override void Execute(object? parameter = null)
+    public override async void Execute(object? parameter = null)
     {
-        mainUI.Show();
+        if (window == null || GetTickCount() - deactivateTime < 100)
+        {
+            return;
+        }
+
+        if (window.AppWindow?.IsVisible == true)
+        {
+            window.AppWindow.Hide();
+            return;
+        }
+
+        const int offsetX = 10;
+        const int offsetY = 10;
+
+        window.AppWindow.Move(new Windows.Graphics.PointInt32(0, 0));
+
+        var scale = GetDpiForWindow(window.GetHandle()) / 96f;
+        var workArea = GetPrimaryWorkArea();
+
+        window.AppWindow.Resize(new Windows.Graphics.SizeInt32(
+            (int)(370 * scale),
+            (int)(300 * scale)));
+        window.AppWindow.Move(new Windows.Graphics.PointInt32(
+            (int)(workArea.Width - window.AppWindow.Size.Width - offsetX),
+            (int)(workArea.Height - window.AppWindow.Size.Height - offsetY)));
+
+        ShowAndActivate(window.GetHandle());
+    }
+
+    private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        if (window != null)
+        {
+            window.Activated -= OnWindowActivated;
+            if (window.AppWindow != null)
+            {
+                window.AppWindow.Closing -= OnWindowClosing;
+            }
+        }
+
+        if (Application.Current is App app)
+        {
+            app.ShutDown();
+        }
+    }
+
+    private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
+    {
+        if (window == null || args.WindowActivationState != WindowActivationState.Deactivated)
+        {
+            return;
+        }
+
+        deactivateTime = GetTickCount();
+        window.AppWindow.Hide();
     }
 }

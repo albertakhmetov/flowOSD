@@ -20,40 +20,38 @@ namespace flowOSD.Services;
 
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using flowOSD.Api;
+using flowOSD.Core;
+using Windows.System;
 using static flowOSD.Native.User32;
 
 sealed class KeysSender : IKeysSender
 {
-    private readonly HashSet<Keys> extendedKeys;
+    private readonly HashSet<VirtualKey> extendedKeys;
 
     public KeysSender()
     {
-        extendedKeys = new HashSet<Keys>(new Keys[]
+        extendedKeys = new HashSet<VirtualKey>(new VirtualKey[]
         {
-            Keys.Menu,
-            Keys.LMenu,
-            Keys.RMenu,
-            Keys.Control,
-            Keys.RControlKey,
-            Keys.Insert,
-            Keys.Delete,
-            Keys.Home,
-            Keys.End,
-            Keys.Prior,
-            Keys.Next,
-            Keys.Right,
-            Keys.Up,
-            Keys.Left,
-            Keys.Down,
-            Keys.NumLock,
-            Keys.Cancel,
-            Keys.Snapshot,
-            Keys.Divide
+            VirtualKey.Menu,
+            VirtualKey.LeftMenu,
+            VirtualKey.RightMenu,
+            VirtualKey.Control,
+            VirtualKey.RightControl,
+            VirtualKey.Insert,
+            VirtualKey.Delete,
+            VirtualKey.Home,
+            VirtualKey.End,
+            VirtualKey.Right,
+            VirtualKey.Up,
+            VirtualKey.Left,
+            VirtualKey.Down,
+            VirtualKey.Cancel,
+            VirtualKey.Snapshot,
+            VirtualKey.Divide
         });
     }
 
-    public void SendKeys(Keys key, params Keys[] modifierKeys)
+    public void SendKeys(VirtualKey key, params VirtualKey[] modifierKeys)
     {
         var inputList = new List<INPUT>();
 

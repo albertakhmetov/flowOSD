@@ -24,9 +24,8 @@ using System.Reactive.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using Microsoft.Win32;
 
@@ -167,15 +166,20 @@ sealed class ConfigService : IConfig, IDisposable
     private void UpdateStartupOption(bool runAtStartup)
     {
         using var key = Registry.CurrentUser.OpenSubKey(RUN_KEY, true);
-
         if (key == null)
         {
             throw new ApplicationException("Can't write to Windows registry");
         }
 
+        var exe = Process.GetCurrentProcess().MainModule?.FileName;
+        if (string.IsNullOrEmpty(exe) || !exe.EndsWith(".exe"))
+        {
+            throw new ApplicationException("Can't retrive app exe path");
+        }
+
         if (runAtStartup)
         {
-            key.SetValue(AppFileInfo.ProductName!, Application.ExecutablePath);
+            key.SetValue(AppFileInfo.ProductName!, exe);
         }
         else
         {

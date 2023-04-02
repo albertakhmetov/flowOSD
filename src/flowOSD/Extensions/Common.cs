@@ -19,6 +19,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Reactive.Disposables;
+using System.Runtime.CompilerServices;
 
 namespace flowOSD.Extensions;
 

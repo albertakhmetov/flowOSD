@@ -16,22 +16,25 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Hardware;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 
 public class PerformanceModeCommand : CommandBase
 {
+    private IConfig config;
     private IAtk atk;
 
-    public PerformanceModeCommand(IAtk atk)
+    public PerformanceModeCommand(IConfig config, IAtk atk)
     {
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
 
         this.atk.PerformanceMode
@@ -42,8 +45,6 @@ public class PerformanceModeCommand : CommandBase
         Description = "Toggle Performance Mode";
         Enabled = true;
     }
-
-    public override string Name => nameof(PerformanceModeCommand);
 
     public override bool CanExecuteWithHotKey => true;
 
@@ -57,6 +58,16 @@ public class PerformanceModeCommand : CommandBase
         if (parameter is PerformanceMode performanceMode)
         {
             atk.SetPerformanceMode(performanceMode);
+
+            if (performanceMode != PerformanceMode.Default)
+            {
+                config.Common.PerformanceModeOverride = performanceMode;
+                config.Common.PerformanceModeOverrideEnabled = true;
+            }
+            else
+            {
+                config.Common.PerformanceModeOverrideEnabled = false;
+            }
         }
         else
         {
@@ -64,6 +75,16 @@ public class PerformanceModeCommand : CommandBase
             if (nextPerformanceMode != null)
             {
                 atk.SetPerformanceMode(nextPerformanceMode.Value);
+
+                if (nextPerformanceMode.Value != PerformanceMode.Default)
+                {
+                    config.Common.PerformanceModeOverride = nextPerformanceMode.Value;
+                    config.Common.PerformanceModeOverrideEnabled = true;
+                }
+                else
+                {
+                    config.Common.PerformanceModeOverrideEnabled = false;
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
+using flowOSD.Core;
 using flowOSD.Native;
 
 sealed class SuspendCommand : CommandBase
@@ -30,12 +30,9 @@ sealed class SuspendCommand : CommandBase
     public const string HIBERNATE = "hibernate";
     public const string SLEEP = "sleep";
 
-    private static readonly IList<ParameterInfo> parameters = new ReadOnlyCollection<ParameterInfo>(
-        new ParameterInfo[]
-        {
-            new ParameterInfo(HIBERNATE, "Hibernate"),
-            new ParameterInfo(SLEEP, "Sleep")
-        });
+    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
+        new CommandParameterInfo(HIBERNATE, "Hibernate"),
+        new CommandParameterInfo(SLEEP, "Sleep"));
 
     public SuspendCommand()
     {
@@ -44,11 +41,9 @@ sealed class SuspendCommand : CommandBase
         Enabled = true;
     }
 
-    public override string Name => nameof(SuspendCommand);
-
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<ParameterInfo> Parameters => parameters;
+    public override IList<CommandParameterInfo> Parameters => parameters;
 
     public override void Execute(object? parameter = null)
     {
@@ -57,6 +52,6 @@ sealed class SuspendCommand : CommandBase
             return;
         }
 
-        Powrprof.SetSuspendState(mode == HIBERNATE, true, true);
+        Kernel32.SetSystemPowerState(mode != HIBERNATE, true);
     }
 }

@@ -1,0 +1,121 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page
+    x:Class="flowOSD.UI.Configs.NotificationsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:resources="using:flowOSD.Core.Resources"
+    xmlns:configs="using:flowOSD.Core.Configs"
+    xmlns:core="using:flowOSD.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer>
+        <ScrollViewer.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="../Styles/CxConfig.xaml"/>
+                    <ResourceDictionary>
+                        <Style TargetType="FontIcon">
+                            <Setter Property="Margin" Value="0,0,15,0"/>
+                        </Style>
+                    </ResourceDictionary>
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </ScrollViewer.Resources>
+
+        <StackPanel>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.PerformanceMode, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PerformanceMode)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PerformanceMode)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.PowerMode, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerMode)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PowerMode)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.PowerSource, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerSource)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PowerSource)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.Boost, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Boost)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Boost)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.TouchPad, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.TouchPad)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.TouchPad)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.DisplayRefreshRate, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.DisplayRefreshRate)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.DisplayRefreshRate)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.Mic, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Mic)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Mic)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+            <Border Style="{StaticResource CxConfigBorderStyle}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.Gpu, Mode=TwoWay}">
+                    <ToggleSwitch.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Gpu)}"/>
+                            <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Gpu)}"/>
+                        </StackPanel>
+                    </ToggleSwitch.Header>
+                </ToggleSwitch>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

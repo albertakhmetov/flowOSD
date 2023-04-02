@@ -18,29 +18,28 @@
  */
 namespace flowOSD.Services;
 
-using flowOSD.Api;
+using System.Runtime.InteropServices;
+using flowOSD.Core;
+using static flowOSD.Native.User32;
 
 sealed class MessageQueue : IMessageQueue, IDisposable
 {
     private Dictionary<int, ICollection<Action<int, IntPtr, IntPtr>>> subscriptions;
-    private Filter filter;
-    private NativeWindow nativeWindow;
+    private NativeWindow? nativeWindow;
 
     public MessageQueue()
     {
-        nativeWindow = new NativeUI(this);
         subscriptions = new Dictionary<int, ICollection<Action<int, IntPtr, IntPtr>>>();
-
-        filter = new Filter(this);
-        Application.AddMessageFilter(filter);
+        nativeWindow = new NativeWindow(this);
     }
 
-    void IDisposable.Dispose()
+    public IntPtr Handle => nativeWindow?.Handle ?? throw new ObjectDisposedException(nameof(MessageQueue));
+
+    public void Dispose()
     {
-        Application.RemoveMessageFilter(filter);
+        nativeWindow?.Dispose();
+        nativeWindow = null;
     }
-
-    public IntPtr Handle => nativeWindow.Handle;
 
     public IDisposable Subscribe(int messageId, Action<int, IntPtr, IntPtr> proc)
     {
@@ -62,13 +61,13 @@ sealed class MessageQueue : IMessageQueue, IDisposable
         }
     }
 
-    private void Push(ref Message message)
+    private void Push(int msg, IntPtr wParam, IntPtr lParam)
     {
-        if (subscriptions.ContainsKey(message.Msg))
+        if (subscriptions.ContainsKey(msg))
         {
-            foreach (var proc in subscriptions[message.Msg])
+            foreach (var proc in subscriptions[msg])
             {
-                proc(message.Msg, message.WParam, message.LParam);
+                proc(msg, wParam, lParam);
             }
         }
     }
@@ -81,7 +80,7 @@ sealed class MessageQueue : IMessageQueue, IDisposable
 
         public Subscription(MessageQueue owner, int messageId, Action<int, IntPtr, IntPtr> proc)
         {
-            this.owner = owner;
+            this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
             this.messageId = messageId;
             this.proc = proc;
         }
@@ -92,43 +91,53 @@ sealed class MessageQueue : IMessageQueue, IDisposable
         }
     }
 
-    private sealed class Filter : IMessageFilter
+    private sealed class NativeWindow : IDisposable
     {
         private MessageQueue queue;
+        private IntPtr handle;
 
-        public Filter(MessageQueue queue)
-        {
-            this.queue = queue;
-        }
+        WNDPROC proc;
 
-        public bool PreFilterMessage(ref Message m)
-        {
-            queue.Push(ref m);
-
-            return false;
-        }
-    }
-
-    private sealed class NativeUI : NativeWindow, IDisposable
-    {
-        private MessageQueue queue;
-
-        private Form? form;
-
-        public NativeUI(MessageQueue queue)
+        public NativeWindow(MessageQueue queue)
         {
             this.queue = queue ?? throw new ArgumentNullException(nameof(queue));
 
-            form = new Form();
-            AssignHandle(form.Handle);
+            var id = "flowOSD_messageQueue";
+
+            this.proc = OnWindowMessageReceived;
+
+            var classInfo = new WNDCLASSEX()
+            {
+                cbSize = Marshal.SizeOf<WNDCLASSEX>(),
+                lpfnWndProc = proc,
+                lpszClassName = id,
+            };
+
+            RegisterClassEx(ref classInfo);
+
+            handle = CreateWindowEx(
+                dwExStyle: 0,
+                lpClassName: id,
+                lpWindowName: id,
+                dwStyle: 0,
+                X: 0,
+                Y: 0,
+                nWidth: 0,
+                nHeight: 0,
+                hWndParent: IntPtr.Zero,
+                hMenu: IntPtr.Zero,
+                hInstance: IntPtr.Zero,
+                lpParam: IntPtr.Zero);
         }
 
-        ~NativeUI()
+        ~NativeWindow()
         {
             Dispose(false);
         }
 
-        void IDisposable.Dispose()
+        public IntPtr Handle => handle;
+
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -136,20 +145,17 @@ sealed class MessageQueue : IMessageQueue, IDisposable
 
         private void Dispose(bool disposing)
         {
-            ReleaseHandle();
-
-            if (disposing)
+            if (handle != IntPtr.Zero)
             {
-                form?.Dispose();
-                form = null;
+                DestroyWindow(handle);
             }
         }
 
-        protected override void WndProc(ref Message message)
+        private IntPtr OnWindowMessageReceived(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
         {
-            queue.Push(ref message);
+            queue.Push(msg, wParam, lParam);
 
-            base.WndProc(ref message);
+            return DefWindowProc(hWnd, msg, wParam, lParam);
         }
     }
 }

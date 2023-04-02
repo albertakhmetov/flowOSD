@@ -24,21 +24,19 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 
 sealed class KeyboardBacklightCommand : CommandBase
 {
     public const string UP = "up";
     public const string DOWN = "down";
 
-    private static readonly IList<ParameterInfo> parameters = new ReadOnlyCollection<ParameterInfo>(
-        new ParameterInfo[]
-        {
-            new ParameterInfo(DOWN, "Down"),
-            new ParameterInfo(UP, "Up")
-        });
+    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
+        new CommandParameterInfo(DOWN, "Down"),
+        new CommandParameterInfo(UP, "Up"));
 
     private IConfig config;
     private IOsd osd;
@@ -55,11 +53,9 @@ sealed class KeyboardBacklightCommand : CommandBase
         Enabled = true;
     }
 
-    public override string Name => nameof(KeyboardBacklightCommand);
-
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<ParameterInfo> Parameters => parameters;
+    public override IList<CommandParameterInfo> Parameters => parameters;
 
     public override async void Execute(object? parameter = null)
     {
@@ -81,9 +77,9 @@ sealed class KeyboardBacklightCommand : CommandBase
         var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
 
         var icon = direction == UP
-            ? UIImages.Hardware_KeyboardLightDown
-            : UIImages.Hardware_KeyboardLightUp;
+            ? Images.Hardware_KeyboardLightUp
+            : Images.Hardware_KeyboardLightDown;
 
-        osd.Show(new OsdData(icon, (float)backlightLevel / (float)KeyboardBacklightLevel.High));
+        osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
     }
 }

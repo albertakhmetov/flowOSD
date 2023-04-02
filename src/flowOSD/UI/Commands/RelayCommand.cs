@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System;
@@ -23,9 +24,8 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using flowOSD.Api;
 
-sealed class RelayCommand : ICommand
+public sealed class RelayCommand : ICommand
 {
     private Action<object?> action;
     private Func<object?, bool>? canExecute;

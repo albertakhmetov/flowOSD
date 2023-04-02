@@ -1,0 +1,66 @@
+<Window
+    x:Class="flowOSD.UI.Osd.OsdWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:flowOSD.UI"
+    xmlns:core="using:flowOSD.Core"
+    xmlns:sys="using:System"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="root" Width="Auto" Background="Transparent" Padding="5">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="../Styles/CxProgressBar.xaml"/>
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </Grid.Resources>
+
+        <Grid VerticalAlignment="Stretch"
+              Visibility="{x:Bind local:ViewModelBase.BoolToVisiblity(ViewModel.IsValue), Mode=OneWay}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <FontIcon Margin="10"
+                      FontSize="14"
+                      FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                      Glyph="{x:Bind ViewModel.Icon, Mode=OneWay}"/>
+
+            <ProgressBar Grid.Column="1"
+                         Margin="5,0,10,0"
+                         Height="6"
+                         Value="{x:Bind ViewModel.Value, Mode=OneWay}"
+                         Minimum="0" 
+                         Maximum="1"
+                         HorizontalAlignment="Stretch"/>
+        </Grid>
+
+        <Grid Width="Auto"
+              Visibility="{x:Bind local:ViewModelBase.BoolToVisiblity(ViewModel.IsMessage), Mode=OneWay}"
+              x:Name="textGrid" 
+              VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <FontIcon Width="Auto"
+                      Margin="10"
+                      FontSize="16"
+                      FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                      VerticalAlignment="Center"
+                      Glyph="{x:Bind ViewModel.Icon, Mode=OneWay}"/>
+            <TextBlock Grid.Column="1"
+                       TextTrimming="None"
+                       FontSize="15"
+                       Margin="5,0,10,0" 
+                       Width="Auto"
+                       VerticalAlignment="Center"
+                       Text="{x:Bind ViewModel.Text, Mode=OneWay}"/>
+        </Grid>
+    </Grid>
+</Window>

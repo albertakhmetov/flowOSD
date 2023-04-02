@@ -22,9 +22,9 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using static flowOSD.Extensions.Common;
 
@@ -57,8 +57,6 @@ sealed class DisplayRefreshRateCommand : CommandBase
         Enabled = true;
     }
 
-    public override string Name => nameof(DisplayRefreshRateCommand);
-
     public override async void Execute(object? parameter = null)
     {
         try
@@ -86,7 +84,6 @@ sealed class DisplayRefreshRateCommand : CommandBase
         catch (Exception ex)
         {
             TraceException(ex, "Error is occurred while toggling display refresh rate (UI).");
-            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 

@@ -18,13 +18,13 @@
  */
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
-using flowOSD.Api.Hardware;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using static flowOSD.Native.User32;
 using static flowOSD.Native.Kernel32;
 using System.Reactive.Linq;
-using flowOSD.Api.Configs;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 
 namespace flowOSD.Services;
 

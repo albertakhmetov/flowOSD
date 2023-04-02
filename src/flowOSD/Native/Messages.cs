@@ -49,6 +49,8 @@ static class Messages
 
     public const int WM_CONTEXTMENU = 0x007B;
 
+    public const int WM_ACTIVATE = 0x0006;
+
     public static int HiWord(IntPtr ptr)
     {
         var val = (int)ptr;

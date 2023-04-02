@@ -22,9 +22,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using static flowOSD.Native.User32;
 
 sealed class DisplayBrightnessCommand : CommandBase
@@ -34,12 +35,9 @@ sealed class DisplayBrightnessCommand : CommandBase
 
     private static int WM_SHELLHOOK = RegisterWindowMessage("SHELLHOOK");
 
-    private static readonly IList<ParameterInfo> parameters = new ReadOnlyCollection<ParameterInfo>(
-        new ParameterInfo[]
-        {
-            new ParameterInfo(DOWN, "Down"),
-            new ParameterInfo(UP, "Up")
-        });
+    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
+        new CommandParameterInfo(DOWN, "Down", Images.Hardware_BrightnessDown),
+        new CommandParameterInfo(UP, "Up", Images.Hardware_BrightnessUp));
 
     private IConfig config;
     private IOsd osd;
@@ -56,11 +54,9 @@ sealed class DisplayBrightnessCommand : CommandBase
         Enabled = true;
     }
 
-    public override string Name => nameof(DisplayBrightnessCommand);
-
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<ParameterInfo> Parameters => parameters;
+    public override IList<CommandParameterInfo> Parameters => parameters;
 
     public override void Execute(object? parameter = null)
     {
@@ -93,9 +89,9 @@ sealed class DisplayBrightnessCommand : CommandBase
         // fail back:
 
         var icon = direction == DOWN
-            ? UIImages.Hardware_BrightnessDown
-            : UIImages.Hardware_BrightnessUp;
+            ? Images.Hardware_BrightnessDown
+            : Images.Hardware_BrightnessUp;
 
-        osd.Show(new OsdData(icon, displayBrightness.GetLevel()));
+        osd.Show(new OsdValue(displayBrightness.GetLevel(), icon));
     }
 }

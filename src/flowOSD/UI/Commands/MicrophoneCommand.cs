@@ -21,9 +21,10 @@ namespace flowOSD.UI.Commands;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Configs;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using static flowOSD.Extensions.Common;
 
 sealed class MicrophoneCommand : CommandBase
@@ -43,8 +44,6 @@ sealed class MicrophoneCommand : CommandBase
         Enabled = true;
     }
 
-    public override string Name => nameof(MicrophoneCommand);
-
     public override bool CanExecuteWithHotKey => true;
 
     public override async void Execute(object? parameter = null)
@@ -61,9 +60,9 @@ sealed class MicrophoneCommand : CommandBase
             await Task.Delay(500);
 
             var isMuted = microphone.IsMicMuted();
-            osd.Show(new OsdData(
-                isMuted ? UIImages.Hardware_MicMuted : UIImages.Hardware_Mic,
-                isMuted ? "Muted" : "On air"));
+            osd.Show(new OsdMessage(
+                isMuted ? "Muted" : "On air",
+                isMuted ? Images.Hardware_MicMuted : Images.Hardware_Mic));
         }
         catch (Exception ex)
         {
