@@ -78,6 +78,7 @@ sealed partial class Battery : IDisposable, IBattery
                 estimatedTimeSubject.Count,
                 powerStateSubject.Count,
                 (x1, x2, x3, x4) => x1 + x2 + x3 + x4)
+            .Throttle(TimeSpan.FromMilliseconds(500))
             .Subscribe(sum =>
             {
                 if (sum == 0 && updateSubscription != null)

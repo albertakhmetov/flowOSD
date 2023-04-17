@@ -43,7 +43,6 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private IAtk atk;
     private IAtkWmi atkWmi;
-    private ICpu cpu;
     private IKeyboard keyboard;
     private IKeyboardBacklight keyboardBacklight;
     private ITouchPad touchPad;
@@ -72,7 +71,6 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         atk = new Atk(config.Common.PerformanceModeOverrideEnabled ? config.Common.PerformanceModeOverride : null);
         atkWmi = new AtkWmi(atk);
-        cpu = new Cpu();
 
         if (config.UseOptimizationMode)
         {
@@ -100,7 +98,6 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         Register<IAtk>(atk);
         Register<IAtkWmi>(atkWmi);
-        Register<ICpu>(cpu);
         Register<IKeyboard>(keyboard);
         Register<IKeyboardBacklight>(keyboardBacklight);
         Register<ITouchPad>(touchPad);

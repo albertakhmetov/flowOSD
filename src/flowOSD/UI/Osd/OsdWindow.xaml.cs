@@ -52,6 +52,11 @@ public sealed partial class OsdWindow : Window, IDisposable
         ViewModel = new OsdViewModel();
 
         this.InitializeComponent();
+        if(Content is FrameworkElement element)
+        {
+            element.DataContext = ViewModel;
+        }
+
         backdrop = new AcrylicSystemBackdrop(this, true).DisposeWith(disposable);
         backdrop.TrySet();
 
@@ -92,7 +97,6 @@ public sealed partial class OsdWindow : Window, IDisposable
         hideTimer = null;
 
         ViewModel.Update(data);
-        Bindings.Update();
 
         var workArea = GetPrimaryWorkArea();
         root.Measure(new Windows.Foundation.Size(workArea.Width, workArea.Height));
@@ -100,7 +104,7 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         if (AppWindow.IsVisible != true)
         {
-            ShowAndActivate(this.GetHandle());
+            AppWindow.Show();
         }
 
         hideTimer = Observable

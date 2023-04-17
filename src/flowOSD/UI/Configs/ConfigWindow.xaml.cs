@@ -75,7 +75,6 @@ public sealed partial class ConfigWindow : Window, IDisposable
             .DisposeWith(disposable);
 
         VisibilityChanged += ConfigWindow_VisibilityChanged;
-
     }
 
     public IReadOnlyCollection<ConfigViewModelBase> ConfigViewModels { get; }

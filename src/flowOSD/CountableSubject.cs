@@ -84,14 +84,14 @@ internal sealed class CountableSubject<T> : ISubject<T>, IDisposable
             throw new ObjectDisposedException(nameof(CountableSubject<T>));
         }
 
-        countSubject!.OnNext(Interlocked.Increment(ref count));
+        countSubject?.OnNext(Interlocked.Increment(ref count));
 
         var decrement = Disposable.Create(() =>
         {
-            countSubject.OnNext(Interlocked.Decrement(ref count));
+            countSubject?.OnNext(Interlocked.Decrement(ref count));
         });
 
-        return new CompositeDisposable(baseSubject!.Subscribe(observer), decrement);
+        return new CompositeDisposable(baseSubject?.Subscribe(observer), decrement);
     }
 
 }

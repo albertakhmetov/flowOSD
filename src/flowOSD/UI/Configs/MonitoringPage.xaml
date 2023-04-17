@@ -28,7 +28,7 @@
 
         <StackPanel>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.ShowBatteryChargeRate, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding ShowBatteryChargeRate, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -40,7 +40,7 @@
             </Border>
 
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.ShowCpuTemperature, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding ShowCpuTemperature, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"

@@ -25,6 +25,8 @@ public interface IAtk
 
     IObservable<GpuMode> GpuMode { get; }
 
+    IObservable<int> CpuTemperature { get; }
+
     int Get(uint deviceId);
 
     void Set(uint deviceId, uint status);

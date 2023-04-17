@@ -20,6 +20,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using flowOSD.Extensions;
+using Microsoft.UI.Xaml;
 using Windows.Foundation;
 
 namespace flowOSD.Native;
@@ -402,9 +404,11 @@ static class User32
         return new Point(p.x, p.y);
     }
 
-    public static void ShowAndActivate(IntPtr handle)
+    public static void ShowAndActivate(Window window)
     {
         const int SW_SHOW = 1;
+
+        var handle = window.GetHandle();
 
         var currentlyFocusedWindowProcessId = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
         var appThread = GetWindowThreadProcessId(handle, IntPtr.Zero);
@@ -413,13 +417,13 @@ static class User32
         {
             AttachThreadInput(currentlyFocusedWindowProcessId, appThread, true);
             BringWindowToTop(handle);
-            ShowWindow(handle, SW_SHOW);
+            window.AppWindow.Show();
             AttachThreadInput(currentlyFocusedWindowProcessId, appThread, false);
         }
         else
         {
             BringWindowToTop(handle);
-            ShowWindow(handle, SW_SHOW);
+            window.AppWindow.Show();
         }
     }
 

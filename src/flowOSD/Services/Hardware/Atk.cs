@@ -45,12 +45,18 @@ sealed partial class Atk : IDisposable, IAtk
     public const uint CPU_Fan = 0x00110013;
     public const uint GPU_Fan = 0x00110014;
 
+    public const int CPU_TEMPERATURE = 0x00120094;
+    public const int Temp_GPU = 0x00120097;
+
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private readonly BehaviorSubject<PerformanceMode> performanceModeSubject;
     private readonly BehaviorSubject<GpuMode> gpuModeSubject;
+    private readonly CountableSubject<int> cpuTemperatureSubject;
 
     private SafeFileHandle handle;
+
+    private IDisposable? updateSubscription;
 
     private readonly object ControlLocker = new object();
 
@@ -73,16 +79,39 @@ sealed partial class Atk : IDisposable, IAtk
 
         performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Default);
         gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)Get(DEVID_GPU_ECO_MODE));
+        cpuTemperatureSubject = new CountableSubject<int>(Get(CPU_TEMPERATURE));
 
         PerformanceMode = performanceModeSubject.AsObservable();
         GpuMode = gpuModeSubject.AsObservable();
+        CpuTemperature = cpuTemperatureSubject.AsObservable();
 
         SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Default);
+
+        cpuTemperatureSubject.Count
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Subscribe(sum =>
+            {
+                if (sum == 0 && updateSubscription != null)
+                {
+                    updateSubscription.Dispose();
+                    updateSubscription = null;
+                }
+
+                if (sum > 0 && updateSubscription == null)
+                {
+                    updateSubscription = Observable.Interval(TimeSpan.FromSeconds(1))
+                        .Subscribe(_ => cpuTemperatureSubject?.OnNext(Get(CPU_TEMPERATURE)));
+                }
+            })
+            .DisposeWith(disposable);
     }
 
     public IObservable<PerformanceMode> PerformanceMode { get; }
 
     public IObservable<GpuMode> GpuMode { get; }
+
+    public IObservable<int> CpuTemperature { get; }
+
 
     public void SetPerformanceMode(PerformanceMode performanceMode)
     {

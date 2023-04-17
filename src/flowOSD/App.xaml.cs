@@ -35,7 +35,7 @@ using WinRT.Interop;
 
 public partial class App : Application
 {
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable;
 
     private IUpdater updater;
 
@@ -55,7 +55,9 @@ public partial class App : Application
 
     public App()
     {
-       this.InitializeComponent();
+        InitializeComponent();  
+        
+        disposable = new CompositeDisposable();
 
         configService = new ConfigService().DisposeWith(disposable);
         updater = new Updater(configService);
@@ -75,21 +77,11 @@ public partial class App : Application
             systemEvents,
             commandService,
             hardwareService.ResolveNotNull<IAtkWmi>()).DisposeWith(disposable);
-        notifyIconService.Show();
-    }
-
-    public bool IsShuttingDown { get; private set; }
-
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
-    {
-
-        base.OnLaunched(args);
+        notifyIconService.Show();     
     }
 
     public void ShutDown()
     {
-        IsShuttingDown = true;
-
         notifyIconService.Hide();
 
         disposable?.Dispose();

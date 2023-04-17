@@ -29,6 +29,7 @@ using static flowOSD.Native.User32;
 using Windows.Foundation;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.UI.NotifyIcon;
 using System.Runtime.InteropServices;
 using System.Reactive.Linq;
 using Microsoft.UI.Xaml;
@@ -38,7 +39,8 @@ sealed class NotifyMenuCommand : CommandBase
     private IConfig config;
     private ISystemEvents systemEvents;
     private ICommandService commandService;
-    private NotifyMenuWindow window;
+    private NotifyMenuWindow? window;
+    private NotifyMenuViewModel viewModel;
 
     public NotifyMenuCommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService)
     {
@@ -46,7 +48,9 @@ sealed class NotifyMenuCommand : CommandBase
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-        window = new NotifyMenuWindow(this.systemEvents, this.commandService).DisposeWith(Disposable!);
+        viewModel = new NotifyMenuViewModel(commandService);
+
+        window = new NotifyMenuWindow(this.systemEvents);
         window.Activated += OnWindowActivated;
 
         var presenter = OverlappedPresenter.CreateForContextMenu();
@@ -71,9 +75,24 @@ sealed class NotifyMenuCommand : CommandBase
         const int offsetY = 5;
 
         window.AppWindow.Move(new Windows.Graphics.PointInt32(0, 0));
-        window.UpdateSize();
 
         var workArea = GetPrimaryWorkArea();
+
+        var scale = GetDpiForWindow(window.GetHandle()) / 96f;
+
+        if (window.Content is FrameworkElement root)
+        {
+            root.Measure(new Size(workArea.Width, workArea.Height));
+            root.DataContext = viewModel;
+        }
+        else
+        {
+            return;
+        }
+
+        window.AppWindow.Resize(new Windows.Graphics.SizeInt32(
+            (int)(root.DesiredSize.Width * scale),
+            (int)(root.DesiredSize.Height * scale)));
 
         if (parameter is Rect rect && !rect.IsEmpty
             && !workArea.Contains(new Point(rect.Left + rect.Width / 2, rect.Top + rect.Height / 2)))
@@ -92,17 +111,31 @@ sealed class NotifyMenuCommand : CommandBase
                 (int)(pos.Y - window.AppWindow.Size.Height)));
         }
 
+        ShowAndActivate(window);
+    }
 
-        ShowAndActivate(window.GetHandle());
+    public override void Dispose()
+    {
+        if (window != null)
+        {
+            window.Dispose();
+            window.Activated -= OnWindowActivated;
+            if (window.AppWindow != null)
+            {
+                window.AppWindow.Closing -= OnWindowClosing;
+            }
+
+            window.Close();
+            window = null;
+        }
+
+        base.Dispose();
     }
 
     private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        if (Application.Current is App app)
-        {
-            args.Cancel = !app.IsShuttingDown;
-            sender.Hide();
-        }
+        args.Cancel = true;
+        sender.Hide();
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)

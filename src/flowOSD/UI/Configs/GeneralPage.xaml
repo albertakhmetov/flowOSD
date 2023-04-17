@@ -25,27 +25,27 @@
             <Border Style="{StaticResource CxConfigBorderStyle}">
                 <ToggleSwitch HorizontalAlignment="Stretch"
                     Header="{x:Bind resources:Text.Instance.Config.RunAtStartup}"
-                    IsOn="{x:Bind ViewModel.RunAtStartup, Mode=TwoWay}" />
+                    IsOn="{Binding RunAtStartup, Mode=TwoWay}" />
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
                 <ToggleSwitch HorizontalAlignment="Stretch"
                     Header="{x:Bind resources:Text.Instance.Config.DisableTouchPadInTabletMode}"
-                    IsOn="{x:Bind ViewModel.DisableTouchPadInTabletMode, Mode=TwoWay}" />
+                    IsOn="{Binding DisableTouchPadInTabletMode, Mode=TwoWay}" />
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
                 <ToggleSwitch HorizontalAlignment="Stretch"
                     Header="{x:Bind resources:Text.Instance.Config.ControlDisplayRefreshRate}"
-                    IsOn="{x:Bind ViewModel.ControlDisplayRefreshRate, Mode=TwoWay}" />
+                    IsOn="{Binding ControlDisplayRefreshRate, Mode=TwoWay}" />
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
                 <ToggleSwitch HorizontalAlignment="Stretch"
                     Header="{x:Bind resources:Text.Instance.Config.ConfirmGpuModeChange}"
-                    IsOn="{x:Bind ViewModel.ConfirmGpuModeChange, Mode=TwoWay}" />
+                    IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
                 <ToggleSwitch HorizontalAlignment="Stretch"
                     Header="{x:Bind resources:Text.Instance.Config.CheckForUpdates}"
-                    IsOn="{x:Bind ViewModel.CheckForUpdates, Mode=TwoWay}" />
+                    IsOn="{Binding CheckForUpdates, Mode=TwoWay}" />
             </Border>
         </StackPanel>
 

@@ -66,7 +66,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 new MonitoringViewModel(config),
             };
 
-            window = new ConfigWindow(systemEvents, viewModels).DisposeWith(Disposable!);
+            window = new ConfigWindow(systemEvents, viewModels);
             window.AppWindow.Closing += OnWindowClosing;
 
             var scale = GetDpiForWindow(window.GetHandle()) / 96f;
@@ -81,23 +81,24 @@ sealed class ConfigCommand : CommandBase, IDisposable
 
     public override void Dispose()
     {
-        if (window?.AppWindow != null)
+        if (window != null)
         {
-            window.AppWindow.Closing -= OnWindowClosing;
-            window.AppWindow.Destroy();
-        }
+            window.Dispose();
+            if (window.AppWindow != null)
+            {
+                window.AppWindow.Closing -= OnWindowClosing;
+            }
 
-        window = null;
+            window.Close();
+            window = null;
+        }
 
         base.Dispose();
     }
 
     private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        if (Application.Current is App app)
-        {
-            args.Cancel = !app.IsShuttingDown;
-            sender.Hide();
-        }
+        args.Cancel = true;
+        sender.Hide();
     }
 }

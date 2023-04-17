@@ -17,7 +17,7 @@
  *
  */
 
-namespace flowOSD.UI;
+namespace flowOSD.UI.NotifyIcon;
 
 using flowOSD.Native;
 using Microsoft.UI.Xaml;
@@ -42,22 +42,14 @@ public sealed partial class NotifyMenuWindow : Window, IDisposable
     private AcrylicSystemBackdrop backdrop;
 
     private ISystemEvents systemEvents;
-    private ICommandService commandService;
 
-    public NotifyMenuWindow(ISystemEvents systemEvents, ICommandService commandService)
+    public NotifyMenuWindow(ISystemEvents systemEvents)
     {
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
-        this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
         this.InitializeComponent();
         backdrop = new AcrylicSystemBackdrop(this).DisposeWith(disposable);
         backdrop.TrySet();
-
-        MainUICommand = this.commandService.ResolveNotNull<MainUICommand>();
-        ConfigCommand = this.commandService.ResolveNotNull<ConfigCommand>();
-        ExitCommand = this.commandService.ResolveNotNull<ExitCommand>();
-
-        root.LayoutUpdated += Root_LayoutUpdated;
 
         AddExStyle(this.GetHandle(), WS_EX_TOOLWINDOW);
 
@@ -67,44 +59,10 @@ public sealed partial class NotifyMenuWindow : Window, IDisposable
             .DisposeWith(disposable);
     }
 
-    ~NotifyMenuWindow()
-    {
-        Dispose(disposing: false);
-    }
-
-    public CommandBase MainUICommand { get; }
-
-    public CommandBase ConfigCommand { get; }
-
-    public CommandBase ExitCommand { get; }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    public void UpdateSize()
-    {
-        if (AppWindow == null)
-        {
-            return;
-        }
-
-        var scale = GetDpiForWindow(this.GetHandle()) / 96f;
-
-        AppWindow.Resize(new Windows.Graphics.SizeInt32(
-            (int)(root.DesiredSize.Width * scale),
-            (int)(root.DesiredSize.Height * scale)));
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            disposable?.Dispose();
-            disposable = null;
-        }
+        disposable?.Dispose();
+        disposable = null;
     }
 
     private void UpdateTheme(bool isDark)
@@ -115,11 +73,6 @@ public sealed partial class NotifyMenuWindow : Window, IDisposable
         {
             content.RequestedTheme = isDark ? ElementTheme.Dark : ElementTheme.Light;
         }
-    }
-
-    private void Root_LayoutUpdated(object? sender, object e)
-    {
-        UpdateSize();
     }
 
     private void OnMenuFlyoutItemClick(object sender, RoutedEventArgs e)

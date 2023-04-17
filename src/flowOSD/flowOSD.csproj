@@ -16,7 +16,7 @@
 		<Copyright>© 2021-2023, Albert Akhmetov</Copyright>
 		<Authors>Albert Akhmetov</Authors>
 		<Product>flowOSD</Product>
-		<Version>3.0.0-dev414</Version>
+		<Version>3.0.0-dev417</Version>
 		<Platforms>x64</Platforms>
 		<PackageIcon></PackageIcon>
 		<PackageIconUrl />
@@ -60,9 +60,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="UI\NotifyMenu\**" />
 	  <Compile Remove="_UI\**" />
+	  <EmbeddedResource Remove="UI\NotifyMenu\**" />
 	  <EmbeddedResource Remove="_UI\**" />
+	  <None Remove="UI\NotifyMenu\**" />
 	  <None Remove="_UI\**" />
+	  <Page Remove="UI\NotifyMenu\**" />
 	  <Page Remove="_UI\**" />
 	</ItemGroup>
 
@@ -143,5 +147,9 @@
 	  <None Remove="UI\Styles\CxProgressBar.xaml" />
 	  <None Remove="UI\Styles\CxSplitButton.xaml" />
 	  <None Remove="UI\Styles\CxToggleSwitch.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PRIResource Remove="UI\NotifyMenu\**" />
 	</ItemGroup>
 </Project>

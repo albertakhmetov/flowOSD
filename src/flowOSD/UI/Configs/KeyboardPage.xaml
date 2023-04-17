@@ -35,13 +35,13 @@
                                Text="{x:Bind resources:Text.Instance.Config.KeyboardBacklightTimeout}"/>
                     <ComboBox Grid.Column="1"
                               HorizontalAlignment="Stretch"
-                              SelectedItem="{x:Bind ViewModel.KeyboardBacklightTimeout, Mode=TwoWay}"
-                              ItemsSource="{x:Bind ViewModel.Timeouts}">
-                        <ComboBox.ItemTemplate>
+                              SelectedItem="{Binding KeyboardBacklightTimeout, Mode=TwoWay}"
+                              ItemsSource="{Binding Timeouts}">
+                        <!--<ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="sys:Int32">
                                 <TextBlock Text="{x:Bind local:KeyboardViewModel.GetTimeoutText((sys:Int32))}" />
                             </DataTemplate>
-                        </ComboBox.ItemTemplate>
+                        </ComboBox.ItemTemplate>-->
                     </ComboBox>
                 </Grid>
             </Border>
@@ -49,14 +49,14 @@
             <Border Style="{StaticResource CxConfigBorderStyle}">
                 <ToggleSwitch HorizontalAlignment="Stretch"
                               Header="{x:Bind resources:Text.Instance.Config.KeyboardBacklightWithDisplay}"
-                              IsOn="{x:Bind ViewModel.KeyboardBacklightWithDisplay, Mode=TwoWay}" />
+                              IsOn="{Binding KeyboardBacklightWithDisplay, Mode=TwoWay}" />
             </Border>
 
             <TextBlock Text="{x:Bind resources:Text.Instance.Config.HotKeys}"
                        FontWeight="SemiBold"
                        Margin="10,30,0,5"/>
 
-            <ItemsControl ItemsSource="{x:Bind ViewModel.HotKeys}" Background="Transparent">
+            <ItemsControl ItemsSource="{Binding HotKeys}" Background="Transparent">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:HotKeyViewModel">
                         <Border Style="{StaticResource CxConfigBorderStyle}">
@@ -79,17 +79,17 @@
                                         CornerRadius="{ThemeResource ControlCornerRadius}"
                                         Padding="5,2">
                                     <TextBlock VerticalAlignment="Center"
-                                               Text="{x:Bind Text}"/>
+                                               Text="{Binding Text}"/>
                                 </Border>
 
                                 <ComboBox Grid.Column="1"
                                           Grid.ColumnSpan="2"
                                           HorizontalAlignment="Stretch"
-                                          SelectedItem="{x:Bind Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          ItemsSource="{x:Bind Commands}">
+                                          SelectedItem="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                          ItemsSource="{Binding Commands}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate x:DataType="commands:CommandBase">
-                                            <TextBlock VerticalAlignment="Center" Text="{x:Bind Description}"/>
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding Description}"/>
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
@@ -99,19 +99,19 @@
                                            Margin="0,10,10,0"
                                            Grid.Column="1"
                                            Grid.Row="1" 
-                                           Visibility="{x:Bind ParametersVisibility, Mode=OneWay}" 
+                                           Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
                                            Text="{x:Bind resources:Text.Instance.Config.HotKeyAction}"/>
                                 <ComboBox HorizontalAlignment="Stretch"
-                                          Visibility="{x:Bind ParametersVisibility, Mode=OneWay}" 
+                                          Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
                                           Grid.Row="1" 
                                           Grid.Column="2"
                                           Margin="0,10,0,0"
-                                          SelectedValue="{x:Bind Parameter, Mode=TwoWay}"
+                                          SelectedValue="{Binding Parameter, Mode=TwoWay}"
                                           SelectedValuePath="Value"
-                                          ItemsSource="{x:Bind Command.Parameters, Mode=OneWay}">
+                                          ItemsSource="{Binding Command.Parameters, Mode=OneWay}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate x:DataType="commands:CommandParameterInfo">
-                                            <TextBlock VerticalAlignment="Center" Text="{x:Bind Description}"/>
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding Description}"/>
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>

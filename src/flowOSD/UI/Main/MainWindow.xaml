@@ -8,7 +8,7 @@
     xmlns:local="using:flowOSD.UI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:core="using:flowOSD.Core"
+    xmlns:converters="using:flowOSD.UI.Converters"
     xmlns:hardware="using:flowOSD.Core.Hardware"
     xmlns:resources="using:flowOSD.Core.Resources"
     mc:Ignorable="d">
@@ -19,6 +19,8 @@
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="../Styles/CxSplitButton.xaml"/>
                     <ResourceDictionary>
+                        <converters:VisibilityConverter x:Key="VisibilityConverter"/>
+
                         <Style x:Name="ButtonStyle" TargetType="ButtonBase">
                             <Style.Setters>
                                 <Setter Property="MinHeight" Value="45"/>
@@ -78,8 +80,8 @@
             <ToggleButton Grid.Row="0" 
                           Grid.Column="0" 
                           Style="{StaticResource ButtonStyle}"
-                          IsChecked="{x:Bind ViewModel.BoostCommand.IsChecked, Mode=OneWay}"
-                          Command="{x:Bind ViewModel.BoostCommand}">
+                          IsChecked="{Binding BoostCommand.IsChecked, Mode=OneWay}"
+                          Command="{Binding BoostCommand, Mode=OneTime}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                           Glyph="{x:Bind resources:Images.Hardware_Cpu}"/>
             </ToggleButton>
@@ -88,42 +90,42 @@
             <ToggleSplitButton Style="{StaticResource SplitButtonStyle}" 
                                Grid.Row="0" 
                                Grid.Column="1"
-                               IsChecked="{x:Bind ViewModel.IsPerformaceModeOverrideEnabled, Mode=OneWay}"
-                               Command="{x:Bind ViewModel.TogglePerformanceModeOverrideCommand}">
+                               IsChecked="{Binding IsPerformaceModeOverrideEnabled, Mode=OneWay}"
+                               Command="{Binding TogglePerformanceModeOverrideCommand, Mode=OneTime}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                          Glyph="{x:Bind ViewModel.PerformanceModeOverrideImage, Mode=OneWay}"/>
+                          Glyph="{Binding PerformanceModeOverrideImage, Mode=OneWay}"/>
                 <ToggleSplitButton.Flyout>
                     <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PerformanceMode.Turbo)}" 
-                                        Command="{x:Bind ViewModel.PerformanceModeCommand}" 
+                                        Command="{Binding PerformanceModeCommand, Mode=OneTime}" 
                                         CommandParameter="{x:Bind hardware:PerformanceMode.Turbo}"/>
                         <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PerformanceMode.Silent)}" 
-                                        Command="{x:Bind ViewModel.PerformanceModeCommand}" 
+                                        Command="{Binding PerformanceModeCommand, Mode=OneTime}" 
                                         CommandParameter="{x:Bind hardware:PerformanceMode.Silent}"/>
                     </MenuFlyout>
                 </ToggleSplitButton.Flyout>
             </ToggleSplitButton>
             <TextBlock Grid.Row="1" 
                        Grid.Column="1" 
-                       Text="{x:Bind ViewModel.PerformanceModeOverrideText, Mode=OneWay}" 
+                       Text="{Binding PerformanceModeOverrideText, Mode=OneWay}" 
                        Style="{StaticResource LabelStyle}"/>
 
             <DropDownButton Grid.Row="0" 
                             Grid.Column="2" 
-                            Visibility="{x:Bind local:ViewModelBase.BoolNotToVisiblity(ViewModel.IsBatterySaver), Mode=OneWay}"
+                            Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}, ConverterParameter='!'}"
                             Style="{StaticResource ButtonStyle}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                          Glyph="{x:Bind ViewModel.PowerModeImage, Mode=OneWay}"/>
+                          Glyph="{Binding PowerModeImage, Mode=OneWay}"/>
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PowerMode.BestPowerEfficiency)}" 
-                                        Command="{x:Bind ViewModel.PowerModeCommand}" 
+                                        Command="{Binding PowerModeCommand, Mode=OneTime}" 
                                         CommandParameter="{x:Bind hardware:PowerMode.BestPowerEfficiency}"/>
                         <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PowerMode.Balanced)}" 
-                                        Command="{x:Bind ViewModel.PowerModeCommand}" 
+                                        Command="{Binding PowerModeCommand, Mode=OneTime}" 
                                         CommandParameter="{x:Bind hardware:PowerMode.Balanced}"/>
                         <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PowerMode.BestPerformance)}" 
-                                        Command="{x:Bind ViewModel.PowerModeCommand}" 
+                                        Command="{Binding PowerModeCommand, Mode=OneTime}" 
                                         CommandParameter="{x:Bind hardware:PowerMode.BestPerformance}"/>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
@@ -131,15 +133,15 @@
 
             <TextBlock Grid.Row="1" 
                        Grid.Column="2" 
-                       Visibility="{x:Bind local:ViewModelBase.BoolNotToVisiblity(ViewModel.IsBatterySaver), Mode=OneWay}"
-                       Text="{x:Bind ViewModel.PowerModeText, Mode=OneWay}" 
+                       Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}, ConverterParameter='!'}"
+                       Text="{Binding PowerModeText, Mode=OneWay}" 
                        Style="{StaticResource LabelStyle}"/>
 
             <Button Style="{StaticResource ButtonStyle}"
                     IsEnabled="False"
                     Grid.Row="0" 
                     Grid.Column="2" 
-                    Visibility="{x:Bind ViewModel.IsBatterySaver, Mode=OneWay}">
+                    Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                           Glyph="{x:Bind resources:Images.Power_BatterySaver, Mode=OneWay}"/>
             </Button>
@@ -148,13 +150,13 @@
                        Grid.Column="2" 
                        Text="{x:Bind resources:Text.Instance.Main.BatterySaver}" 
                        Style="{StaticResource LabelStyle}"
-                       Visibility="{x:Bind ViewModel.IsBatterySaver, Mode=OneWay}"/>
+                       Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
 
             <ToggleButton Grid.Row="2" 
                           Grid.Column="0" 
                           Style="{StaticResource ButtonStyle}"
-                          IsChecked="{x:Bind ViewModel.DisplayRefreshRateCommand.IsChecked, Mode=OneWay}"
-                          Command="{x:Bind ViewModel.DisplayRefreshRateCommand}">
+                          IsChecked="{Binding DisplayRefreshRateCommand.IsChecked, Mode=OneWay}"
+                          Command="{Binding DisplayRefreshRateCommand, Mode=OneTime}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                           Glyph="{x:Bind resources:Images.Hardware_Screen}"/>
             </ToggleButton>
@@ -166,8 +168,8 @@
             <ToggleButton Grid.Row="2" 
                           Grid.Column="1" 
                           Style="{StaticResource ButtonStyle}"
-                          IsChecked="{x:Bind ViewModel.GpuCommand.IsChecked, Mode=OneWay}"
-                          Command="{x:Bind ViewModel.GpuCommand}">
+                          IsChecked="{Binding GpuCommand.IsChecked, Mode=OneWay}"
+                          Command="{Binding GpuCommand, Mode=OneTime}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                           Glyph="{x:Bind resources:Images.Hardware_Gpu}"/>
             </ToggleButton>
@@ -179,8 +181,8 @@
             <ToggleButton Grid.Row="2" 
                           Grid.Column="2" 
                           Style="{StaticResource ButtonStyle}"
-                          IsChecked="{x:Bind ViewModel.TouchPadCommand.IsChecked, Mode=OneWay}"
-                          Command="{x:Bind ViewModel.TouchPadCommand}">
+                          IsChecked="{Binding TouchPadCommand.IsChecked, Mode=OneWay}"
+                          Command="{Binding TouchPadCommand, Mode=OneTime}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                           Glyph="{x:Bind resources:Images.Hardware_TouchPad}"/>
             </ToggleButton>
@@ -215,18 +217,17 @@
                     </Style>
                 </StackPanel.Resources>
                 <StackPanel Orientation="Horizontal"
-                            Visibility="{x:Bind ViewModel.ShowBatteryChargeRate, Mode=OneWay}"
-                            ToolTipService.ToolTip="{x:Bind ViewModel.BatteryChargeRateInfo, Mode=OneWay}">                   
+                            Visibility="{Binding ShowBatteryChargeRate, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                              Glyph="{x:Bind ViewModel.BatteryChargeRateIcon, Mode=OneWay}"/>
-                    <TextBlock Text="{x:Bind ViewModel.BatteryChargeRate, Mode=OneWay}"/>
+                              x:Name="batteryChargeRateIcon"/>
+                    <TextBlock x:Name="batteryChargeRate"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
-                            Visibility="{x:Bind ViewModel.ShowCpuTemperature, Mode=OneWay}">
+                            Visibility="{Binding ShowCpuTemperature, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
                               Glyph="{x:Bind resources:Images.Temperature}"/>
-                    <TextBlock Text="{x:Bind ViewModel.CpuTemperature, Mode=OneWay}"/>
+                    <TextBlock x:Name="cpuTemperature"/>
                 </StackPanel>
             </StackPanel>
 
@@ -235,7 +236,7 @@
                     Height="40"
                     Background="Transparent"
                     BorderBrush="Transparent"
-                    Command="{x:Bind ViewModel.ConfigCommand}">
+                    Command="{Binding ConfigCommand, Mode=OneTime}">
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
                           FontSize="16"
                           Glyph="{x:Bind resources:Images.Settings}"/>

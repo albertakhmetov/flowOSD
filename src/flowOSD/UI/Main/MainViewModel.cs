@@ -35,14 +35,9 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     private IConfig config;
     private IPowerManagement powerManagement;
-    private IBattery battery;
-    private ICpu cpu;
 
     private string powerModeText, powerModeImage;
     private bool isBatterySaver;
-
-    private bool showBatteryChargeRate, showCpuTemperature;
-    private string batteryChargeRate, batteryChargeRateIcon, batteryChargeRateInfo, cpuTemperature;
 
     private IDisposable? updatesDisposable;
 
@@ -61,8 +56,6 @@ public class MainViewModel : ViewModelBase, IDisposable
         this.config = config ?? throw new ArgumentNullException(nameof(config));
 
         powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
-        battery = hardwareService.ResolveNotNull<IBattery>();
-        cpu = hardwareService.ResolveNotNull<ICpu>();
 
         BoostCommand = commandService.ResolveNotNull<ToggleBoostCommand>();
         PerformanceModeCommand = commandService.ResolveNotNull<PerformanceModeCommand>();
@@ -118,30 +111,6 @@ public class MainViewModel : ViewModelBase, IDisposable
         set => SetProperty(ref powerModeImage, value);
     }
 
-    public string BatteryChargeRate
-    {
-        get => batteryChargeRate;
-        set => SetProperty(ref batteryChargeRate, value);
-    }
-
-    public string BatteryChargeRateIcon
-    {
-        get => batteryChargeRateIcon;
-        set => SetProperty(ref batteryChargeRateIcon, value);
-    }
-
-    public string BatteryChargeRateInfo
-    {
-        get => batteryChargeRateInfo;
-        set => SetProperty(ref batteryChargeRateInfo, value);
-    }
-
-    public string CpuTemperature
-    {
-        get => cpuTemperature;
-        set => SetProperty(ref cpuTemperature, value);
-    }
-
     public bool ShowBatteryChargeRate
     {
         get => config.Common.ShowBatteryChargeRate;
@@ -164,6 +133,7 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public void Activate()
     {
+        updatesDisposable?.Dispose();
         updatesDisposable = InitSubscriptions();
     }
 
@@ -213,25 +183,6 @@ public class MainViewModel : ViewModelBase, IDisposable
             .Subscribe(OnPropertyChanged)
             .DisposeWith(localDisposable);
 
-        if(config.Common.ShowBatteryChargeRate)
-        {
-            battery.Rate
-                .CombineLatest(
-                    battery.Capacity,
-                    battery.PowerState,
-                    battery.EstimatedTime,
-                    (rate, capacity, powerState, estimatedTime) => new { rate, capacity, powerState, estimatedTime })
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(x => UpdateBattery(x.rate, x.capacity, x.powerState, x.estimatedTime));
-        }
-
-        if (cpu.IsAvailable && config.Common.ShowCpuTemperature)
-        {
-            cpu.Temperature
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(value => CpuTemperature = value == 0 ? string.Empty : $"{value} °C");
-        }
-
         return localDisposable;
     }
 
@@ -243,47 +194,5 @@ public class MainViewModel : ViewModelBase, IDisposable
         disposable = null;
     }
 
-    private void UpdateBattery(int rate, uint capacity, BatteryPowerState powerState, uint estimatedTime)
-    {
-        var isEmptyRate = Math.Abs(rate) < 100;
-
-        BatteryChargeRateIcon = Images.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
-        BatteryChargeRate = isEmptyRate ? "" : $"{rate / 1000f:N1} W";
-
-        var time = TimeSpan.FromSeconds(estimatedTime);
-        var builder = new StringBuilder();
-        builder.Append($"{capacity * 100f / battery.FullChargedCapacity:N0}%");
-
-        if (isEmptyRate)
-        {
-            builder.Append("");
-        }
-        else if ((powerState & BatteryPowerState.Discharging) == BatteryPowerState.Discharging)
-        {
-            builder.Append(" remaining");
-        }
-        else if ((powerState & BatteryPowerState.Charging) == BatteryPowerState.Charging)
-        {
-            builder.Append(" available");
-        }
-
-        if ((powerState & BatteryPowerState.PowerOnLine) == BatteryPowerState.PowerOnLine)
-        {
-            builder.Append(" (plugged in)");
-        }
-
-        if (!isEmptyRate && (powerState & BatteryPowerState.Discharging) == BatteryPowerState.Discharging && time.TotalMinutes > 1)
-        {
-            builder.AppendLine();
-
-            if (time.Hours > 0)
-            {
-                builder.Append($"{time.Hours}h ");
-            }
-
-            builder.Append($"{time.Minutes.ToString().PadLeft(2, '0')}min");
-        }
-
-        BatteryChargeRateInfo = builder.ToString();
-    }
+    
 }

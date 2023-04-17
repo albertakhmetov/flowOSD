@@ -29,7 +29,7 @@
 
         <StackPanel>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.PerformanceMode, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding PerformanceMode, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -40,7 +40,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.PowerMode, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding PowerMode, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -51,7 +51,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.PowerSource, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding PowerSource, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -62,7 +62,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.Boost, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding Boost, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -73,7 +73,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.TouchPad, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding TouchPad, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -84,7 +84,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.DisplayRefreshRate, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding DisplayRefreshRate, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -95,7 +95,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.Mic, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding Mic, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
@@ -106,7 +106,7 @@
                 </ToggleSwitch>
             </Border>
             <Border Style="{StaticResource CxConfigBorderStyle}">
-                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{x:Bind ViewModel.Gpu, Mode=TwoWay}">
+                <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding Gpu, Mode=TwoWay}">
                     <ToggleSwitch.Header>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"

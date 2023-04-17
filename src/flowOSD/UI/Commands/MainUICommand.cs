@@ -41,8 +41,11 @@ sealed class MainUICommand : CommandBase
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
-        window = new MainWindow(this.systemEvents, new MainViewModel(config, commandService, hardwareService).DisposeWith(Disposable!))
-            .DisposeWith(Disposable!);
+        window = new MainWindow(
+            config,
+            this.systemEvents,
+           hardwareService,
+            new MainViewModel(config, commandService, hardwareService).DisposeWith(Disposable!));
         window.Activated += OnWindowActivated;
 
         var presenter = OverlappedPresenter.CreateForDialog();
@@ -61,9 +64,9 @@ sealed class MainUICommand : CommandBase
 
     public override bool CanExecuteWithHotKey => true;
 
-    public override async void Execute(object? parameter = null)
+    public override void Execute(object? parameter = null)
     {
-        if (window == null || GetTickCount() - deactivateTime < 100)
+        if (window?.AppWindow == null || GetTickCount() - deactivateTime < 100)
         {
             return;
         }
@@ -89,20 +92,29 @@ sealed class MainUICommand : CommandBase
             (int)(workArea.Width - window.AppWindow.Size.Width - offsetX),
             (int)(workArea.Height - window.AppWindow.Size.Height - offsetY)));
 
-        ShowAndActivate(window.GetHandle());
+        ShowAndActivate(window);
     }
 
-    private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    public override void Dispose()
     {
         if (window != null)
         {
+            window.Dispose();
             window.Activated -= OnWindowActivated;
             if (window.AppWindow != null)
             {
                 window.AppWindow.Closing -= OnWindowClosing;
             }
+
+            window.Close();
+            window = null;
         }
 
+        base.Dispose();
+    }
+
+    private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
         if (Application.Current is App app)
         {
             app.ShutDown();

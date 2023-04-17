@@ -75,7 +75,7 @@ sealed class CommandService : ICommandService, IDisposable
         Register(() => new KeyboardBacklightCommand(config, osd, hardwareService.ResolveNotNull<IKeyboardBacklight>()));
         Register(() => new SuspendCommand());
 
-        Register(new NotifyMenuCommand(this.config, systemEvents, this));
+        Register(() => new NotifyMenuCommand(this.config, systemEvents, this));
     }
 
     public void Dispose()
