@@ -70,9 +70,12 @@ sealed partial class Osd : IOsd, IDisposable
 
     public void Dispose()
     {
-        if(window != null)
+        if (window != null)
         {
-            window.Close();
+            //window.Close();
+
+            window.AppWindow?.Destroy();
+            window.Dispose();
             window = null;
         }
 

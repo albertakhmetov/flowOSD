@@ -51,8 +51,8 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         ViewModel = new OsdViewModel();
 
-        this.InitializeComponent();
-        if(Content is FrameworkElement element)
+        InitializeComponent();
+        if (Content is FrameworkElement element)
         {
             element.DataContext = ViewModel;
         }
@@ -128,7 +128,7 @@ public sealed partial class OsdWindow : Window, IDisposable
         var scale = GetDpiForWindow(this.GetHandle()) / 96f;
         var workArea = GetPrimaryWorkArea();
 
-        var width = ViewModel.IsValue ? (int)(260) : (int)(root.DesiredSize.Width*scale);
+        var width = ViewModel.IsValue ? (int)(260) : (int)(root.DesiredSize.Width * scale);
         var height = (int)(72f);
 
         var x = (int)((workArea.Width - width) / 2);

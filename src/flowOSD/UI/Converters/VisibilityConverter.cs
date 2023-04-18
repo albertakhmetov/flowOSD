@@ -25,7 +25,7 @@ using Microsoft.UI.Xaml.Data;
 
 public sealed class VisibilityConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public object? Convert(object? value, Type targetType, object? parameter, string language)
     {
         if (targetType == typeof(Visibility) && value is bool b)
         {
@@ -34,10 +34,15 @@ public sealed class VisibilityConverter : IValueConverter
                 : (b ? Visibility.Visible : Visibility.Collapsed);
         }
 
+        if (targetType == typeof(Visibility) && value is object)
+        {
+            return value == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, string language)
     {
         return value;
     }

@@ -83,13 +83,14 @@ sealed class ConfigCommand : CommandBase, IDisposable
     {
         if (window != null)
         {
-            window.Dispose();
             if (window.AppWindow != null)
             {
                 window.AppWindow.Closing -= OnWindowClosing;
             }
 
-            window.Close();
+            window.AppWindow?.Destroy();
+            window.Dispose();
+            //window.Close();
             window = null;
         }
 

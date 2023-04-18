@@ -10,8 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Width="Auto" Height="Auto" Padding="3" Background="Transparent">
-       
+    <Grid Width="Auto" Height="Auto" Padding="3" Background="Transparent">       
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
@@ -24,23 +23,28 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <MenuFlyoutItem Grid.Row="0" 
-                        Text="{Binding MainUICommand.Text, Mode=OneWay}" 
-                        Command="{Binding MainUICommand}" 
-                        Click="OnMenuFlyoutItemClick"/>
-        <MenuFlyoutSeparator Grid.Row="1" 
-                             IsTabStop="False"/>
-        <MenuFlyoutItem Grid.Row="2" Text="{Binding ConfigCommand.Text, Mode=OneWay}" 
-                        Command="{Binding ConfigCommand, Mode=OneTime}" 
-                        Click="OnMenuFlyoutItemClick"/>
-        <MenuFlyoutItem Grid.Row="3"
-                        Text="Check for updates"
-                        IsEnabled="false"
-                        Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutItem 
+            Grid.Row="0" 
+            Text="{Binding MainUICommand.Text, Mode=OneWay}"
+            Command="{Binding MainUICommand}" 
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutSeparator 
+            Grid.Row="1" 
+            IsTabStop="False"/>
+        <MenuFlyoutItem 
+            Grid.Row="2" Text="{Binding ConfigCommand.Text, Mode=OneWay}" 
+            Command="{Binding ConfigCommand, Mode=OneTime}" 
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutItem
+            Grid.Row="3"
+            Text="Check for updates"
+            IsEnabled="false"
+            Click="OnMenuFlyoutItemClick"/>
         <MenuFlyoutSeparator Grid.Row="4" IsTabStop="False"/>
-        <MenuFlyoutItem Grid.Row="5" 
-                        Text="{Binding ExitCommand.Text, Mode=OneWay}" 
-                        Command="{Binding ExitCommand, Mode=OneTime}" 
-                        Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutItem 
+            Grid.Row="5" 
+            Text="{Binding ExitCommand.Text, Mode=OneWay}" 
+            Command="{Binding ExitCommand, Mode=OneTime}" 
+            Click="OnMenuFlyoutItemClick"/>
     </Grid>
 </Window>

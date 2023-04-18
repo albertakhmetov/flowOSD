@@ -47,7 +47,8 @@ public sealed partial class NotifyMenuWindow : Window, IDisposable
     {
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
-        this.InitializeComponent();
+        InitializeComponent();
+
         backdrop = new AcrylicSystemBackdrop(this).DisposeWith(disposable);
         backdrop.TrySet();
 

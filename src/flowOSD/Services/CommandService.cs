@@ -66,16 +66,15 @@ sealed class CommandService : ICommandService, IDisposable
             hardwareService.ResolveNotNull<IDisplay>(),
             config.Common));
 
-        Register(() => new ConfigCommand(config, systemEvents, this, hardwareService));
-        Register(()=>new MainUICommand(this.config, systemEvents, this, hardwareService));
         Register(() => new ExitCommand());
+        Register(() => new SuspendCommand());
 
+        Register(() => new ConfigCommand(config, systemEvents, this, hardwareService));
+        Register(() => new MainUICommand(this.config, systemEvents, this, hardwareService));
+        Register(() => new NotifyMenuCommand(this.config, systemEvents, this));
 
         Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(config, osd, hardwareService.ResolveNotNull<IKeyboardBacklight>()));
-        Register(() => new SuspendCommand());
-
-        Register(() => new NotifyMenuCommand(this.config, systemEvents, this));
     }
 
     public void Dispose()

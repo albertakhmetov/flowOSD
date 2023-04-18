@@ -49,8 +49,8 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 
         Timeouts = new ReadOnlyCollection<int>(new int[] { 5, 15, 30, 60, 600, 0 });
 
-        var commands = new ReadOnlyCollection<CommandBase?>(
-            new CommandBase?[] { null }.Union(commandService.Commands.Where(i => i.CanExecuteWithHotKey)).ToArray());
+        var commands = new ReadOnlyCollection<CommandBase>(
+            new CommandBase[] { CommandBase.Empty }.Union(commandService.Commands.Where(i => i.CanExecuteWithHotKey)).ToArray());
 
         HotKeys = new ReadOnlyCollection<KeyboardHotKeyViewModel>(new KeyboardHotKeyViewModel[]
         {

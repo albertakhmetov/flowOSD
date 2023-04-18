@@ -38,21 +38,22 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
     private HotKeysConfig hotKeysConfig;
     private ICommandService commandService;
 
-    private CommandBase? command;
-    private string? parameter;
+    private CommandBase command;
+    private CommandParameterInfo? parameterInfo;
 
     public KeyboardHotKeyViewModel(
         HotKeysConfig hotKeysConfig,
-        ICommandService commandService, 
-        AtkKey key, 
-        IReadOnlyCollection<CommandBase?> commands)
+        ICommandService commandService,
+        AtkKey key,
+        IReadOnlyCollection<CommandBase> commands)
     {
         this.hotKeysConfig = hotKeysConfig ?? throw new ArgumentNullException(nameof(hotKeysConfig));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
         Key = key;
-
         Commands = commands;
+
+        command = CommandBase.Empty;
 
         UpdateFromConfig();
 
@@ -63,7 +64,7 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
             .DisposeWith(disposable);
     }
 
-    public IReadOnlyCollection<CommandBase?> Commands { get; }
+    public IReadOnlyCollection<CommandBase> Commands { get; }
 
     public AtkKey Key { get; }
 
@@ -118,7 +119,7 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public CommandBase? Command
+    public CommandBase Command
     {
         get => command;
         set
@@ -130,25 +131,25 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
 
             command = value;
 
-            Parameter = Command?.Parameters?.Count > 0 ? Command?.Parameters.First().Value : null;
+            ParameterInfo = Command?.Parameters.FirstOrDefault();
 
             OnPropertyChanged(null);
         }
     }
 
-    public string? Parameter
+    public CommandParameterInfo? ParameterInfo
     {
-        get => parameter;
+        get => parameterInfo;
         set
         {
-            if (parameter == value)
+            if (parameterInfo == value)
             {
                 return;
             }
 
-            parameter = value;
+            parameterInfo = value;
 
-            hotKeysConfig[Key] = Command == null ? null : new HotKeysConfig.Command(Command.Name, Parameter);
+            hotKeysConfig[Key] = Command.IsEmptyCommand ? null : new HotKeysConfig.Command(Command.Name, ParameterInfo?.Value);
             OnPropertyChanged();
         }
     }
@@ -170,13 +171,13 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
 
     private void UpdateFromConfig()
     {
-        if (Command?.Name == hotKeysConfig[Key]?.Name && parameter == hotKeysConfig[Key]?.Parameter)
+        if (Command?.Name == hotKeysConfig[Key]?.Name && parameterInfo?.Value == hotKeysConfig[Key]?.Parameter)
         {
             return;
         }
 
-        command = commandService.Resolve(hotKeysConfig[Key]?.Name);
-        parameter = hotKeysConfig[Key]?.Parameter;
+        command = commandService.Resolve(hotKeysConfig[Key]?.Name) ?? CommandBase.Empty;
+        parameterInfo = command.Parameters.FirstOrDefault(x => x.Value == hotKeysConfig[Key]?.Parameter);
 
         OnPropertyChanged(null);
     }

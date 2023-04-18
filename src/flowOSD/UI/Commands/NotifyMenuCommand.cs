@@ -40,7 +40,6 @@ sealed class NotifyMenuCommand : CommandBase
     private ISystemEvents systemEvents;
     private ICommandService commandService;
     private NotifyMenuWindow? window;
-    private NotifyMenuViewModel viewModel;
 
     public NotifyMenuCommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService)
     {
@@ -48,10 +47,13 @@ sealed class NotifyMenuCommand : CommandBase
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-        viewModel = new NotifyMenuViewModel(commandService);
-
         window = new NotifyMenuWindow(this.systemEvents);
         window.Activated += OnWindowActivated;
+
+        if (window.Content is FrameworkElement element)
+        {
+            element.DataContext = new NotifyMenuViewModel(commandService);
+        }
 
         var presenter = OverlappedPresenter.CreateForContextMenu();
         presenter.SetBorderAndTitleBar(true, false);
@@ -71,6 +73,11 @@ sealed class NotifyMenuCommand : CommandBase
 
     public override async void Execute(object? parameter = null)
     {
+        if (window == null)
+        {
+            return;
+        }
+
         await Task.Delay(100);
         const int offsetY = 5;
 
@@ -83,7 +90,6 @@ sealed class NotifyMenuCommand : CommandBase
         if (window.Content is FrameworkElement root)
         {
             root.Measure(new Size(workArea.Width, workArea.Height));
-            root.DataContext = viewModel;
         }
         else
         {
@@ -118,14 +124,16 @@ sealed class NotifyMenuCommand : CommandBase
     {
         if (window != null)
         {
-            window.Dispose();
             window.Activated -= OnWindowActivated;
             if (window.AppWindow != null)
             {
                 window.AppWindow.Closing -= OnWindowClosing;
+              //  window.AppWindow.Destroy();
             }
 
-            window.Close();
+           // window.Close();
+            window.Dispose();
+
             window = null;
         }
 

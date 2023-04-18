@@ -85,6 +85,7 @@ public partial class App : Application
         osd?.Dispose();
 
         commandService?.Resolve<ConfigCommand>()?.Dispose();
+       // commandService?.Resolve<NotifyMenuCommand>()?.Dispose(); ????
         commandService?.Resolve<MainUICommand>()?.Dispose();
 
         notifyIconService.Hide();

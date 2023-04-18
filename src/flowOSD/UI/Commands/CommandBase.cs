@@ -26,6 +26,8 @@ using System.Windows.Input;
 
 public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChanged
 {
+    public static readonly CommandBase Empty = new EmptyCommand();
+
     private string text, description;
     private bool enabled, isChecked;
 
@@ -65,6 +67,8 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
     }
 
     public virtual IList<CommandParameterInfo> Parameters { get; } = new CommandParameterInfo[0];
+
+    public bool IsEmptyCommand => this == Empty;
 
     public bool IsChecked
     {
@@ -111,6 +115,19 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
         {
             property = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    private sealed class EmptyCommand : CommandBase
+    {
+        public EmptyCommand()
+        {
+            Description = "Not Set";
+        }
+
+        public override void Execute(object? parameter = null)
+        {
+            ; // DO NOTHING
         }
     }
 }

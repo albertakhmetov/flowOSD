@@ -99,14 +99,15 @@ sealed class MainUICommand : CommandBase
     {
         if (window != null)
         {
-            window.Dispose();
             window.Activated -= OnWindowActivated;
             if (window.AppWindow != null)
             {
                 window.AppWindow.Closing -= OnWindowClosing;
             }
 
-            window.Close();
+            window.AppWindow?.Destroy();
+            window.Dispose();
+            //  window.Close();
             window = null;
         }
 
