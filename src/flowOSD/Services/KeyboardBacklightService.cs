@@ -35,7 +35,8 @@ sealed class KeyboardBacklightService : IDisposable
     private IConfig config;
     private IKeyboardBacklight keyboardBacklight;
     private IKeyboard keyboard;
-    private IPowerManagement powerManagement;
+    private IPowerManagement powerManagement; 
+    private IDisplay display;
     private TimeSpan timeout;
 
     private volatile uint lastActivityTime;
@@ -44,19 +45,21 @@ sealed class KeyboardBacklightService : IDisposable
         IConfig config,
         IKeyboardBacklight keyboardBacklight,
         IKeyboard keyboard,
-        IPowerManagement powerManagement)
+        IPowerManagement powerManagement,
+        IDisplay display)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.keyboardBacklight = keyboardBacklight ?? throw new ArgumentNullException(nameof(keyboardBacklight));
         this.keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
+        this.display = display ?? throw new ArgumentNullException(nameof(display)); 
         this.timeout = TimeSpan.FromSeconds(config.Common.KeyboardBacklightTimeout);
 
         this.keyboard.Activity
             .Subscribe(x =>
             {
                 lastActivityTime = x;
-                keyboardBacklight.SetState(DeviceState.Enabled);
+                Enable();
             })
             .DisposeWith(disposable);
 
@@ -67,17 +70,23 @@ sealed class KeyboardBacklightService : IDisposable
 
         this.powerManagement.PowerEvent
             .Where(x => x == PowerEvent.DisplayOff || x == PowerEvent.DisplayDimmed)
-            .Subscribe(_ => keyboardBacklight.SetState(DeviceState.Disabled))
+            .Subscribe(_ => Disable())
             .DisposeWith(disposable);
 
         this.powerManagement.PowerEvent
             .Where(x => x == PowerEvent.DisplayOn)
             .Subscribe(_ => lastActivityTime = GetTickCount())
+            .DisposeWith(disposable); 
+        
+        this.display.State
+            .Where(x => x == DeviceState.Enabled)
+            .Subscribe(_ => lastActivityTime = GetTickCount())
             .DisposeWith(disposable);
 
         Observable.Interval(TimeSpan.FromMilliseconds(1000))
+            .CombineLatest(this.display.State, (_, displayState) => displayState)
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(x => UpdateBacklightState())
+            .Subscribe(UpdateBacklightState)
             .DisposeWith(disposable);
     }
 
@@ -98,8 +107,29 @@ sealed class KeyboardBacklightService : IDisposable
         lastActivityTime = GetTickCount();
     }
 
-    private void UpdateBacklightState()
+    public async void Enable()
     {
+        if (config.Common.KeyboardBacklightWithDisplay && await display.State.FirstOrDefaultAsync() == DeviceState.Disabled)
+        {
+            return;
+        }
+
+        keyboardBacklight.SetState(DeviceState.Enabled);
+    }
+
+    public void Disable()
+    {
+        keyboardBacklight.SetState(DeviceState.Disabled);
+    }
+
+    private void UpdateBacklightState(DeviceState displayState)
+    {
+        if (config.Common.KeyboardBacklightWithDisplay && displayState == DeviceState.Disabled)
+        {
+            keyboardBacklight.SetState(DeviceState.Disabled);
+            return;
+        }
+
         var lii = new LASTINPUTINFO();
         lii.cbSize = Marshal.SizeOf<LASTINPUTINFO>();
 

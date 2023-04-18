@@ -36,13 +36,11 @@ sealed class KeyboardBacklight : IKeyboardBacklight
     {
         this.device = device ?? throw new ArgumentNullException(nameof(device));
 
-        stateSubject = new BehaviorSubject<DeviceState>(DeviceState.Enabled);
+        stateSubject = new BehaviorSubject<DeviceState>(DeviceState.Disabled);
         levelSubject = new BehaviorSubject<KeyboardBacklightLevel>(level);
 
         State = stateSubject.AsObservable();
         Level = levelSubject.AsObservable();
-
-        WriteLevel(level);
     }
 
     public IObservable<DeviceState> State { get; }

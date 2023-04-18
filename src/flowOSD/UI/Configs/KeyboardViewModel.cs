@@ -52,21 +52,21 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
         var commands = new ReadOnlyCollection<CommandBase?>(
             new CommandBase?[] { null }.Union(commandService.Commands.Where(i => i.CanExecuteWithHotKey)).ToArray());
 
-        HotKeys = new ReadOnlyCollection<HotKeyViewModel>(new HotKeyViewModel[]
+        HotKeys = new ReadOnlyCollection<KeyboardHotKeyViewModel>(new KeyboardHotKeyViewModel[]
         {
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Mic, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Rog, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Copy, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Paste, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightDown, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightUp, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Aura, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Fan, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessDown, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessUp, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.TouchPad, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Sleep, commands),
-            new HotKeyViewModel(config.HotKeys, commandService, AtkKey.Wireless, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Mic, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Rog, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Copy, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Paste, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightDown, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightUp, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Aura, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Fan, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessDown, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessUp, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.TouchPad, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Sleep, commands),
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Wireless, commands),
         });
 
         Config.Common.PropertyChanged
@@ -89,7 +89,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 
     public IReadOnlyCollection<int> Timeouts { get; }
 
-    public IReadOnlyCollection<HotKeyViewModel> HotKeys { get; }
+    public IReadOnlyCollection<KeyboardHotKeyViewModel> HotKeys { get; }
 
     public void Dispose()
     {
@@ -99,22 +99,6 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
         foreach (var i in HotKeys)
         {
             i.Dispose();
-        }
-    }
-
-    public static string GetTimeoutText(int timeout)
-    {
-        if (timeout == 0)
-        {
-            return "Auto";
-        }
-        else if (timeout < 60)
-        {
-            return $"{timeout} sec";
-        }
-        else
-        {
-            return $"{timeout / 60} min";
         }
     }
 }

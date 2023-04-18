@@ -131,7 +131,8 @@ sealed class HardwareService : IDisposable, IHardwareService
             config, 
             keyboardBacklight,
             keyboard,
-            powerManagement).DisposeWith(disposable);
+            powerManagement,
+            display).DisposeWith(disposable);
 
         refreshRateService = new RefreshRateService(
             this.config,
@@ -181,7 +182,7 @@ sealed class HardwareService : IDisposable, IHardwareService
     {
         if (!config.UseOptimizationMode)
         {
-            keyboardBacklight.SetState(DeviceState.Disabled, force: true);
+            keyboardBacklightService?.Disable();
         }
     }
 
@@ -198,7 +199,7 @@ sealed class HardwareService : IDisposable, IHardwareService
         {
             InitHid();
             keyboardBacklightService?.ResetTimer();
-            keyboardBacklight.SetState(DeviceState.Enabled, force: true);
+            keyboardBacklightService?.Enable();
         }
 
         refreshRateService.Update();

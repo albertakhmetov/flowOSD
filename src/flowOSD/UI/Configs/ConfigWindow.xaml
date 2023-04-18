@@ -28,6 +28,7 @@
                             <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
                         </Style>
                         <converters:VisibilityConverter x:Key="VisibilityConverter"/>
+                        <converters:TimeConverter x:Key="TimeConverter" ZeroValue="Auto"/>
                     </ResourceDictionary>
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
@@ -49,52 +50,71 @@
                 <DataTemplate x:DataType="local:ConfigViewModelBase">
                     <NavigationViewItem Content="{Binding Title}">
                         <NavigationViewItem.Icon>
-                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                                      Glyph="{Binding Icon}"/>
+                            <FontIcon 
+                                FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                                Glyph="{Binding Icon}"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
                 </DataTemplate>
             </NavigationView.MenuItemTemplate>
 
-            <ScrollViewer Grid.Column="1">
+            <ScrollViewer>
+                <ScrollViewer.Resources>
+                    <ResourceDictionary>
+                        <Style TargetType="FontIcon">
+                            <Setter Property="Margin" Value="0,0,15,0"/>
+                        </Style>
+                    </ResourceDictionary>
+                </ScrollViewer.Resources>
+
                 <Grid>
-                    <StackPanel x:Name="generalConfig"
-                            Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+                    <StackPanel 
+                        x:Name="generalConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch HorizontalAlignment="Stretch"
-                    Header="{x:Bind resources:Text.Instance.Config.RunAtStartup}"
-                    IsOn="{Binding RunAtStartup, Mode=TwoWay}" />
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.RunAtStartup}"
+                                IsOn="{Binding RunAtStartup, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch HorizontalAlignment="Stretch"
-                    Header="{x:Bind resources:Text.Instance.Config.DisableTouchPadInTabletMode}"
-                    IsOn="{Binding DisableTouchPadInTabletMode, Mode=TwoWay}" />
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.DisableTouchPadInTabletMode}"
+                                IsOn="{Binding DisableTouchPadInTabletMode, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch HorizontalAlignment="Stretch"
-                    Header="{x:Bind resources:Text.Instance.Config.ControlDisplayRefreshRate}"
-                    IsOn="{Binding ControlDisplayRefreshRate, Mode=TwoWay}" />
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.ControlDisplayRefreshRate}"
+                                IsOn="{Binding ControlDisplayRefreshRate, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch HorizontalAlignment="Stretch"
-                                            Header="{x:Bind resources:Text.Instance.Config.ConfirmGpuModeChange}"
-                                            IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.ConfirmGpuModeChange}"
+                                IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch HorizontalAlignment="Stretch"
-                    Header="{x:Bind resources:Text.Instance.Config.CheckForUpdates}"
-                    IsOn="{Binding CheckForUpdates, Mode=TwoWay}" />
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.CheckForUpdates}"
+                                IsOn="{Binding CheckForUpdates, Mode=TwoWay}" />
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="notificationsConfig"
-                            Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+                    <StackPanel 
+                        x:Name="notificationsConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding PerformanceMode, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PerformanceMode)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PerformanceMode)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PerformanceMode)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -104,8 +124,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding PowerMode, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerMode)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerMode)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PowerMode)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -115,8 +136,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding PowerSource, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerSource)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerSource)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PowerSource)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -126,8 +148,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding Boost, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Boost)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Boost)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Boost)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -137,8 +160,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding TouchPad, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.TouchPad)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.TouchPad)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.TouchPad)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -148,8 +172,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding DisplayRefreshRate, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.DisplayRefreshRate)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.DisplayRefreshRate)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.DisplayRefreshRate)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -159,8 +184,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding Mic, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Mic)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Mic)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Mic)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -170,8 +196,9 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding Gpu, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Gpu)}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Gpu)}"/>
                                         <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Gpu)}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -179,8 +206,10 @@
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="keyboardConfig"
-                            Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+                    <StackPanel 
+                        x:Name="keyboardConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -188,34 +217,38 @@
                                     <ColumnDefinition Width="100"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock VerticalAlignment="Center" 
-                               Text="{x:Bind resources:Text.Instance.Config.KeyboardBacklightTimeout}"/>
-                                <ComboBox Grid.Column="1"
-                              HorizontalAlignment="Stretch"
-                              SelectedItem="{Binding KeyboardBacklightTimeout, Mode=TwoWay}"
-                              ItemsSource="{Binding Timeouts}">
-                                    <!--<ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="sys:Int32">
-                                <TextBlock Text="{x:Bind local:KeyboardViewModel.GetTimeoutText((sys:Int32))}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>-->
+                                <TextBlock 
+                                    VerticalAlignment="Center"
+                                    Text="{x:Bind resources:Text.Instance.Config.KeyboardBacklightTimeout}"/>
+                                <ComboBox 
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Stretch"
+                                    SelectedItem="{Binding KeyboardBacklightTimeout, Mode=TwoWay}"
+                                    ItemsSource="{Binding Timeouts}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="x:Int32">
+                                            <TextBlock Text="{Binding Converter={StaticResource TimeConverter}, Mode=OneTime}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
                                 </ComboBox>
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch HorizontalAlignment="Stretch"
-                              Header="{x:Bind resources:Text.Instance.Config.KeyboardBacklightWithDisplay}"
-                              IsOn="{Binding KeyboardBacklightWithDisplay, Mode=TwoWay}" />
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.KeyboardBacklightWithDisplay}"
+                                IsOn="{Binding KeyboardBacklightWithDisplay, Mode=TwoWay}" />
                         </Border>
 
-                        <TextBlock Text="{x:Bind resources:Text.Instance.Config.HotKeys}"
-                       FontWeight="SemiBold"
-                       Margin="10,30,0,5"/>
+                        <TextBlock 
+                            Text="{x:Bind resources:Text.Instance.Config.HotKeys}"
+                            FontWeight="SemiBold"
+                            Margin="10,30,0,5"/>
 
                         <ItemsControl ItemsSource="{Binding HotKeys}" Background="Transparent">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="local:HotKeyViewModel">
+                                <DataTemplate x:DataType="local:KeyboardHotKeyViewModel">
                                     <Border Style="{StaticResource CxConfigBorderStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -229,21 +262,24 @@
                                                 <RowDefinition Height="auto"/>
                                             </Grid.RowDefinitions>
 
-                                            <Border BorderBrush="{ThemeResource ControlStrokeColorSecondaryBrush}"
-                                        BorderThickness="1"
-                                        Background="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                        HorizontalAlignment="Left"
-                                        CornerRadius="{ThemeResource ControlCornerRadius}"
-                                        Padding="5,2">
-                                                <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding Text}"/>
+                                            <Border 
+                                                BorderBrush="{ThemeResource ControlStrokeColorSecondaryBrush}"
+                                                BorderThickness="1"
+                                                Background="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                HorizontalAlignment="Left"
+                                                CornerRadius="{ThemeResource ControlCornerRadius}"
+                                                Padding="5,2">
+
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding Text}"/>
                                             </Border>
 
-                                            <ComboBox Grid.Column="1"
-                                          Grid.ColumnSpan="2"
-                                          HorizontalAlignment="Stretch"
-                                          SelectedItem="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          ItemsSource="{Binding Commands}">
+                                            <ComboBox 
+                                                Grid.Column="1"
+                                                Grid.ColumnSpan="2"
+                                                HorizontalAlignment="Stretch"
+                                                SelectedItem="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                ItemsSource="{Binding Commands}">
+
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate x:DataType="commands:CommandBase">
                                                         <TextBlock VerticalAlignment="Center" Text="{Binding Description}"/>
@@ -251,21 +287,25 @@
                                                 </ComboBox.ItemTemplate>
                                             </ComboBox>
 
-                                            <TextBlock VerticalAlignment="Center"
-                                           HorizontalAlignment="Right"
-                                           Margin="0,10,10,0"
-                                           Grid.Column="1"
-                                           Grid.Row="1" 
-                                           Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
-                                           Text="{x:Bind resources:Text.Instance.Config.HotKeyAction}"/>
-                                            <ComboBox HorizontalAlignment="Stretch"
-                                          Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
-                                          Grid.Row="1" 
-                                          Grid.Column="2"
-                                          Margin="0,10,0,0"
-                                          SelectedValue="{Binding Parameter, Mode=TwoWay}"
-                                          SelectedValuePath="Value"
-                                          ItemsSource="{Binding Command.Parameters, Mode=OneWay}">
+                                            <TextBlock 
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Right"
+                                                Margin="0,10,10,0"
+                                                Grid.Column="1"
+                                                Grid.Row="1" 
+                                                Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
+                                                Text="{x:Bind resources:Text.Instance.Config.HotKeyAction}"/>
+
+                                            <ComboBox 
+                                                HorizontalAlignment="Stretch"
+                                                Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
+                                                Grid.Row="1" 
+                                                Grid.Column="2"
+                                                Margin="0,10,0,0"
+                                                SelectedValue="{Binding Parameter, Mode=TwoWay}"
+                                                SelectedValuePath="Value"
+                                                ItemsSource="{Binding Command.Parameters, Mode=OneWay}">
+
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate x:DataType="commands:CommandParameterInfo">
                                                         <TextBlock VerticalAlignment="Center" Text="{Binding Description}"/>
@@ -279,22 +319,17 @@
                         </ItemsControl>
                     </StackPanel>
 
-                    <StackPanel x:Name="monitoringConfig"
-                            Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
-                        <StackPanel.Resources>
-                            <ResourceDictionary>
-                                <Style TargetType="FontIcon">
-                                    <Setter Property="Margin" Value="0,0,15,0"/>
-                                </Style>
-                            </ResourceDictionary>
-                        </StackPanel.Resources>
+                    <StackPanel 
+                        x:Name="monitoringConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
 
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding ShowBatteryChargeRate, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.Hardware_AC}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.Hardware_AC}"/>
                                         <TextBlock Text="{x:Bind resources:Text.Instance.Config.ShowBatteryChargeRate}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -305,8 +340,10 @@
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding ShowCpuTemperature, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                      Glyph="{x:Bind resources:Images.Temperature}"/>
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{x:Bind resources:Images.Temperature}"/>
+
                                         <TextBlock Text="{x:Bind resources:Text.Instance.Config.ShowCpuTemperature}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>

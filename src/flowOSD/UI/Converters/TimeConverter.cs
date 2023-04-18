@@ -23,21 +23,32 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-public sealed class VisibilityConverter : IValueConverter
+public sealed class TimeConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public string? ZeroValue { get; set; }
+
+    public object? Convert(object value, Type targetType, object parameter, string language)
     {
-        if (targetType == typeof(Visibility) && value is bool b)
+        if (targetType == typeof(string) && value is int seconds)
         {
-            return parameter as string == "!"
-                ? (!b ? Visibility.Visible : Visibility.Collapsed)
-                : (b ? Visibility.Visible : Visibility.Collapsed);
+            if (seconds == 0)
+            {
+                return ZeroValue;
+            }
+            else if (seconds < 60)
+            {
+                return $"{seconds} sec";
+            }
+            else
+            {
+                return $"{seconds / 60} min";
+            }
         }
 
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    public object? ConvertBack(object value, Type targetType, object parameter, string language)
     {
         return value;
     }

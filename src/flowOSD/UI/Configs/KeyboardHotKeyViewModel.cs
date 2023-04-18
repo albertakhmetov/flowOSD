@@ -31,7 +31,7 @@ using flowOSD.Extensions;
 using flowOSD.UI.Commands;
 using Microsoft.UI.Xaml;
 
-public class HotKeyViewModel : ViewModelBase, IDisposable
+public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -41,7 +41,7 @@ public class HotKeyViewModel : ViewModelBase, IDisposable
     private CommandBase? command;
     private string? parameter;
 
-    public HotKeyViewModel(
+    public KeyboardHotKeyViewModel(
         HotKeysConfig hotKeysConfig,
         ICommandService commandService, 
         AtkKey key, 
