@@ -51,15 +51,14 @@ public sealed partial class ConfigWindow : Window, IDisposable
         }
 
         ConfigViewModels = new ReadOnlyCollection<ConfigViewModelBase>(configViewModels);
-        foreach (var viewModel in configViewModels)
-        {
-            if (viewModel is IDisposable disposableViewModel)
-            {
-                disposableViewModel.DisposeWith(disposable);
-            }
-        }
-
         this.InitializeComponent();
+
+        navigationView.DataContext = ConfigViewModels;
+
+        generalConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(GeneralViewModel));
+        notificationsConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(NotificationsViewModel));
+        keyboardConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(KeyboardViewModel));
+        monitoringConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(MonitoringViewModel));
 
         SystemBackdrop = new MicaBackdrop();
 
@@ -120,42 +119,10 @@ public sealed partial class ConfigWindow : Window, IDisposable
 
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        var options = new FrameNavigationOptions
+        foreach (var model in ConfigViewModels)
         {
-            TransitionInfoOverride = args.RecommendedNavigationTransitionInfo,
-            IsNavigationStackEnabled = false,
-        };
-
-        Type pageType;
-
-        if (args.SelectedItem is GeneralViewModel)
-        {
-            pageType = typeof(GeneralPage);
+            model.IsSelected = model == args.SelectedItem;
         }
-        else if (args.SelectedItem is NotificationsViewModel)
-        {
-            pageType = typeof(NotificationsPage);
-        }
-        else if (args.SelectedItem is KeyboardViewModel)
-        {
-            pageType = typeof(KeyboardPage);
-        }
-        else if (args.SelectedItem is MonitoringViewModel)
-        {
-            pageType = typeof(MonitoringPage);
-        }
-        else
-        {
-            return;
-        }
-
-        if (!pages.ContainsKey(pageType.Name))
-        {
-            pages[pageType.Name] = (Activator.CreateInstance(pageType) as Page)!;
-            pages[pageType.Name].DataContext = args.SelectedItem;
-        }
-
-        contentFrame.Content = pages[pageType.Name];
     }
 
 }

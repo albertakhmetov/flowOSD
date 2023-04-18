@@ -43,7 +43,7 @@ public partial class App : Application
     private MessageQueue messageQueue;
     private SystemEvents systemEvents;
     private KeysSender keysSender;
-    private IOsd osd;
+    private Osd osd;
 
     private HardwareService hardwareService;
     private CommandService commandService;
@@ -82,6 +82,11 @@ public partial class App : Application
 
     public void ShutDown()
     {
+        osd?.Dispose();
+
+        commandService?.Resolve<ConfigCommand>()?.Dispose();
+        commandService?.Resolve<MainUICommand>()?.Dispose();
+
         notifyIconService.Hide();
 
         disposable?.Dispose();

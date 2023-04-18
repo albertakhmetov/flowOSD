@@ -24,12 +24,20 @@ using flowOSD.Core.Configs;
 
 public abstract class ConfigViewModelBase : ViewModelBase
 {
+    private bool isSelected;
+
     protected ConfigViewModelBase(IConfig config, string title, string? icon)
     {
         Config = config ?? throw new ArgumentNullException(nameof(config));
 
         Title = title ?? string.Empty;
         Icon = icon ?? string.Empty;
+    }
+
+    public bool IsSelected
+    {
+        get => isSelected;
+        set => SetProperty(ref isSelected, value);
     }
 
     public string Title { get; }

@@ -86,9 +86,6 @@
 	  <None Update="App.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </None>
-	  <Page Update="UI\Configs\MonitoringPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
 	  <Page Update="UI\Styles\CxSplitButton.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -135,11 +132,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="UI\Configs\MonitoringPage.xaml" />
 	  <None Remove="UI\ConfigWindow.xaml" />
-	  <None Remove="UI\Configs\GeneralPage.xaml" />
-	  <None Remove="UI\Configs\KeyboardPage.xaml" />
-	  <None Remove="UI\Configs\NotificationsPage.xaml" />
 	  <None Remove="UI\MainWindow.xaml" />
 	  <None Remove="UI\NotifyMenuWindow.xaml" />
 	  <None Remove="UI\OsdWindow.xaml" />

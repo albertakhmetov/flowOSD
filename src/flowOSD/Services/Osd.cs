@@ -37,7 +37,7 @@ sealed partial class Osd : IOsd, IDisposable
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
-    private UI.Osd.OsdWindow window;
+    private UI.Osd.OsdWindow? window;
     private SystemOsd systemOsd;
 
     private Subject<OsdMessage> messageSubject;
@@ -46,7 +46,7 @@ sealed partial class Osd : IOsd, IDisposable
     public Osd(UI.Osd.OsdWindow window)
     {
         this.window = window ?? throw new ArgumentNullException(nameof(window));
-        systemOsd = new SystemOsd().DisposeWith(disposable);
+        systemOsd = new SystemOsd();
         systemOsd.IsVisible
             .Where(i => i)
             .ObserveOn(SynchronizationContext.Current!)
@@ -70,6 +70,12 @@ sealed partial class Osd : IOsd, IDisposable
 
     public void Dispose()
     {
+        if(window != null)
+        {
+            window.Close();
+            window = null;
+        }
+
         disposable?.Dispose();
         disposable = null;
     }
@@ -87,7 +93,7 @@ sealed partial class Osd : IOsd, IDisposable
     private void ShowWindow(object data)
     {
         systemOsd?.Hide();
-        window.Show(data);
+        window?.Show(data);
     }
 
     /* private sealed class OsdForm : Form
