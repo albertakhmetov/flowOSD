@@ -32,15 +32,91 @@ sealed class MainUICommand : CommandBase
 {
     private IConfig config;
     private ISystemEvents systemEvents;
+    private ICommandService commandService;
+    private IHardwareService hardwareService;
     private MainWindow? window;
 
     private uint deactivateTime;
 
-    public MainUICommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService, IHardwareService hardwareService)
+    public MainUICommand(
+        IConfig config,
+        ISystemEvents systemEvents,
+        ICommandService commandService,
+        IHardwareService hardwareService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
+        this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+        this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
 
+        Text = $"Show {this.config.ProductName}";
+        Description = Text;
+        Enabled = true;
+    }
+
+    public override bool CanExecuteWithHotKey => true;
+
+    public override void Execute(object? parameter = null)
+    {
+        if (GetTickCount() - deactivateTime < 100)
+        {
+            return;
+        }
+
+        if (window == null)
+        {
+            CreateWindow();
+        }
+
+        if (window!.AppWindow?.IsVisible == true)
+        {
+            window.AppWindow.Hide();
+            return;
+        }
+
+        const int offsetX = 10;
+        const int offsetY = 10;
+
+        window.AppWindow?.Move(new Windows.Graphics.PointInt32(0, 0));
+
+        var scale = GetDpiForWindow(window.GetHandle()) / 96f;
+        var workArea = GetPrimaryWorkArea();
+
+        window.AppWindow?.Resize(new Windows.Graphics.SizeInt32(
+            (int)(370 * scale),
+            (int)(300 * scale)));
+        window.AppWindow?.Move(new Windows.Graphics.PointInt32(
+            (int)(workArea.Width - window.AppWindow.Size.Width - offsetX),
+            (int)(workArea.Height - window.AppWindow.Size.Height - offsetY)));
+
+        ShowAndActivate(window);
+    }
+
+    public override void Dispose()
+    {
+        DisposeWindow();
+
+        base.Dispose();
+    }
+
+    private void DisposeWindow()
+    {
+        if (window != null)
+        {
+            window.Activated -= OnWindowActivated;
+            if (window.AppWindow != null)
+            {
+                window.AppWindow.Closing -= OnWindowClosing;
+            }
+
+            window.Dispose();
+            window.Close();
+            window = null;
+        }
+    }
+
+    private void CreateWindow()
+    {
         window = new MainWindow(
             config,
             this.systemEvents,
@@ -56,62 +132,6 @@ sealed class MainUICommand : CommandBase
         window.AppWindow.SetPresenter(presenter);
 
         Dwmapi.SetCornerPreference(window.GetHandle(), Dwmapi.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND);
-
-        Text = $"Show {this.config.ProductName}";
-        Description = Text;
-        Enabled = true;
-    }
-
-    public override bool CanExecuteWithHotKey => true;
-
-    public override void Execute(object? parameter = null)
-    {
-        if (window?.AppWindow == null || GetTickCount() - deactivateTime < 100)
-        {
-            return;
-        }
-
-        if (window.AppWindow?.IsVisible == true)
-        {
-            window.AppWindow.Hide();
-            return;
-        }
-
-        const int offsetX = 10;
-        const int offsetY = 10;
-
-        window.AppWindow.Move(new Windows.Graphics.PointInt32(0, 0));
-
-        var scale = GetDpiForWindow(window.GetHandle()) / 96f;
-        var workArea = GetPrimaryWorkArea();
-
-        window.AppWindow.Resize(new Windows.Graphics.SizeInt32(
-            (int)(370 * scale),
-            (int)(300 * scale)));
-        window.AppWindow.Move(new Windows.Graphics.PointInt32(
-            (int)(workArea.Width - window.AppWindow.Size.Width - offsetX),
-            (int)(workArea.Height - window.AppWindow.Size.Height - offsetY)));
-
-        ShowAndActivate(window);
-    }
-
-    public override void Dispose()
-    {
-        if (window != null)
-        {
-            window.Activated -= OnWindowActivated;
-            if (window.AppWindow != null)
-            {
-                window.AppWindow.Closing -= OnWindowClosing;
-            }
-
-            window.AppWindow?.Destroy();
-            window.Dispose();
-            //  window.Close();
-            window = null;
-        }
-
-        base.Dispose();
     }
 
     private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)

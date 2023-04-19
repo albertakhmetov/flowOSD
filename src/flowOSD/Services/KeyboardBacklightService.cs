@@ -88,6 +88,8 @@ sealed class KeyboardBacklightService : IDisposable
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateBacklightState)
             .DisposeWith(disposable);
+
+        Enable();
     }
 
     public TimeSpan Timeout
@@ -114,12 +116,12 @@ sealed class KeyboardBacklightService : IDisposable
             return;
         }
 
-        keyboardBacklight.SetState(DeviceState.Enabled);
+        keyboardBacklight.SetState(DeviceState.Enabled, force: true);
     }
 
     public void Disable()
     {
-        keyboardBacklight.SetState(DeviceState.Disabled);
+        keyboardBacklight.SetState(DeviceState.Disabled, force: true);
     }
 
     private void UpdateBacklightState(DeviceState displayState)

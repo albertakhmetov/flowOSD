@@ -19,6 +19,8 @@
                     <ResourceDictionary>
                         <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
                         <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent"/>
+                        <Thickness x:Key="NavigationViewHeaderMargin">10,0,0,20</Thickness>
+
                         <Style x:Key="CxConfigBorderStyle" TargetType="Border">
                             <Setter Property="BorderThickness" Value="1"/>
                             <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}"/>
@@ -40,10 +42,13 @@
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="False"
             PaneDisplayMode="Left"
-            AlwaysShowHeader="False"
+            AlwaysShowHeader="True"
             SelectionChanged="OnSelectionChanged"
             OpenPaneLength="200"
-            MenuItemsSource="{Binding}">
+            MenuItemsSource="{Binding}"
+            >
+            
+          
 
             <NavigationView.MenuItemTemplate>
                 <DataTemplate x:DataType="local:ConfigViewModelBase">

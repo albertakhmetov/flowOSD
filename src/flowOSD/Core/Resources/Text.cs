@@ -119,6 +119,8 @@ public class Text
 
     public sealed class ConfigSection
     {
+        public string Title => "Settings";
+
         public string General => "General";
 
         public string Notifications => "Notifications";

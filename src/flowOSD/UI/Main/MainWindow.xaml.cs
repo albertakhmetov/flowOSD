@@ -53,15 +53,13 @@ public sealed partial class MainWindow : Window, IDisposable
     private ISystemEvents systemEvents;
     private IHardwareService hardwareServices;
 
-    private IDisposable? themeUpdateSubscription;
-
     public MainWindow(IConfig config, ISystemEvents systemEvents, IHardwareService hardwareServices, MainViewModel viewModel)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.hardwareServices = hardwareServices ?? throw new ArgumentNullException(nameof(hardwareServices));
 
-        monitoring = new Monitoring(this, config, hardwareServices);
+        monitoring = new Monitoring(this, config, hardwareServices).DisposeWith(disposable);
 
         ViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         InitializeComponent();
@@ -77,6 +75,11 @@ public sealed partial class MainWindow : Window, IDisposable
         AddExStyle(this.GetHandle(), WS_EX_TOOLWINDOW);
 
         Activated += MainWindow_Activated;
+
+        systemEvents.SystemDarkMode
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(UpdateTheme)
+            .DisposeWith(disposable);
     }
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
@@ -88,24 +91,13 @@ public sealed partial class MainWindow : Window, IDisposable
 
         if (args.WindowActivationState == WindowActivationState.Deactivated)
         {
-            themeUpdateSubscription?.Dispose();
-            themeUpdateSubscription = null;
-
             monitoring.Deactivate();
             ViewModel.Deactivate();
-
-            Bindings.StopTracking();
         }
         else
         {
-            Bindings.Update();
             monitoring.Activate();
             ViewModel.Activate();
-
-            themeUpdateSubscription?.Dispose();
-            themeUpdateSubscription = systemEvents.SystemDarkMode
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(UpdateTheme);
         }
     }
 
@@ -114,7 +106,6 @@ public sealed partial class MainWindow : Window, IDisposable
     public void Dispose()
     {
         disposable?.Dispose();
-        themeUpdateSubscription?.Dispose();
     }
 
     private void UpdateTheme(bool isDark)

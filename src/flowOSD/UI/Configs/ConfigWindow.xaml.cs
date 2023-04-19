@@ -32,6 +32,7 @@ using static flowOSD.Native.Styles;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml.Navigation;
+using flowOSD.Core.Resources;
 
 public sealed partial class ConfigWindow : Window, IDisposable
 {
@@ -51,7 +52,7 @@ public sealed partial class ConfigWindow : Window, IDisposable
         }
 
         ConfigViewModels = new ReadOnlyCollection<ConfigViewModelBase>(configViewModels);
-        this.InitializeComponent();
+        InitializeComponent();
 
         navigationView.DataContext = ConfigViewModels;
 
@@ -66,10 +67,12 @@ public sealed partial class ConfigWindow : Window, IDisposable
         presenter.IsResizable = true;
         AppWindow.SetPresenter(presenter);
 
+        Title = Text.Instance.Config.Title;
+
         AddExStyle(this.GetHandle(), WS_EX_DLGMODALFRAME);
 
         systemEvents.AppsDarkMode
-            .ObserveOn(SynchronizationContext.Current)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateTheme)
             .DisposeWith(disposable);
 
@@ -106,15 +109,17 @@ public sealed partial class ConfigWindow : Window, IDisposable
 
     private void ConfigWindow_VisibilityChanged(object sender, WindowVisibilityChangedEventArgs args)
     {
-        if (args.Visible)
-        {
-            navigationView.SelectedItem = (navigationView.MenuItemsSource as IEnumerable<ConfigViewModelBase>)?.FirstOrDefault();
-        }
+        navigationView.SelectedItem = (navigationView.MenuItemsSource as IEnumerable<ConfigViewModelBase>)?.FirstOrDefault();
     }
 
     private void UpdateTheme(bool isDark)
     {
         Dwmapi.UseDarkMode(this.GetHandle(), isDark);
+
+        if (Content is FrameworkElement content)
+        {
+            content.RequestedTheme = isDark ? ElementTheme.Dark : ElementTheme.Light;
+        }
     }
 
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -122,6 +127,10 @@ public sealed partial class ConfigWindow : Window, IDisposable
         foreach (var model in ConfigViewModels)
         {
             model.IsSelected = model == args.SelectedItem;
+            if (model.IsSelected)
+            {
+                navigationView.Header = model.Title;
+            }
         }
     }
 

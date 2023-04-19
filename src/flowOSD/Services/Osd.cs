@@ -28,6 +28,7 @@ using flowOSD.Native;
 using static flowOSD.Native.Dwmapi;
 using static Native.User32;
 using static flowOSD.Extensions.Common;
+using flowOSD.Core.Configs;
 
 sealed partial class Osd : IOsd, IDisposable
 {
@@ -37,20 +38,25 @@ sealed partial class Osd : IOsd, IDisposable
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private IConfig config;
+    private ISystemEvents systemEvents;
+
     private UI.Osd.OsdWindow? window;
     private SystemOsd systemOsd;
 
     private Subject<OsdMessage> messageSubject;
     private Subject<OsdValue> valueSubject;
 
-    public Osd(UI.Osd.OsdWindow window)
+    public Osd(IConfig config, ISystemEvents systemEvents)
     {
-        this.window = window ?? throw new ArgumentNullException(nameof(window));
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
+
         systemOsd = new SystemOsd();
         systemOsd.IsVisible
             .Where(i => i)
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(_ => this.window.AppWindow.Hide())
+            .Subscribe(_ => window?.AppWindow?.Hide())
             .DisposeWith(disposable);
 
         messageSubject = new Subject<OsdMessage>();
@@ -70,18 +76,12 @@ sealed partial class Osd : IOsd, IDisposable
 
     public void Dispose()
     {
-        if (window != null)
-        {
-            //window.Close();
-
-            window.AppWindow?.Destroy();
-            window.Dispose();
-            window = null;
-        }
+        DisposeWindow();
 
         disposable?.Dispose();
         disposable = null;
     }
+
 
     public void Show(OsdMessage message)
     {
@@ -95,10 +95,29 @@ sealed partial class Osd : IOsd, IDisposable
 
     private void ShowWindow(object data)
     {
+        if (window == null)
+        {
+            CreateWindow();
+        }
+
         systemOsd?.Hide();
         window?.Show(data);
     }
 
+    private void CreateWindow()
+    {
+        window = new UI.Osd.OsdWindow(config, systemEvents);
+    }
+
+    private void DisposeWindow()
+    {
+        if (window != null)
+        {
+            window.Dispose();
+            window.Close();
+            window = null;
+        }
+    }
     /* private sealed class OsdForm : Form
      {
          private CompositeDisposable disposable = new CompositeDisposable();

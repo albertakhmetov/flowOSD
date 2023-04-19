@@ -37,7 +37,12 @@ sealed partial class NotifyIconService : IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
-    private static readonly Guid IconGuid = new Guid("EF27BC18-C13D-4056-BE35-3603AB766696");
+#if DEBUG
+    private static readonly Guid IconGuid = new Guid("EF27BC18-C13D-4056-BE35-000000000000");
+#else
+    private static readonly Guid IconGuid = new Guid("EF27BC18-C13D-4056-BE35-3603AB766796");
+#endif
+
     private static readonly int MessageId = 5800;
 
     private IConfig config;

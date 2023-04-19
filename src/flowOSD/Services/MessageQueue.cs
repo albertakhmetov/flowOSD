@@ -93,6 +93,8 @@ sealed class MessageQueue : IMessageQueue, IDisposable
 
     private sealed class NativeWindow : IDisposable
     {
+        private const string ID = "flowOSD_messageQueue";
+
         private MessageQueue queue;
         private IntPtr handle;
 
@@ -102,23 +104,21 @@ sealed class MessageQueue : IMessageQueue, IDisposable
         {
             this.queue = queue ?? throw new ArgumentNullException(nameof(queue));
 
-            var id = "flowOSD_messageQueue";
-
-            this.proc = OnWindowMessageReceived;
+            proc = OnWindowMessageReceived;
 
             var classInfo = new WNDCLASSEX()
             {
                 cbSize = Marshal.SizeOf<WNDCLASSEX>(),
                 lpfnWndProc = proc,
-                lpszClassName = id,
+                lpszClassName = ID,
             };
 
             RegisterClassEx(ref classInfo);
 
             handle = CreateWindowEx(
                 dwExStyle: 0,
-                lpClassName: id,
-                lpWindowName: id,
+                lpClassName: ID,
+                lpWindowName: ID,
                 dwStyle: 0,
                 X: 0,
                 Y: 0,
@@ -145,6 +145,8 @@ sealed class MessageQueue : IMessageQueue, IDisposable
 
         private void Dispose(bool disposing)
         {
+            UnregisterClass(ID, IntPtr.Zero);
+
             if (handle != IntPtr.Zero)
             {
                 DestroyWindow(handle);

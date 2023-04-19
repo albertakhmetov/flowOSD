@@ -56,7 +56,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
 
     public override void Execute(object? parameter = null)
     {
-        if (window?.AppWindow == null)
+        if (window == null)
         {
             var viewModels = new ConfigViewModelBase[]
             {
@@ -88,9 +88,8 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 window.AppWindow.Closing -= OnWindowClosing;
             }
 
-            window.AppWindow?.Destroy();
             window.Dispose();
-            //window.Close();
+            window.Close();
             window = null;
         }
 

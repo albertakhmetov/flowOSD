@@ -55,6 +55,9 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         this.config = config ?? throw new ArgumentNullException(nameof(config));
 
+        powerModeText = string.Empty;
+        powerModeImage = string.Empty;
+
         powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
 
         BoostCommand = commandService.ResolveNotNull<ToggleBoostCommand>();
@@ -192,7 +195,5 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         disposable?.Dispose();
         disposable = null;
-    }
-
-    
+    }    
 }

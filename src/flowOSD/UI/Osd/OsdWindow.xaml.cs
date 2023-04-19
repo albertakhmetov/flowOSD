@@ -70,10 +70,8 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         AddExStyle(this.GetHandle(), Styles.WS_EX_NOACTIVATE | Styles.WS_EX_TOOLWINDOW);
 
-        root.LayoutUpdated += Root_LayoutUpdated;
-
         this.systemEvents.SystemDarkMode
-            .ObserveOn(SynchronizationContext.Current)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateTheme)
             .DisposeWith(disposable);
     }
@@ -109,7 +107,7 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         hideTimer = Observable
             .Timer(DateTimeOffset.Now.AddMilliseconds(VISIBLE_TIMEOUT), TimeSpan.FromMilliseconds(500 / 16))
-            .ObserveOn(SynchronizationContext.Current)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(t =>
             {
                 AppWindow?.Hide();
@@ -135,10 +133,6 @@ public sealed partial class OsdWindow : Window, IDisposable
         var y = (int)((workArea.Bottom - 90));
 
         AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(x, y, width, height));
-    }
-
-    private void Root_LayoutUpdated(object? sender, object e)
-    {
     }
 
     private void UpdateTheme(bool isDark)

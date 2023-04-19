@@ -334,6 +334,11 @@ static class User32
         ref WNDCLASSEX lpwcx);
 
     [DllImport(nameof(User32), SetLastError = true)]
+    public static extern bool UnregisterClass(
+        string lpClassName,
+        IntPtr hInstance);
+
+    [DllImport(nameof(User32), SetLastError = true)]
     public static extern IntPtr CreateWindowEx(
         ushort dwExStyle,
         string lpClassName,

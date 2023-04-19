@@ -47,6 +47,92 @@ sealed class NotifyMenuCommand : CommandBase
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
+        CreateWindow();
+
+        Text = $"Show {this.config.ProductName}";
+        Description = Text;
+        Enabled = true;
+    }
+
+ 
+    public override bool CanExecuteWithHotKey => false;
+
+    public override async void Execute(object? parameter = null)
+    {
+        if (window == null)
+        {
+            CreateWindow();
+        }
+
+        await Task.Delay(100);
+        const int offsetY = 5;
+
+        window!.AppWindow?.Move(new Windows.Graphics.PointInt32(0, 0));
+
+        var workArea = GetPrimaryWorkArea();
+
+        var scale = GetDpiForWindow(window.GetHandle()) / 96f;
+
+        if (window.Content is FrameworkElement root)
+        {
+            root.Measure(new Size(workArea.Width, workArea.Height));
+        }
+        else
+        {
+            return;
+        }
+
+        window.AppWindow?.Resize(new Windows.Graphics.SizeInt32(
+            (int)(root.DesiredSize.Width * scale),
+            (int)(root.DesiredSize.Height * scale)));
+
+        if (parameter is Rect rect && !rect.IsEmpty
+            && !workArea.Contains(new Point(rect.Left + rect.Width / 2, rect.Top + rect.Height / 2)))
+        {
+            window.AppWindow?.Move(new Windows.Graphics.PointInt32(
+                (int)(rect.Left + (rect.Width - window.AppWindow.Size.Width) / 2),
+                (int)(workArea.Bottom - window.AppWindow.Size.Height - offsetY)));
+        }
+        else
+        {
+            // icon isn't pinned or we can't get rectangle
+
+            var pos = GetCursorPos();
+            window.AppWindow?.Move(new Windows.Graphics.PointInt32(
+                (int)(pos.X + window.AppWindow.Size.Width < workArea.Width ? pos.X : pos.X - window.AppWindow.Size.Width),
+                (int)(pos.Y - window.AppWindow.Size.Height)));
+        }
+
+        ShowAndActivate(window);
+    }
+
+    public override void Dispose()
+    {
+        DisposeWindow();
+
+        base.Dispose();
+    }
+
+    private void DisposeWindow()
+    {
+        if (window != null)
+        {
+            window.Activated -= OnWindowActivated;
+            if (window.AppWindow != null)
+            {
+                window.AppWindow.Closing -= OnWindowClosing;
+                //  window.AppWindow.Destroy();
+            }
+
+            // window.Close();
+            window.Dispose();
+
+            window = null;
+        }
+    }
+
+    private void CreateWindow()
+    {
         window = new NotifyMenuWindow(this.systemEvents);
         window.Activated += OnWindowActivated;
 
@@ -63,81 +149,6 @@ sealed class NotifyMenuCommand : CommandBase
         window.AppWindow.SetPresenter(presenter);
 
         Dwmapi.SetCornerPreference(window.GetHandle(), Dwmapi.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND);
-
-        Text = $"Show {this.config.ProductName}";
-        Description = Text;
-        Enabled = true;
-    }
-
-    public override bool CanExecuteWithHotKey => false;
-
-    public override async void Execute(object? parameter = null)
-    {
-        if (window == null)
-        {
-            return;
-        }
-
-        await Task.Delay(100);
-        const int offsetY = 5;
-
-        window.AppWindow.Move(new Windows.Graphics.PointInt32(0, 0));
-
-        var workArea = GetPrimaryWorkArea();
-
-        var scale = GetDpiForWindow(window.GetHandle()) / 96f;
-
-        if (window.Content is FrameworkElement root)
-        {
-            root.Measure(new Size(workArea.Width, workArea.Height));
-        }
-        else
-        {
-            return;
-        }
-
-        window.AppWindow.Resize(new Windows.Graphics.SizeInt32(
-            (int)(root.DesiredSize.Width * scale),
-            (int)(root.DesiredSize.Height * scale)));
-
-        if (parameter is Rect rect && !rect.IsEmpty
-            && !workArea.Contains(new Point(rect.Left + rect.Width / 2, rect.Top + rect.Height / 2)))
-        {
-            window.AppWindow.Move(new Windows.Graphics.PointInt32(
-                (int)(rect.Left + (rect.Width - window.AppWindow.Size.Width) / 2),
-                (int)(workArea.Bottom - window.AppWindow.Size.Height - offsetY)));
-        }
-        else
-        {
-            // icon isn't pinned or we can't get rectangle
-
-            var pos = GetCursorPos();
-            window.AppWindow.Move(new Windows.Graphics.PointInt32(
-                (int)(pos.X + window.AppWindow.Size.Width < workArea.Width ? pos.X : pos.X - window.AppWindow.Size.Width),
-                (int)(pos.Y - window.AppWindow.Size.Height)));
-        }
-
-        ShowAndActivate(window);
-    }
-
-    public override void Dispose()
-    {
-        if (window != null)
-        {
-            window.Activated -= OnWindowActivated;
-            if (window.AppWindow != null)
-            {
-                window.AppWindow.Closing -= OnWindowClosing;
-              //  window.AppWindow.Destroy();
-            }
-
-           // window.Close();
-            window.Dispose();
-
-            window = null;
-        }
-
-        base.Dispose();
     }
 
     private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)

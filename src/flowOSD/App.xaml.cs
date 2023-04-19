@@ -64,7 +64,7 @@ public partial class App : Application
         messageQueue = new MessageQueue().DisposeWith(disposable);
         keysSender = new KeysSender();
         systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
-        osd = new Osd(new UI.Osd.OsdWindow(configService, systemEvents)).DisposeWith(disposable);
+        osd = new Osd(configService, systemEvents);
 
         hardwareService = new HardwareService(configService, messageQueue, keysSender).DisposeWith(disposable);
         commandService = new CommandService(configService, hardwareService, keysSender, systemEvents, updater, osd).DisposeWith(disposable);
@@ -85,7 +85,7 @@ public partial class App : Application
         osd?.Dispose();
 
         commandService?.Resolve<ConfigCommand>()?.Dispose();
-       // commandService?.Resolve<NotifyMenuCommand>()?.Dispose(); ????
+        commandService?.Resolve<NotifyMenuCommand>()?.Dispose();
         commandService?.Resolve<MainUICommand>()?.Dispose();
 
         notifyIconService.Hide();
