@@ -43,8 +43,7 @@
             IsSettingsVisible="False"
             PaneDisplayMode="Left"
             AlwaysShowHeader="True"
-            OpenPaneLength="200"
-            MenuItemsSource="{Binding}">
+            OpenPaneLength="200">
 
             <NavigationView.MenuItemTemplate>
                 <DataTemplate x:DataType="local:ConfigViewModelBase">
@@ -351,6 +350,77 @@
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
                         </Border>
+                    </StackPanel>
+
+                    <StackPanel 
+                        x:Name="aboutConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.Resources>
+                                    <Style x:Key="Header" TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="40, 0, 40, 5"/>
+                                    </Style>
+                                    
+                                    <Style x:Key="Value" TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="10, 0, 20, 5"/>
+                                        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </Style>
+                                </Grid.Resources>
+                                
+                                <TextBlock 
+                                    Grid.ColumnSpan="2" 
+                                    Text="{Binding ProductName}"
+                                    FontWeight="SemiBold"
+                                    FontSize="20"
+                                    Margin="0,0,0,10" />
+
+                                <TextBlock 
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2" 
+                                    Text="{Binding Comments}"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    TextWrapping="Wrap"
+                                    Margin="40,0,0,20" />
+
+                                <TextBlock Grid.Row="2" Text="Version" Style="{StaticResource Header}"/>
+                                <TextBlock Grid.Row="3" Text="Runtime" Style="{StaticResource Header}"/>
+                                <TextBlock Grid.Row="4" Text="Device" Style="{StaticResource Header}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ProductVersion}" Style="{StaticResource Value}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Runtime}" Style="{StaticResource Value}"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ModelName}" Style="{StaticResource Value}"/>
+
+                                <StackPanel 
+                                    Orientation="Horizontal" 
+                                    Grid.Row="5" 
+                                    Grid.ColumnSpan="2" 
+                                    HorizontalAlignment="Right"
+                                    Margin="0,10,0,0">
+                                    
+                                    <HyperlinkButton NavigateUri="{Binding HomePageUrl}" Content="{Binding HomePage}"/>
+                                    <HyperlinkButton Command="{Binding UpdateCommand}" Content="{Binding UpdateCommand.Text}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock 
+                            Text="{Binding Copyright}"
+                            Margin="10,30,0,5"/>
                     </StackPanel>
                 </Grid>
             </ScrollViewer>

@@ -103,6 +103,8 @@ public static class Images
         }
     }
 
+    public static string Info = "\uE946";
+
     public static string Diagnostic = "\uE9D9";
 
     public static string Home = "\uE80F";

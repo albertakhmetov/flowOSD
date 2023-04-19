@@ -216,7 +216,7 @@ sealed partial class Display : IDisposable, IDisplay
     {
         var name = default(string[]);
 
-        var searcher = new ManagementObjectSearcher("root\\wmi", "SELECT * FROM WmiMonitorConnectionParams");
+        using var searcher = new ManagementObjectSearcher("root\\wmi", "SELECT * FROM WmiMonitorConnectionParams");
         foreach (var i in searcher.Get())
         {
             if (i.Properties["VideoOutputTechnology"].Value is uint videoOutputTechnology

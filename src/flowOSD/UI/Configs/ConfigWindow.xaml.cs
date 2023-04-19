@@ -53,12 +53,14 @@ public sealed partial class ConfigWindow : Window, IDisposable
         ConfigViewModels = new ReadOnlyCollection<ConfigViewModelBase>(configViewModels);
         InitializeComponent();
 
-        navigationView.DataContext = ConfigViewModels;
+        navigationView.MenuItemsSource = ConfigViewModels.Where(i => !i.IsFooterItem);
+        navigationView.FooterMenuItemsSource = ConfigViewModels.Where(i => i.IsFooterItem);
 
         generalConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(GeneralViewModel));
         notificationsConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(NotificationsViewModel));
         keyboardConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(KeyboardViewModel));
         monitoringConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(MonitoringViewModel));
+        aboutConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(AboutViewModel));
 
         SystemBackdrop = new MicaBackdrop();
 
@@ -80,6 +82,8 @@ public sealed partial class ConfigWindow : Window, IDisposable
     }
 
     public IReadOnlyCollection<ConfigViewModelBase> ConfigViewModels { get; }
+
+    public AboutViewModel AboutViewModel { get; }
 
     public void Dispose()
     {

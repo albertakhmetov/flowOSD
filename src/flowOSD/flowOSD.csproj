@@ -73,7 +73,6 @@
 	<ItemGroup>
 	  <Compile Remove="Extensions\Drawing.cs" />
 	  <Compile Remove="Extensions\Forms.cs" />
-	  <Compile Remove="UI\Commands\UpdateCommand.cs" />
 	  <Compile Remove="_App.cs" />
 	  <Compile Remove="_Program.cs" />
 	</ItemGroup>

@@ -131,7 +131,7 @@ internal class GeneralConfigPage : ConfigPageBase
 
             grid.Add<CxLabel>(1, 1, x =>
             {
-                x.Text =$"Runtime: {Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}";
+                x.Text =$"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}";
 
                 x.TabListener = TabListener;
                 x.UseClearType = true;

@@ -44,4 +44,6 @@ public interface IConfig
     string ProductVersion { get; }
 
     Version FileVersion { get; }
+
+    string ModelName { get; }
 }

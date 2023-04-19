@@ -19,6 +19,7 @@
 namespace flowOSD.Services;
 
 using System.Diagnostics;
+using System.Management;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
@@ -59,6 +60,8 @@ sealed class ConfigService : IConfig, IDisposable
         {
             DataDirectory.Create();
         }
+
+        ModelName = GetModelName() ?? string.Empty;
 
         configFile = new FileInfo(Path.Combine(DataDirectory.FullName, "config.json"));
 
@@ -113,6 +116,8 @@ sealed class ConfigService : IConfig, IDisposable
     public string ProductVersion { get; }
 
     public Version FileVersion { get; }
+
+    public string ModelName { get; }
 
     public void Dispose()
     {
@@ -185,6 +190,21 @@ sealed class ConfigService : IConfig, IDisposable
         {
             key.DeleteValue(AppFileInfo.ProductName!, false);
         }
+    }
+
+    private string? GetModelName()
+    {
+        using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+        foreach (var i in searcher.Get())
+        {
+            if (i.Properties["Model"].Value is string modelName)
+            {
+                var underlineIndex = modelName?.IndexOf("_");
+                return underlineIndex > 0 ? modelName?.Substring(0, underlineIndex.Value) : modelName;
+            }
+        }
+
+        return null;
     }
 
     private class POCO

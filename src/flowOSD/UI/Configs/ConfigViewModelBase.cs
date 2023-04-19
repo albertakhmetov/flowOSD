@@ -26,10 +26,11 @@ public abstract class ConfigViewModelBase : ViewModelBase
 {
     private bool isSelected;
 
-    protected ConfigViewModelBase(IConfig config, string title, string? icon)
+    protected ConfigViewModelBase(IConfig config, string title, string? icon, bool isFooterItem = false)
     {
         Config = config ?? throw new ArgumentNullException(nameof(config));
 
+        IsFooterItem = isFooterItem;
         Title = title ?? string.Empty;
         Icon = icon ?? string.Empty;
     }
@@ -39,6 +40,8 @@ public abstract class ConfigViewModelBase : ViewModelBase
         get => isSelected;
         set => SetProperty(ref isSelected, value);
     }
+
+    public bool IsFooterItem { get; }
 
     public string Title { get; }
 

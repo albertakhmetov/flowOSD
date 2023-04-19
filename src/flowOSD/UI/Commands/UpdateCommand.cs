@@ -22,23 +22,21 @@ namespace flowOSD.UI.Commands;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
+using flowOSD.Core;
 
 sealed class UpdateCommand : CommandBase
 {
     private IUpdater updater;
-    private UpdaterUI updaterUI;
+   // private UpdaterUI updaterUI;
 
-    public UpdateCommand(IUpdater updater, UpdaterUI updaterUI)
+    public UpdateCommand(IUpdater updater)
     {
         this.updater = updater ?? throw new ArgumentNullException(nameof(updater));
-        this.updaterUI = updaterUI ?? throw new ArgumentNullException(nameof(updaterUI));
+     //   this.updaterUI = updaterUI ?? throw new ArgumentNullException(nameof(updaterUI));
 
         Text = "Check for updates";
         Enabled = true;
     }
-
-    public override string Name => nameof(UpdateCommand);
 
     public override bool CanExecuteWithHotKey => false;
 
@@ -47,16 +45,16 @@ sealed class UpdateCommand : CommandBase
         Enabled = false;
         try
         {
-            var version = await updater.CheckUpdate();
-            if (version == null)
-            {
-                return;
-            }
+            //var version = await updater.CheckUpdate();
+            //if (version == null)
+            //{
+            //    return;
+            //}
 
-            if (updater.IsUpdate(version) || parameter is bool showNoUpdate == false || showNoUpdate)
-            {
-                updaterUI.Show(version, updater.IsUpdate(version));
-            }
+            //if (updater.IsUpdate(version) || parameter is bool showNoUpdate == false || showNoUpdate)
+            //{
+            //    updaterUI.Show(version, updater.IsUpdate(version));
+            //}
         }
         finally
         {

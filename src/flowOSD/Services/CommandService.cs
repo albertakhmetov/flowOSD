@@ -72,6 +72,7 @@ sealed class CommandService : ICommandService, IDisposable
         Register(() => new ConfigCommand(config, systemEvents, this, hardwareService));
         Register(() => new MainUICommand(this.config, systemEvents, this, hardwareService));
         Register(() => new NotifyMenuCommand(this.config, systemEvents, this));
+        Register(() => new UpdateCommand(this.updater));
 
         Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(config, osd, hardwareService.ResolveNotNull<IKeyboardBacklight>()));

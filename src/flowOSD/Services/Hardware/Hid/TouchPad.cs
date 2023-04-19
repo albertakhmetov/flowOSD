@@ -57,7 +57,7 @@ sealed class TouchPad : IDisposable, ITouchPad
         var query = "SELECT * FROM RegistryValueChangeEvent WHERE Hive='HKEY_USERS' " +
             $"AND KeyPath='{sid}\\\\{TOUCHPAD_STATE_KEY.Replace("\\", "\\\\")}' AND ValueName='{TOUCHPAD_STATE_VALUE}'";
 
-        watcher = new ManagementEventWatcher(query);
+        watcher = new ManagementEventWatcher(query).DisposeWith(disposable);
         watcher.EventArrived += OnWmiEvent;
         watcher.Start();
     }
