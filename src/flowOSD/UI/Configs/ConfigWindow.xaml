@@ -43,12 +43,8 @@
             IsSettingsVisible="False"
             PaneDisplayMode="Left"
             AlwaysShowHeader="True"
-            SelectionChanged="OnSelectionChanged"
             OpenPaneLength="200"
-            MenuItemsSource="{Binding}"
-            >
-            
-          
+            MenuItemsSource="{Binding}">
 
             <NavigationView.MenuItemTemplate>
                 <DataTemplate x:DataType="local:ConfigViewModelBase">

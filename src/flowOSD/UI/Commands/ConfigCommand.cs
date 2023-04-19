@@ -81,6 +81,13 @@ sealed class ConfigCommand : CommandBase, IDisposable
 
     public override void Dispose()
     {
+        DisposeWindow();
+
+        base.Dispose();
+    }
+
+    private void DisposeWindow()
+    {
         if (window != null)
         {
             if (window.AppWindow != null)
@@ -92,8 +99,6 @@ sealed class ConfigCommand : CommandBase, IDisposable
             window.Close();
             window = null;
         }
-
-        base.Dispose();
     }
 
     private void OnWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)

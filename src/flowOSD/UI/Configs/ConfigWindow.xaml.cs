@@ -37,7 +37,6 @@ using flowOSD.Core.Resources;
 public sealed partial class ConfigWindow : Window, IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
-    private Dictionary<string, Page> pages = new Dictionary<string, Page>();
 
     public ConfigWindow(ISystemEvents systemEvents, IList<ConfigViewModelBase> configViewModels)
     {
@@ -76,7 +75,8 @@ public sealed partial class ConfigWindow : Window, IDisposable
             .Subscribe(UpdateTheme)
             .DisposeWith(disposable);
 
-        VisibilityChanged += ConfigWindow_VisibilityChanged;
+        navigationView.SelectionChanged += OnSelectionChanged;
+        AppWindow.Changed += AppWindow_Changed;
     }
 
     public IReadOnlyCollection<ConfigViewModelBase> ConfigViewModels { get; }
@@ -88,16 +88,6 @@ public sealed partial class ConfigWindow : Window, IDisposable
         disposable?.Dispose();
         disposable = null;
 
-        foreach (var i in pages.Values)
-        {
-            if (i is IDisposable disposablePage)
-            {
-                disposablePage.Dispose();
-            }
-        }
-
-        pages.Clear();
-
         foreach (var i in ConfigViewModels)
         {
             if (i is IDisposable disposableModel)
@@ -105,11 +95,17 @@ public sealed partial class ConfigWindow : Window, IDisposable
                 disposableModel.Dispose();
             }
         }
+
+        AppWindow.Changed -= AppWindow_Changed;
+        navigationView.SelectionChanged -= OnSelectionChanged;
     }
 
-    private void ConfigWindow_VisibilityChanged(object sender, WindowVisibilityChangedEventArgs args)
+    private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
     {
-        navigationView.SelectedItem = (navigationView.MenuItemsSource as IEnumerable<ConfigViewModelBase>)?.FirstOrDefault();
+        if (args.DidVisibilityChange)
+        {
+            navigationView.SelectedItem = (navigationView.MenuItemsSource as IEnumerable<ConfigViewModelBase>)?.FirstOrDefault();
+        }
     }
 
     private void UpdateTheme(bool isDark)
