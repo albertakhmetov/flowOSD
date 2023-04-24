@@ -42,6 +42,7 @@ sealed class UpdateCommand : CommandBase
 
     public override async void Execute(object? parameter = null)
     {
+        Text = "Checking for updates...";
         Enabled = false;
         try
         {
@@ -55,9 +56,12 @@ sealed class UpdateCommand : CommandBase
             //{
             //    updaterUI.Show(version, updater.IsUpdate(version));
             //}
+
+            await Task.Delay(5000);
         }
         finally
         {
+            Text = "Check for updates";
             Enabled = true;
         }
     }

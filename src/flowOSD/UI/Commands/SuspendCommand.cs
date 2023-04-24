@@ -52,6 +52,6 @@ sealed class SuspendCommand : CommandBase
             return;
         }
 
-        Kernel32.SetSystemPowerState(mode != HIBERNATE, true);
+        Powrprof.SetSuspendState(mode == HIBERNATE, true, true);
     }
 }

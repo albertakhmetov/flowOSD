@@ -35,18 +35,19 @@ sealed partial class Atk : IDisposable, IAtk
     public const int FEATURE_KBD_REPORT_ID = 0x5a;
 
     private const uint IO_CONTROL_CODE = 0x0022240C;
+    private const uint ASUS_WMI_METHODID_INIT = 0x54494E49;
 
-    const uint DSTS = 0x53545344;
-    const uint DEVS = 0x53564544;
+    private const uint DSTS = 0x53545344;
+    private const uint DEVS = 0x53564544;
 
-    const uint DEVID_GPU_ECO_MODE = 0x00090020;
-    const uint DEVID_THROTTLE_THERMAL_POLICY = 0x00120075;
+    private const uint DEVID_GPU_ECO_MODE = 0x00090020;
+    private const uint DEVID_THROTTLE_THERMAL_POLICY = 0x00120075;
 
-    public const uint CPU_Fan = 0x00110013;
-    public const uint GPU_Fan = 0x00110014;
+    private const uint CPU_Fan = 0x00110013;
+    private const uint GPU_Fan = 0x00110014;
 
-    public const int CPU_TEMPERATURE = 0x00120094;
-    public const int Temp_GPU = 0x00120097;
+    private const int CPU_TEMPERATURE = 0x00120094;
+    private const int Temp_GPU = 0x00120097;
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -104,6 +105,8 @@ sealed partial class Atk : IDisposable, IAtk
                 }
             })
             .DisposeWith(disposable);
+
+        Invoke(ASUS_WMI_METHODID_INIT, new byte[8]);
     }
 
     public IObservable<PerformanceMode> PerformanceMode { get; }

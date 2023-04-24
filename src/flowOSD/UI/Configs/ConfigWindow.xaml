@@ -41,8 +41,10 @@
             IsBackEnabled="False" 
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="False"
-            PaneDisplayMode="Left"
+            PaneDisplayMode="Auto"
             AlwaysShowHeader="True"
+            CompactModeThresholdWidth="450"
+            ExpandedModeThresholdWidth="600"
             OpenPaneLength="200">
 
             <NavigationView.MenuItemTemplate>
