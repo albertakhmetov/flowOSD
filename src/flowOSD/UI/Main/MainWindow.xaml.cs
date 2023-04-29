@@ -80,6 +80,61 @@ public sealed partial class MainWindow : Window, IDisposable
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateTheme)
             .DisposeWith(disposable);
+
+        config.Performance.ProfileChanged
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_=>UpdatePerformanceProfilesMenu())
+            .DisposeWith(disposable);
+
+        UpdatePerformanceProfilesMenu();
+    }
+
+    private void UpdatePerformanceProfilesMenu()
+    {
+        performanceProfilesMenu.Items.Clear();
+
+        performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+        {
+            Command = ViewModel.PerformanceCommand,
+            CommandParameter = PerformanceProfile.Default.Id,
+            Icon = new FontIcon { Glyph = Images.ToImage(PerformanceMode.Default) },
+            Text = Text.ToText(PerformanceMode.Default),
+        });
+
+        performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+        {
+            Command = ViewModel.PerformanceCommand,
+            CommandParameter = PerformanceProfile.Turbo.Id,
+            Icon = new FontIcon { Glyph = Images.ToImage(PerformanceMode.Turbo) },
+            Text = Text.ToText(PerformanceMode.Turbo),
+        });
+
+        performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+        {
+            Command = ViewModel.PerformanceCommand,
+            CommandParameter = PerformanceProfile.Silent.Id,
+            Icon = new FontIcon { Glyph = Images.ToImage(PerformanceMode.Silent) },
+            Text = Text.ToText(PerformanceMode.Silent),
+        });
+
+        var userProfiles = config.Performance.GetProfiles();
+        if(userProfiles.Count == 0)
+        {
+            return;
+        }
+
+        performanceProfilesMenu.Items.Add(new MenuFlyoutSeparator());
+
+        foreach (var profile in userProfiles)
+        {
+            performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+            {
+                Command = ViewModel.PerformanceCommand,
+                CommandParameter = profile.Id,
+                Text = profile.Name,
+            });
+        }
+
     }
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)

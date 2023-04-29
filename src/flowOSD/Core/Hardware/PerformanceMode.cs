@@ -19,7 +19,7 @@
 
 namespace flowOSD.Core.Hardware;
 
-public enum PerformanceMode
+public enum PerformanceMode : uint
 {
     Default = 0,
     Turbo = 1,

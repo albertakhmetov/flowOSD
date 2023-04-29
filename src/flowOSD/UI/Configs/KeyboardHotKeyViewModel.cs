@@ -130,9 +130,9 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
             }
 
             command = value;
+            OnPropertyChanged();
 
             ParameterInfo = Command?.Parameters.FirstOrDefault();
-
             OnPropertyChanged(null);
         }
     }

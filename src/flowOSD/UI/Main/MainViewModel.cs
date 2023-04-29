@@ -35,6 +35,9 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     private IConfig config;
     private IPowerManagement powerManagement;
+    private IPerformanceService performanceService;
+
+    private string performanceProfileText, performanceProfileImage;
 
     private string powerModeText, powerModeImage;
     private bool isBatterySaver;
@@ -59,47 +62,40 @@ public class MainViewModel : ViewModelBase, IDisposable
         powerModeImage = string.Empty;
 
         powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
+        performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
 
         BoostCommand = commandService.ResolveNotNull<ToggleBoostCommand>();
-        PerformanceModeCommand = commandService.ResolveNotNull<PerformanceModeCommand>();
+        PerformanceCommand = commandService.ResolveNotNull<PerformanceCommand>();
         PowerModeCommand = commandService.ResolveNotNull<PowerModeCommand>();
         DisplayRefreshRateCommand = commandService.ResolveNotNull<DisplayRefreshRateCommand>();
         GpuCommand = commandService.ResolveNotNull<GpuCommand>();
         TouchPadCommand = commandService.ResolveNotNull<TouchPadCommand>();
 
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
-
-        TogglePerformanceModeOverrideCommand = new RelayCommand(x =>
-        {
-            if (IsPerformaceModeOverrideEnabled)
-            {
-                PerformanceModeCommand.Execute(PerformanceMode.Default);
-            }
-            else
-            {
-                PerformanceModeCommand.Execute(config.Common.PerformanceModeOverride);
-            }
-        });
     }
 
     public CommandBase BoostCommand { get; }
 
-    public CommandBase PerformanceModeCommand { get; }
+    public CommandBase PerformanceCommand { get; }
 
-    public RelayCommand TogglePerformanceModeOverrideCommand { get; }
+    public string PerformanceProfileText
+    {
+        get => performanceProfileText;
+        private set => SetProperty(ref performanceProfileText, value);
+    }
 
-    public bool IsPerformaceModeOverrideEnabled => config.Common.PerformanceModeOverrideEnabled;
-
-    public string PerformanceModeOverrideText => Text.ToText(config.Common.PerformanceModeOverride);
-
-    public string PerformanceModeOverrideImage => Images.ToImage(config.Common.PerformanceModeOverride);
+    public string PerformanceProfileImage
+    {
+        get => performanceProfileImage;
+        private set => SetProperty(ref performanceProfileImage, value);
+    }
 
     public CommandBase PowerModeCommand { get; }
 
     public bool IsBatterySaver
     {
         get => isBatterySaver;
-        set => SetProperty(ref isBatterySaver, value);            
+        set => SetProperty(ref isBatterySaver, value);
     }
 
     public string PowerModeText
@@ -150,19 +146,28 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         var localDisposable = new CompositeDisposable();
 
-        config.Common.PropertyChanged
-            .Where(propertyName => propertyName == nameof(CommonConfig.PerformanceModeOverrideEnabled))
+        performanceService.ActiveProfile
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(_ => OnPropertyChanged(nameof(IsPerformaceModeOverrideEnabled)))
-            .DisposeWith(localDisposable);
-
-        config.Common.PropertyChanged
-            .Where(propertyName => propertyName == nameof(CommonConfig.PerformanceModeOverride))
-            .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(_ =>
+            .Subscribe(profile =>
             {
-                OnPropertyChanged(nameof(PerformanceModeOverrideText));
-                OnPropertyChanged(nameof(PerformanceModeOverrideImage));
+                PerformanceProfileText = profile.Name;
+
+                if (profile.Id == PerformanceProfile.Default.Id)
+                {
+                    PerformanceProfileImage = Images.Performance_Default;
+                }
+                else if (profile.Id == PerformanceProfile.Turbo.Id)
+                {
+                    PerformanceProfileImage = Images.Performance_Turbo;
+                }
+                else if (profile.Id == PerformanceProfile.Silent.Id)
+                {
+                    PerformanceProfileImage = Images.Performance_Silent;
+                }
+                else
+                {
+                    PerformanceProfileImage = Images.Performance_User;
+                }
             })
             .DisposeWith(localDisposable);
 
@@ -195,5 +200,5 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         disposable?.Dispose();
         disposable = null;
-    }    
+    }
 }

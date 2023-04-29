@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:flowOSD.UI.Configs"
     xmlns:configs="using:flowOSD.Core.Configs"
+    xmlns:controls="using:flowOSD.UI.Controls"
     xmlns:commands="using:flowOSD.UI.Commands"
     xmlns:converters="using:flowOSD.UI.Converters"
     xmlns:resources="using:flowOSD.Core.Resources"
@@ -29,7 +30,98 @@
                             <Setter Property="Padding" Value="20, 10, 10, 10"/>
                             <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
                         </Style>
+
+                        <Style TargetType="controls:FanCurveTuner">
+                            <Setter Property="CoordinateGridBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+                            <Setter Property="CoordinateGridLabelBrush" Value="{ThemeResource TextFillColorTertiaryBrush}"/>
+                            <Setter Property="CoordinateGridThickness" Value="1"/>
+
+                            <Setter Property="LineBrush" Value="{ThemeResource AccentFillColorTertiaryBrush}"/>
+                            <Setter Property="DisabledLineBrush" Value="{ThemeResource ControlStrongStrokeColorDisabledBrush}"/>
+                            <Setter Property="LineThickness" Value="2"/>
+
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="controls:FanCurveTuner">
+                                        <Grid Background="Transparent">
+                                            <TextBlock 
+                                                Text="{TemplateBinding Title}" 
+                                                Margin="55, 20" 
+                                                Opacity=".5" 
+                                                FontSize="25" 
+                                                Foreground="{ThemeResource ControlStrongStrokeColorDefaultBrush}"/>
+
+                                            <Canvas
+                                                Name="CANVAS_PART" 
+                                                Margin="50, 20, 20, 50" 
+                                                Background="Transparent">
+
+                                                <Canvas.Resources>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Thumb">
+                                                                    <Grid 
+                                                                        ToolTipService.ToolTip="{TemplateBinding Tag}">
+                                                                        <VisualStateManager.VisualStateGroups>
+                                                                            <VisualStateGroup x:Name="CommonStates">
+                                                                                <VisualState x:Name="Normal" />
+
+                                                                                <VisualState x:Name="Pressed">
+                                                                                    <VisualState.Setters>
+                                                                                        <Setter Target="ThumbHover.Opacity" Value=".2" />
+
+                                                                                    </VisualState.Setters>
+                                                                                </VisualState>
+
+                                                                                <VisualState x:Name="Disabled">
+                                                                                    <VisualState.Setters>
+                                                                                    </VisualState.Setters>
+                                                                                </VisualState>
+
+                                                                                <VisualState x:Name="PointerOver">
+                                                                                    <VisualState.Setters>
+                                                                                        <Setter Target="ThumbHover.Opacity" Value=".5" />
+
+                                                                                    </VisualState.Setters>
+                                                                                </VisualState>
+                                                                            </VisualStateGroup>
+                                                                        </VisualStateManager.VisualStateGroups>
+
+                                                                        <Rectangle 
+                                                                            x:Name="ThumbHover" 
+                                                                            Opacity="0" 
+                                                                            Width="20" 
+                                                                            Height="20"
+                                                                            RadiusX="10" 
+                                                                            RadiusY="10"
+                                                                            Fill="{TemplateBinding Background}"
+                                                                            Stroke="{TemplateBinding Foreground}"/>
+
+
+                                                                        <Rectangle 
+                                                                            x:Name="ThumbVisual" 
+                                                                            Width="10"
+                                                                            Height="10" 
+                                                                            RadiusX="5" 
+                                                                            RadiusY="5"
+                                                                            Fill="{TemplateBinding Background}"/>
+                                                                    </Grid>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Canvas.Resources>
+
+                                            </Canvas>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
                         <converters:VisibilityConverter x:Key="VisibilityConverter"/>
+                        <converters:BooleanConverter x:Key="BooleanConverter"/>
                         <converters:TimeConverter x:Key="TimeConverter" ZeroValue="Auto"/>
                     </ResourceDictionary>
                 </ResourceDictionary.MergedDictionaries>
@@ -354,6 +446,153 @@
                         </Border>
                     </StackPanel>
 
+                    <StackPanel
+                        x:Name="performanceConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
+                        <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button
+                                IsEnabled="{Binding IsDirty}"
+                                Content="Save changes"
+                                Click="SaveChanges"
+                                Style="{StaticResource AccentButtonStyle}"/>
+                            <ComboBox 
+                                ItemsSource="{Binding Profiles, Mode=OneWay}"
+                                SelectedItem="{Binding CurrentProfile, Mode=TwoWay}"
+                                DisplayMemberPath="Name"
+                                Grid.Column="1" 
+                                HorizontalAlignment="Stretch"  
+                                VerticalAlignment="Center"/>
+                            
+                            <Button 
+                                Grid.Column="2"
+                                Margin="5,0,0,0"
+                                VerticalAlignment="Center"
+                                ToolTipService.ToolTip="Create a new profile">
+
+                                <FontIcon FontSize="18" Glyph="&#xE8C8;" Margin="0"/>
+                                <Button.Flyout>
+                                    <Flyout x:Name="createProfileFlyout">
+                                        <StackPanel MinWidth="250">                                            
+                                            <TextBox
+                                                x:Name="createProfileName"
+                                                PlaceholderText="Enter a new profile name"/>
+                                            <Button 
+                                                IsEnabled="{Binding ElementName=createProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
+                                                Style="{StaticResource AccentButtonStyle}"
+                                                HorizontalAlignment="Right" 
+                                                Click="CreateProfile"
+                                                Content="Create Profile" Margin="0,10,0,0"/>
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Button 
+                                Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
+                                Grid.Column="3"
+                                Margin="5,0,0,0"
+                                VerticalAlignment="Center">
+
+                                <FontIcon FontSize="18" Glyph="&#xE8AC;" Margin="0"/>
+                                <Button.Flyout>
+                                    <Flyout x:Name="renameProfileFlyout">
+                                        <StackPanel MinWidth="250">
+                                            <TextBox
+                                                x:Name="renameProfileName"
+                                                Text="{Binding Name, Mode=OneWay}"
+                                                PlaceholderText="Enter a new profile name"/>
+                                            <Button 
+                                                IsEnabled="{Binding ElementName=renameProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
+                                                Style="{StaticResource AccentButtonStyle}"
+                                                HorizontalAlignment="Right" 
+                                                Click="RenameProfile"
+                                                Content="Rename Profile" Margin="0,10,0,0"/>
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Button 
+                                Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
+                                Grid.Column="4"
+                                Margin="5,0,0,0"
+                                VerticalAlignment="Center">
+
+                                <FontIcon FontSize="18" Glyph="&#xE74D;" Margin="0" />
+                                <Button.Flyout>
+                                    <Flyout x:Name="removeProfileFlyout">
+                                        <StackPanel MinWidth="250">
+                                            <TextBlock>Remove the current profile?</TextBlock>
+                                            <Button 
+                                                Style="{StaticResource AccentButtonStyle}"
+                                                HorizontalAlignment="Right" 
+                                                Click="RemoveProfile"
+                                                Content="Remove Profile" Margin="0,10,0,0"/>
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                        </Grid>
+
+                        <TextBlock 
+                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
+                            Text="Power Limits"
+                            FontWeight="SemiBold"
+                            Margin="10,30,0,5"/>
+
+                        <Border
+                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
+                            Style="{StaticResource CxConfigBorderStyle}">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="CPU" VerticalAlignment="Center"/>
+                                <Slider 
+                                    Grid.Column="1" 
+                                    Minimum="{Binding CpuLimitMin}"
+                                    Maximum="{Binding CpuLimitMax}"
+                                    Value="{Binding CpuLimit, Mode=TwoWay}"/>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock 
+                            Text="Fan Curves"
+                            FontWeight="SemiBold"
+                            Margin="10,30,0,5"/>
+
+                        <Border 
+                            Style="{StaticResource CxConfigBorderStyle}">
+                            
+                            <controls:FanCurveTuner 
+                                IsEnabled="{Binding IsUserData, Mode=OneWay}"
+                                DataContext="{Binding Cpu, Mode=OneTime}"
+                                Title="CPU Fan Curve"
+                                Height="300"/>
+                        </Border>
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            
+                            <controls:FanCurveTuner 
+                                IsEnabled="{Binding IsUserData, Mode=OneWay}"
+                                LineBrush="Red"
+                                DataContext="{Binding Gpu, Mode=OneTime}"
+                                Title="GPU Fan Curve"
+                                Height="300"/>
+                        </Border>
+
+                    </StackPanel>
+
                     <StackPanel 
                         x:Name="aboutConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -377,13 +616,13 @@
                                     <Style x:Key="Header" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="40, 0, 40, 5"/>
                                     </Style>
-                                    
+
                                     <Style x:Key="Value" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="10, 0, 20, 5"/>
                                         <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     </Style>
                                 </Grid.Resources>
-                                
+
                                 <TextBlock 
                                     Grid.ColumnSpan="2" 
                                     Text="{Binding ProductName}"
@@ -413,7 +652,7 @@
                                     Grid.ColumnSpan="2" 
                                     HorizontalAlignment="Right"
                                     Margin="0,10,0,0">
-                                    
+
                                     <HyperlinkButton NavigateUri="{Binding HomePageUrl}" Content="{Binding HomePage}"/>
                                     <HyperlinkButton Command="{Binding UpdateCommand}" Content="{Binding UpdateCommand.Text}"/>
                                 </StackPanel>

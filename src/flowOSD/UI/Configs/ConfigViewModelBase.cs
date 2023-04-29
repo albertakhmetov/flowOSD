@@ -20,6 +20,7 @@
 namespace flowOSD.UI.Configs;
 
 using System;
+using System.Collections.ObjectModel;
 using flowOSD.Core.Configs;
 
 public abstract class ConfigViewModelBase : ViewModelBase

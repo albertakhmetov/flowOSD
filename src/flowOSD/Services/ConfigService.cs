@@ -88,7 +88,20 @@ sealed class ConfigService : IConfig, IDisposable
         HotKeys = poco.HotKeys ?? new HotKeysConfig();
         HotKeys.PropertyChanged
             .Throttle(TimeSpan.FromMilliseconds(500))
-            .Subscribe(x => Save(x))
+            .Subscribe(x => Save())
+            .DisposeWith(disposable);
+
+        Performance = new PerformanceConfig(poco.Performance?.Profiles);
+        if (poco.Performance != null)
+        {
+            Performance.ChargerProfile = poco.Performance.ChargerProfile;
+            Performance.BatteryProfile = poco.Performance.BatteryProfile;
+            Performance.TabletProfile = poco.Performance.TabletProfile;
+        }
+
+        Performance.PropertyChanged
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Subscribe(x => Save())
             .DisposeWith(disposable);
 
         var service = new System.ServiceProcess.ServiceController("ASUSOptimization");
@@ -100,6 +113,8 @@ sealed class ConfigService : IConfig, IDisposable
     public NotificationsConfig Notifications { get; }
 
     public HotKeysConfig HotKeys { get; }
+
+    public PerformanceConfig Performance { get; }
 
     public FileInfo AppFile { get; }
 
@@ -143,7 +158,7 @@ sealed class ConfigService : IConfig, IDisposable
         }
     }
 
-    private void Save(string propertyName = null)
+    private void Save()
     {
         using var stream = configFile.Create();
 
@@ -155,7 +170,14 @@ sealed class ConfigService : IConfig, IDisposable
         {
             Common = this.Common,
             Notifications = this.Notifications,
-            HotKeys = this.HotKeys
+            HotKeys = this.HotKeys,
+            Performance = new PerformancePOCO
+            {
+                ChargerProfile = this.Performance.ChargerProfile,
+                BatteryProfile = this.Performance.BatteryProfile,
+                TabletProfile = this.Performance.TabletProfile,
+                Profiles = this.Performance.GetProfiles().ToArray()
+            }
         };
 
         JsonSerializer.Serialize<POCO>(stream, poco, options);
@@ -214,6 +236,19 @@ sealed class ConfigService : IConfig, IDisposable
         public NotificationsConfig? Notifications { get; set; }
 
         public HotKeysConfig? HotKeys { get; set; }
+
+        public PerformancePOCO? Performance { get; set; }
+    }
+
+    private class PerformancePOCO
+    {
+        public Guid ChargerProfile { get; set; }
+
+        public Guid BatteryProfile { get; set; }
+
+        public Guid TabletProfile { get; set; }
+
+        public PerformanceProfile[]? Profiles { get; set; }
     }
 
     private class NotificationConfigConverter : JsonConverter<NotificationsConfig>

@@ -51,6 +51,7 @@ sealed class HardwareService : IDisposable, IHardwareService
     private Battery battery;
     private IPowerManagement powerManagement;
     private IMicrophone microphone;
+    private PerformanceService performanceService;
 
     private Dictionary<Type, object> devices = new Dictionary<Type, object>();
 
@@ -96,6 +97,8 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         microphone = new Microphone();
 
+        performanceService = new PerformanceService(config, atk, atkWmi, powerManagement);
+
         Register<IAtk>(atk);
         Register<IAtkWmi>(atkWmi);
         Register<IKeyboard>(keyboard);
@@ -106,6 +109,7 @@ sealed class HardwareService : IDisposable, IHardwareService
         Register<IBattery>(battery);
         Register<IPowerManagement>(powerManagement);
         Register<IMicrophone>(microphone);
+        Register<IPerformanceService>(performanceService);
 
         powerManagement.PowerEvent
            .Where(x => x == PowerEvent.Suspend)
@@ -203,6 +207,7 @@ sealed class HardwareService : IDisposable, IHardwareService
         }
 
         refreshRateService.Update();
+        performanceService.Update();
     }
 
     private void InitHid()

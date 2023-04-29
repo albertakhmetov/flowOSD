@@ -24,6 +24,7 @@ using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using flowOSD.UI.Configs;
 using Microsoft.UI.Windowing;
@@ -35,6 +36,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
     private IConfig config;
     private ISystemEvents systemEvents;
     private ICommandService commandService;
+    private IHardwareService hardwareService;
 
     private ConfigWindow? window;
 
@@ -47,6 +49,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+        this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
 
         Text = "Settings...";
         Enabled = true;
@@ -64,6 +67,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 new NotificationsViewModel(config),
                 new KeyboardViewModel(config, commandService),
                 new MonitoringViewModel(config),
+                new PerformanceViewModel(config, hardwareService.ResolveNotNull<IAtk>()),
                 new AboutViewModel(config, commandService)
             };
 

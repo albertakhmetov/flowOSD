@@ -60,6 +60,7 @@ public sealed partial class ConfigWindow : Window, IDisposable
         notificationsConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(NotificationsViewModel));
         keyboardConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(KeyboardViewModel));
         monitoringConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(MonitoringViewModel));
+        performanceConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(PerformanceViewModel));
         aboutConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(AboutViewModel));
 
         SystemBackdrop = new MicaBackdrop();
@@ -134,4 +135,33 @@ public sealed partial class ConfigWindow : Window, IDisposable
         }
     }
 
+    private void CreateProfile(object sender, RoutedEventArgs e)
+    {
+        createProfileFlyout.Hide();
+
+        (performanceConfig.DataContext as PerformanceViewModel)?.CreateProfile(createProfileName.Text);
+
+        createProfileName.Text = "";
+    }
+
+    private void RenameProfile(object sender, RoutedEventArgs e)
+    {
+        renameProfileFlyout.Hide();
+
+        (performanceConfig.DataContext as PerformanceViewModel)?.RenameProfile(renameProfileName.Text);
+
+        renameProfileName.Text = "";
+    }
+
+    private void RemoveProfile(object sender, RoutedEventArgs e)
+    {
+        removeProfileFlyout.Hide();
+
+        (performanceConfig.DataContext as PerformanceViewModel)?.RemoveProfile();
+    }
+
+    private void SaveChanges(object sender, RoutedEventArgs e)
+    {
+        (performanceConfig.DataContext as PerformanceViewModel)?.SaveChanges(out var _);
+    }
 }

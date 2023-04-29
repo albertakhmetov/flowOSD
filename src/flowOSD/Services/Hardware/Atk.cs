@@ -37,17 +37,25 @@ sealed partial class Atk : IDisposable, IAtk
     private const uint IO_CONTROL_CODE = 0x0022240C;
     private const uint ASUS_WMI_METHODID_INIT = 0x54494E49;
 
+    private const uint DSTS_PRESENCE_BIT = 0x00010000;
     private const uint DSTS = 0x53545344;
     private const uint DEVS = 0x53564544;
 
     private const uint DEVID_GPU_ECO_MODE = 0x00090020;
     private const uint DEVID_THROTTLE_THERMAL_POLICY = 0x00120075;
 
-    private const uint CPU_Fan = 0x00110013;
-    private const uint GPU_Fan = 0x00110014;
+    private const uint CPU_FAN_SPEED = 0x00110013;
+    private const uint GPU_FAN_SPEED = 0x00110014;
+
+    private const uint CPU_FAN_CURVE = 0x00110024;
+    private const uint GPU_FAN_CURVE = 0x00110025;
 
     private const int CPU_TEMPERATURE = 0x00120094;
     private const int Temp_GPU = 0x00120097;
+
+    const int PPT_APUA3 = 0x001200A3;
+    const int PPT_TotalA0 = 0x001200A0;
+    const int PPT_CPUB0 = 0x001200B0;
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -115,6 +123,67 @@ sealed partial class Atk : IDisposable, IAtk
 
     public IObservable<int> CpuTemperature { get; }
 
+    public bool SetCpuLimit(uint value)
+    {
+        Set(PPT_TotalA0, value);
+        Set(PPT_APUA3, value);
+
+        return true;
+    }
+
+    public bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints)
+    {
+        if (dataPoints == null || dataPoints.Count != 8)
+        {
+            throw new ArgumentNullException(nameof(dataPoints));
+        }
+
+        var data = new byte[16];
+        for (var i = 0; i < dataPoints.Count; i++)
+        {
+            data[i] = dataPoints[i].Temperature;
+            data[8 + i] = dataPoints[i].Value;
+        }
+
+        switch (fanType)
+        {
+            case FanType.Cpu:
+                return BitConverter.ToInt32(Set(CPU_FAN_CURVE, data), 0) == 1;
+
+            case FanType.Gpu:
+                return BitConverter.ToInt32(Set(GPU_FAN_CURVE, data), 0) == 1;
+        }
+
+        return false;
+    }
+
+    public IList<FanDataPoint> GetFanCurve(FanType fanType, PerformanceMode performanceMode)
+    {
+        var device = fanType == FanType.Cpu ? CPU_FAN_CURVE : GPU_FAN_CURVE;
+        uint mode;
+        if (performanceMode == Core.Hardware.PerformanceMode.Turbo)
+        {
+            mode = 2;
+        }
+        else if (performanceMode == Core.Hardware.PerformanceMode.Silent)
+        {
+            mode = 1;
+        }
+        else
+        {
+            mode = 0;
+        }
+
+        var r = Get(device, mode);
+
+        var points = new FanDataPoint[8];
+        for (var i = 0; i < 15; i += 2)
+        {
+            points[i / 2] = new FanDataPoint(r[i], r[i + 1]);
+        }
+
+        return points;
+    }
 
     public void SetPerformanceMode(PerformanceMode performanceMode)
     {
@@ -145,16 +214,34 @@ sealed partial class Atk : IDisposable, IAtk
         var args = new byte[8];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
 
-        return BitConverter.ToInt32(Invoke(DSTS, args), 0) - 65536;
+        return Convert.ToInt32(BitConverter.ToInt64(Get(deviceId, 0), 0) & ~DSTS_PRESENCE_BIT);
     }
 
-    public void Set(uint deviceId, uint status)
+    public byte[] Get(uint deviceId, uint status)
     {
         var args = new byte[8];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         BitConverter.GetBytes(status).CopyTo(args, 4);
 
-        Invoke(DEVS, args);
+        return Invoke(DSTS, args);
+    }
+
+    public byte[] Set(uint deviceId, uint status)
+    {
+        var args = new byte[8];
+        BitConverter.GetBytes(deviceId).CopyTo(args, 0);
+        BitConverter.GetBytes(status).CopyTo(args, 4);
+
+        return Invoke(DEVS, args);
+    }
+
+    public byte[] Set(uint deviceId, byte[] parameters)
+    {
+        var args = new byte[4 + parameters.Length];
+        BitConverter.GetBytes(deviceId).CopyTo(args, 0);
+        parameters.CopyTo(args, 4);
+
+        return Invoke(DEVS, args);
     }
 
     private byte[] Invoke(uint MethodId, byte[] args)

@@ -1,4 +1,4 @@
-/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
+﻿/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
  *
  *  This file is part of flowOSD.
  *
@@ -19,29 +19,8 @@
 
 namespace flowOSD.Core.Hardware;
 
-public interface IAtk
+public enum FanType
 {
-    IObservable<PerformanceMode> PerformanceMode { get; }
-
-    IObservable<GpuMode> GpuMode { get; }
-
-    IObservable<int> CpuTemperature { get; }
-
-    int Get(uint deviceId);
-
-    byte[] Get(uint deviceId, uint status);
-
-    byte[] Set(uint deviceId, uint status);
-
-    byte[] Set(uint deviceId, byte[] parameters);
-
-    bool SetCpuLimit(uint value);
-
-    void SetPerformanceMode(PerformanceMode performanceMode);
-
-    void SetGpuMode(GpuMode gpuMode);
-
-    bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints);
-
-    IList<FanDataPoint> GetFanCurve(FanType fanType, PerformanceMode performanceMode);
+    Cpu,
+    Gpu,
 }

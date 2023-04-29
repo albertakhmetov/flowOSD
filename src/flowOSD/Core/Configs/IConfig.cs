@@ -29,6 +29,8 @@ public interface IConfig
 
     HotKeysConfig HotKeys { get; }
 
+    PerformanceConfig Performance { get; }
+
     FileInfo AppFile { get; }
 
     FileVersionInfo AppFileInfo { get; }

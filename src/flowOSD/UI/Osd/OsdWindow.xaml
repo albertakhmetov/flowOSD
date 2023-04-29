@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="root" Width="Auto" Background="Transparent" Padding="5">
+    <Grid x:Name="root" Width="Auto" Background="Transparent" Padding="8, 4">
         <Grid.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>

@@ -23,28 +23,27 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-public sealed class VisibilityConverter : IValueConverter
+
+public class BooleanConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (targetType == typeof(Visibility) && value is bool b)
+        if (targetType == typeof(bool) && value is string text)
         {
             return parameter as string == "!"
-                ? (!b ? Visibility.Visible : Visibility.Collapsed)
-                : (b ? Visibility.Visible : Visibility.Collapsed);
+                ? !string.IsNullOrEmpty(text)
+                : string.IsNullOrEmpty(text);
         }
 
-        if (targetType == typeof(Visibility) && value is object)
+        if (targetType == typeof(bool) && value is object)
         {
-            return parameter as string == "!"
-                ? (value != null ? Visibility.Collapsed : Visibility.Visible)
-                : (value == null ? Visibility.Collapsed : Visibility.Visible);
+            return parameter as string == "!" ? value == null : value != null;
         }
 
         return value;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, string language)
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
         return value;
     }

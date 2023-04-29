@@ -87,27 +87,21 @@
             </ToggleButton>
             <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Bind resources:Text.Instance.Main.CpuBoost}" Style="{StaticResource LabelStyle}"/>
 
-            <ToggleSplitButton Style="{StaticResource SplitButtonStyle}" 
-                               Grid.Row="0" 
-                               Grid.Column="1"
-                               IsChecked="{Binding IsPerformaceModeOverrideEnabled, Mode=OneWay}"
-                               Command="{Binding TogglePerformanceModeOverrideCommand, Mode=OneTime}">
+            <DropDownButton Style="{StaticResource ButtonStyle}" 
+                         Grid.Row="0" 
+                         Grid.Column="1"
+                         Command="{Binding TogglePerformanceProfileCommand, Mode=OneTime}">
+                
                 <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                          Glyph="{Binding PerformanceModeOverrideImage, Mode=OneWay}"/>
-                <ToggleSplitButton.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PerformanceMode.Turbo)}" 
-                                        Command="{Binding PerformanceModeCommand, Mode=OneTime}" 
-                                        CommandParameter="{x:Bind hardware:PerformanceMode.Turbo}"/>
-                        <MenuFlyoutItem Text="{x:Bind resources:Text.ToText(hardware:PerformanceMode.Silent)}" 
-                                        Command="{Binding PerformanceModeCommand, Mode=OneTime}" 
-                                        CommandParameter="{x:Bind hardware:PerformanceMode.Silent}"/>
-                    </MenuFlyout>
-                </ToggleSplitButton.Flyout>
-            </ToggleSplitButton>
+                          Glyph="{Binding PerformanceProfileImage, Mode=OneWay}"/>
+
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom" x:Name="performanceProfilesMenu"/>
+                </DropDownButton.Flyout>
+            </DropDownButton>
             <TextBlock Grid.Row="1" 
                        Grid.Column="1" 
-                       Text="{Binding PerformanceModeOverrideText, Mode=OneWay}" 
+                       Text="{Binding PerformanceProfileText, Mode=OneWay}" 
                        Style="{StaticResource LabelStyle}"/>
 
             <DropDownButton Grid.Row="0" 

@@ -131,6 +131,8 @@ public class Text
 
         public string Monitoring => "Monitoring";
 
+        public string Profiles => "Profiles";
+
         public string About => "About";
 
         public string RunAtStartup => "Run at logon";

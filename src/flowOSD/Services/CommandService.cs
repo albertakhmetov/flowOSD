@@ -56,7 +56,11 @@ sealed class CommandService : ICommandService, IDisposable
               new ClipboardPastePlainTextCommand(keysSender));*/
 
         Register(() => new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
-        Register(() => new PerformanceModeCommand(config, hardwareService.ResolveNotNull<IAtk>()));
+        Register(() => new PerformanceCommand(
+            config,
+            hardwareService.ResolveNotNull<IAtkWmi>(),
+            hardwareService.ResolveNotNull<IPowerManagement>(),
+            hardwareService.ResolveNotNull<IPerformanceService>()));
         Register(() => new PowerModeCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new GpuCommand(hardwareService.ResolveNotNull<IAtk>(), config));
         Register(() => new TouchPadCommand(hardwareService.ResolveNotNull<ITouchPad>()));
