@@ -153,9 +153,9 @@ public static class Images
 
     public static string Hardware_TouchPad => "\uefa5";
 
-    public static string Performance_Default => "\uECAA";
+    public static string Performance_Default => "\ue945";
 
-    public static string Performance_Turbo => "\ue945";
+    public static string Performance_Turbo => "\uECAD";
 
     public static string Performance_Silent => "\uec0a";
 

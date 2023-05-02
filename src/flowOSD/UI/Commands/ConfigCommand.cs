@@ -67,7 +67,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 new NotificationsViewModel(config),
                 new KeyboardViewModel(config, commandService),
                 new MonitoringViewModel(config),
-                new PerformanceViewModel(config, hardwareService.ResolveNotNull<IAtk>()),
+                new PerformanceViewModel(config, hardwareService),
                 new AboutViewModel(config, commandService)
             };
 

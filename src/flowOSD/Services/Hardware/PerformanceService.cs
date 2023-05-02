@@ -93,7 +93,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
         activeProfileSubject.OnNext(GetProfile(id));
     }
 
-    private PerformanceProfile GetProfile(Guid id)
+    public PerformanceProfile GetProfile(Guid id)
     {
         if (id == PerformanceProfile.Default.Id)
         {

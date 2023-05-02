@@ -125,8 +125,8 @@ sealed partial class Atk : IDisposable, IAtk
 
     public bool SetCpuLimit(uint value)
     {
-        Set(PPT_TotalA0, value);
-        Set(PPT_APUA3, value);
+        Set(PPT_TotalA0, Math.Max(5, Math.Min(80, value)));
+        Set(PPT_APUA3, Math.Max(5, Math.Min(80, value)));
 
         return true;
     }
@@ -142,7 +142,7 @@ sealed partial class Atk : IDisposable, IAtk
         for (var i = 0; i < dataPoints.Count; i++)
         {
             data[i] = dataPoints[i].Temperature;
-            data[8 + i] = dataPoints[i].Value;
+            data[8 + i] = Math.Min((byte)99, dataPoints[i].Value);
         }
 
         switch (fanType)

@@ -23,6 +23,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows.Input;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
@@ -39,18 +40,27 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private IAtk atk;
+    private IPerformanceService performanceService;
+
+    private BehaviorSubject<bool> isDirtySubject;
 
     private IReadOnlyCollection<PerformanceProfile> profiles;
     private PerformanceProfile currentProfile;
 
     private uint cpuLimit;
-    private string name;
-    private bool isDirty;
 
-    public PerformanceViewModel(IConfig config, IAtk atk)
-        : base(config, Text.Instance.Config.Profiles, Images.Notification)
+    public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
+        : base(config, Text.Instance.Config.Performance, Images.Performance_Default)
     {
-        this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
+        if (hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
+        atk = hardwareService.ResolveNotNull<IAtk>();
+        performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
+
+        isDirtySubject = new BehaviorSubject<bool>(false);
 
         cpu = new FanCurveDataSource();
         cpu.Changed += FanCurveChanged;
@@ -59,10 +69,15 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         gpu.Changed += FanCurveChanged;
 
         UpdateProfiles(Guid.Empty);
-        CurrentProfile = PerformanceProfile.Default;
 
         CpuLimitMin = 5;
         CpuLimitMax = 80;
+
+        isDirtySubject
+            .Throttle(TimeSpan.FromSeconds(2))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => SaveChanges())
+            .DisposeWith(disposable);
 
         Config.Performance.ProfileChanged
             .ObserveOn(SynchronizationContext.Current!)
@@ -72,28 +87,26 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private void UpdateProfiles(Guid changedProfileId)
     {
-        var p = new List<PerformanceProfile>
+        Profiles = new ReadOnlyCollection<PerformanceProfile>(Config.Performance.GetProfiles());
+
+        var profile = performanceService.GetProfile(changedProfileId);
+        if (profile.IsUserProfile)
         {
-            PerformanceProfile.Default,
-            PerformanceProfile.Turbo,
-            PerformanceProfile.Silent
-        };
-
-        p.AddRange(Config.Performance.GetProfiles());
-
-        Profiles = new ReadOnlyCollection<PerformanceProfile>(p);
-        CurrentProfile = Config.Performance[changedProfileId] ?? PerformanceProfile.Default;
+            CurrentProfile = profile;
+        }
+        else if (Profiles.Count > 0)
+        {
+            CurrentProfile = Profiles.First();
+        }
+        else
+        {
+            CreateProfile(Text.Instance.Config.UserProfileName);
+        }
     }
 
     private void FanCurveChanged(object? sender, EventArgs e)
     {
-        IsDirty = true;
-    }
-
-    public bool IsDirty
-    {
-        get => isDirty;
-        set => SetProperty(ref isDirty, value);
+        isDirtySubject.OnNext(true);
     }
 
     public IReadOnlyCollection<PerformanceProfile> Profiles
@@ -113,7 +126,6 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
                 return;
             }
 
-            name = currentProfile.Name;
             cpuLimit = currentProfile.CpuLimit;
 
             OnPropertyChanged(null);
@@ -143,21 +155,11 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
                 Gpu.Set(atk.GetFanCurve(FanType.Gpu, mode), false);
             }
 
-            IsDirty = false;
+            isDirtySubject.OnNext(false);
         }
     }
 
     public bool IsUserProfile => CurrentProfile.IsUserProfile;
-
-    public string Name
-    {
-        get => name;
-        set
-        {
-            SetProperty(ref name, value);
-            IsDirty = true;
-        }
-    }
 
     public uint CpuLimit
     {
@@ -165,10 +167,9 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         set
         {
             SetProperty(ref cpuLimit, value);
-            IsDirty = true;
+            isDirtySubject.OnNext(true);
         }
     }
-
 
     public uint CpuLimitMin { get; }
 
@@ -190,20 +191,15 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             Guid.NewGuid(),
             profileName,
             35,
-            Cpu.ToArray(),
-            Gpu.ToArray());
+            FanDataPoint.CreateDefaultCurve(),
+            FanDataPoint.CreateDefaultCurve());
 
         Config.Performance[profile.Id] = profile;
     }
 
     public void RenameProfile(string profileName)
     {
-        if (CurrentProfile.IsUserProfile)
-        {
-            var profile = CurrentProfile.Rename(profileName);
-
-            Config.Performance[profile.Id] = profile;
-        }
+        SaveChanges(profileName);
     }
 
     public void RemoveProfile()
@@ -214,18 +210,19 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         }
     }
 
-    public void SaveChanges(out bool isCorrected)
+    private void SaveChanges(string? newProfileName = null)
     {
-        var profile = new PerformanceProfile(
+        if (CurrentProfile.IsUserProfile && (!string.IsNullOrEmpty(newProfileName) || isDirtySubject.Value == true))
+        {
+            var profile = new PerformanceProfile(
             CurrentProfile.Id,
-            CurrentProfile.Name,
+            newProfileName ?? CurrentProfile.Name,
             CpuLimit,
-            FanDataPoint.MakeSafe(Cpu, out var isCpuCorrected),
-            FanDataPoint.MakeSafe(Gpu, out var isGpuCorrected));
+            Cpu.ToArray(),
+            Gpu.ToArray());
 
-        isCorrected = isCpuCorrected || isGpuCorrected;
-
-        Config.Performance[profile.Id] = profile;
-        IsDirty = false;
+            Config.Performance[profile.Id] = profile;
+            isDirtySubject.OnNext(false);
+        }
     }
 }

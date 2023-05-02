@@ -450,38 +450,31 @@
                         x:Name="performanceConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
 
-                        <Grid Margin="10,5">
+                        <Grid Margin="10,5" HorizontalAlignment="Right">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button
-                                IsEnabled="{Binding IsDirty}"
-                                Content="Save changes"
-                                Click="SaveChanges"
-                                Style="{StaticResource AccentButtonStyle}"/>
                             <ComboBox 
                                 ItemsSource="{Binding Profiles, Mode=OneWay}"
                                 SelectedItem="{Binding CurrentProfile, Mode=TwoWay}"
                                 DisplayMemberPath="Name"
-                                Grid.Column="1" 
                                 HorizontalAlignment="Stretch"  
                                 VerticalAlignment="Center"/>
-                            
+
                             <Button 
-                                Grid.Column="2"
+                                Grid.Column="1"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTipService.ToolTip="Create a new profile">
 
-                                <FontIcon FontSize="18" Glyph="&#xE8C8;" Margin="0"/>
+                                <FontIcon FontSize="18" Glyph="&#xE710;" Margin="0"/>
                                 <Button.Flyout>
                                     <Flyout x:Name="createProfileFlyout">
-                                        <StackPanel MinWidth="250">                                            
+                                        <StackPanel MinWidth="250">
                                             <TextBox
                                                 x:Name="createProfileName"
                                                 PlaceholderText="Enter a new profile name"/>
@@ -495,9 +488,9 @@
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
+
                             <Button 
-                                Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
-                                Grid.Column="3"
+                                Grid.Column="2"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center">
 
@@ -519,9 +512,9 @@
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
+                            
                             <Button 
-                                Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
-                                Grid.Column="4"
+                                Grid.Column="3"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center">
 
@@ -542,13 +535,11 @@
                         </Grid>
 
                         <TextBlock 
-                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
                             Text="Power Limits"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
                         <Border
-                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
                             Style="{StaticResource CxConfigBorderStyle}">
 
                             <Grid>
@@ -557,7 +548,12 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="CPU" VerticalAlignment="Center"/>
+                                <TextBlock VerticalAlignment="Center">
+                                    <Run Text="CPU : "/>
+                                    <Run Text="{Binding CpuLimit, Mode=OneWay}"/>
+                                    <Run Text="W"/>
+                                </TextBlock>
+                                
                                 <Slider 
                                     Grid.Column="1" 
                                     Minimum="{Binding CpuLimitMin}"
@@ -573,22 +569,21 @@
 
                         <Border 
                             Style="{StaticResource CxConfigBorderStyle}">
-                            
+
                             <controls:FanCurveTuner 
                                 IsEnabled="{Binding IsUserData, Mode=OneWay}"
                                 DataContext="{Binding Cpu, Mode=OneTime}"
                                 Title="CPU Fan Curve"
-                                Height="300"/>
+                                Height="200"/>
                         </Border>
 
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-                            
+
                             <controls:FanCurveTuner 
                                 IsEnabled="{Binding IsUserData, Mode=OneWay}"
-                                LineBrush="Red"
                                 DataContext="{Binding Gpu, Mode=OneTime}"
                                 Title="GPU Fan Curve"
-                                Height="300"/>
+                                Height="200"/>
                         </Border>
 
                     </StackPanel>

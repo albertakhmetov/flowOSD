@@ -42,12 +42,12 @@ public class FanCurveTuner : Control
     {
         if (d is FanCurveTuner tuner && e.NewValue is Brush brush)
         {
-            foreach (var line in tuner.verticalLines)
+            foreach (var line in tuner.temperatureLines)
             {
                 line.Stroke = brush;
             }
 
-            foreach (var line in tuner.horizontalLines)
+            foreach (var line in tuner.valueLines)
             {
                 line.Stroke = brush;
             }
@@ -74,12 +74,12 @@ public class FanCurveTuner : Control
     {
         if (d is FanCurveTuner tuner && e.NewValue is double value)
         {
-            foreach (var line in tuner.verticalLines)
+            foreach (var line in tuner.temperatureLines)
             {
                 line.StrokeThickness = value;
             }
 
-            foreach (var line in tuner.horizontalLines)
+            foreach (var line in tuner.valueLines)
             {
                 line.StrokeThickness = value;
             }
@@ -106,12 +106,12 @@ public class FanCurveTuner : Control
     {
         if (d is FanCurveTuner tuner && e.NewValue is Brush brush)
         {
-            foreach (var line in tuner.verticalLabels)
+            foreach (var line in tuner.temperatureLabels)
             {
                 line.Foreground = brush;
             }
 
-            foreach (var line in tuner.horizontalLabels)
+            foreach (var line in tuner.valueLabels)
             {
                 line.Foreground = brush;
             }
@@ -223,8 +223,8 @@ public class FanCurveTuner : Control
     private List<Thumb> thumbs = new List<Thumb>();
     private Polyline dataLine = new Polyline();
 
-    private List<Line> verticalLines = new List<Line>(), horizontalLines = new List<Line>();
-    private List<TextBlock> verticalLabels = new List<TextBlock>(), horizontalLabels = new List<TextBlock>();
+    private List<Line> temperatureLines = new List<Line>(), valueLines = new List<Line>();
+    private List<TextBlock> temperatureLabels = new List<TextBlock>(), valueLabels = new List<TextBlock>();
 
     private CurvePoint? current;
 
@@ -274,6 +274,10 @@ public class FanCurveTuner : Control
     private FanCurveDataSource? DataSource { get; set; }
 
     private double ThumbRadius { get; } = 10;
+
+    private int MinTemperature { get; } = 20;
+
+    private int MaxTemperature { get; } = 100;
 
     protected override void OnApplyTemplate()
     {
@@ -398,24 +402,26 @@ public class FanCurveTuner : Control
 
         Canvas.Children.Clear();
 
-        for (var i = 0; i <= 10; i++)
+        var temperatureLinesCount = (MaxTemperature - MinTemperature) / 10;
+
+        for (var i = 0; i < temperatureLinesCount * 2 + 1; i++)
         {
             var line = new Line();
             line.Stroke = CoordinateGridBrush;
             line.StrokeThickness = CoordinateGridThickness;
             line.IsHitTestVisible = false;
 
-            verticalLines.Add(line);
+            temperatureLines.Add(line);
             Canvas.Children.Add(line);
 
-            if (i > 0)
+            if (i % 2 == 0)
             {
                 var label = new TextBlock();
-                label.Text = $"{i * 10}°";
+                label.Text = $"{MinTemperature + (i / 2f) * 10}°";
                 label.Foreground = CoordinateGridLabelBrush;
                 label.FontSize = 10;
                 label.Padding = new Thickness(0, 10, 0, 0);
-                verticalLabels.Add(label);
+                temperatureLabels.Add(label);
                 Canvas.Children.Add(label);
             }
         }
@@ -426,17 +432,17 @@ public class FanCurveTuner : Control
             line.Stroke = CoordinateGridBrush;
             line.StrokeThickness = CoordinateGridThickness;
 
-            horizontalLines.Add(line);
+            valueLines.Add(line);
             Canvas.Children.Add(line);
 
-            if (i > 0)
+            //   if (i > 0)
             {
                 var label = new TextBlock();
                 label.Text = $"{i * 10}%";
                 label.Foreground = CoordinateGridLabelBrush;
                 label.FontSize = 10;
                 label.Padding = new Thickness(0, 0, 10, 0);
-                horizontalLabels.Add(label);
+                valueLabels.Add(label);
                 Canvas.Children.Add(label);
             }
         }
@@ -449,22 +455,42 @@ public class FanCurveTuner : Control
             return;
         }
 
-        // Grid
+        var size = new Windows.Foundation.Size(Canvas.ActualWidth, Canvas.ActualHeight);
 
-        for (var i = 0; i < verticalLines.Count; i++)
+        // Temperature
+
+        float dTemperature = (MaxTemperature - MinTemperature);
+
+        for (var i = 0; i < temperatureLines.Count; i++)
         {
-            var line = verticalLines[i];
+            var line = temperatureLines[i];
 
-            line.X1 = Canvas.ActualWidth * (i / 10f); // 10% step
+            var x = GetTemperatureX(MinTemperature + Convert.ToInt32(Math.Round(i / 2f * 10)));
+
+            line.X1 = x;
             line.Y1 = 0;
 
-            line.X2 = Canvas.ActualWidth * (i / 10f); // 10% step
+            line.X2 = x;
             line.Y2 = Canvas.ActualHeight;
         }
 
-        for (var i = 0; i < horizontalLines.Count; i++)
+        for (var i = 0; i < temperatureLabels.Count; i++)
         {
-            var line = horizontalLines[i];
+            var label = temperatureLabels[i];
+            label.Measure(size);
+
+            var x = GetTemperatureX(MinTemperature + i * 10) - label.ActualWidth / 2;
+            var y = Canvas.ActualHeight;
+
+            Canvas.SetLeft(label, x);
+            Canvas.SetTop(label, y);
+        }
+
+        // Fan %
+
+        for (var i = 0; i < valueLines.Count; i++)
+        {
+            var line = valueLines[i];
 
             line.X1 = 0;
             line.Y1 = Canvas.ActualHeight * (i / 10f); // 10% step;
@@ -473,32 +499,17 @@ public class FanCurveTuner : Control
             line.Y2 = Canvas.ActualHeight * (i / 10f); // 10% step;
         }
 
-        // Axes Labels
-        var size = new Windows.Foundation.Size(Canvas.ActualWidth, Canvas.ActualHeight);
+        valueLabels[0].Measure(size);
+        var isTiny = Canvas.ActualHeight / 10 < 1.5 * valueLabels[0].ActualHeight;
 
-        horizontalLabels[0].Measure(size);
-        var isTiny = Canvas.ActualHeight / 10 < 1.5 * horizontalLabels[0].ActualHeight;
-
-        for (var i = 0; i < verticalLabels.Count; i++)
+        for (var i = 0; i < valueLabels.Count; i++)
         {
-            var label = verticalLabels[i];
-            label.Measure(size);
-
-            var x = Canvas.ActualWidth * ((i + 1) / 10f) - label.ActualWidth / 2;
-            var y = Canvas.ActualHeight;
-
-            Canvas.SetLeft(label, x);
-            Canvas.SetTop(label, y);
-        }
-
-        for (var i = 0; i < horizontalLabels.Count; i++)
-        {
-            var label = horizontalLabels[i];
+            var label = valueLabels[i];
             label.Measure(size);
             label.Visibility = isTiny && i % 2 == 0 ? Visibility.Collapsed : Visibility.Visible;
 
             var x = -label.ActualWidth;
-            var y = Canvas.ActualHeight * ((10 - i - 1) / 10f) - label.ActualHeight / 2;
+            var y = Canvas.ActualHeight * ((10 - i) / 10f) - label.ActualHeight / 2;
 
             Canvas.SetLeft(label, x);
             Canvas.SetTop(label, y);
@@ -536,14 +547,11 @@ public class FanCurveTuner : Control
             return;
         }
 
-        var leftThumb = index > 0 ? thumbs[index - 1] : null;
-        var rightThumb = index < thumbs.Count - 1 ? thumbs[index + 1] : null;
-
-        var minX = leftThumb != null ? Canvas.GetLeft(leftThumb) + ThumbRadius * 3 : 0;
-        var maxX = rightThumb != null ? Canvas.GetLeft(rightThumb) - ThumbRadius : Canvas.ActualWidth;
+        var minX = GetTemperatureX(MinTemperature + index * 10);
+        var maxX = GetTemperatureX(MinTemperature + (index + 1) * 10 - Convert.ToInt32(DataSource.GridSize));
 
         var minY = 0;
-        var maxY = Canvas.ActualHeight;
+        var maxY = index >= 5 ? GetValueY(FanDataPoint.GetMinValue(MinTemperature + index * 10)) : Canvas.ActualHeight;
 
         var left = Math.Min(maxX, Math.Max(minX, x)) - ThumbRadius;
         var top = Math.Min(maxY, Math.Max(minY, y)) - ThumbRadius;
@@ -592,26 +600,32 @@ public class FanCurveTuner : Control
 
     private FanDataPoint ToDataPoint(double x, double y)
     {
-        if (Canvas == null)
-        {
-            throw new InvalidOperationException();
-        }
+        float d = MaxTemperature - MinTemperature;
 
         return new FanDataPoint(
-            (byte)Math.Round((x / Canvas.ActualWidth) * 100),
-            (byte)Math.Round((1 - y / Canvas.ActualHeight) * 100));
+            (byte)Math.Round(MinTemperature + (x / Canvas!.ActualWidth) * d),
+            (byte)Math.Round((1 - y / Canvas!.ActualHeight) * 100));
     }
 
     private CurvePoint ToCurvePoint(FanDataPoint dataPoint)
     {
-        if (Canvas == null)
-        {
-            throw new InvalidOperationException();
-        }
+        float d = MaxTemperature - MinTemperature;
 
         return new CurvePoint(
-            Canvas.ActualWidth * dataPoint.Temperature / 100f,
-            Canvas.ActualHeight * (1.0 - dataPoint.Value / 100f));
+            Canvas!.ActualWidth * (dataPoint.Temperature - MinTemperature) / d,
+            Canvas!.ActualHeight * (1.0 - dataPoint.Value / 100f));
+    }
+
+    private float GetTemperatureX(int temperature)
+    {
+        float d = MaxTemperature - MinTemperature;
+
+        return Convert.ToSingle(Canvas!.ActualWidth * (temperature - MinTemperature) / d);
+    }
+
+    private float GetValueY(int value)
+    {
+        return Convert.ToSingle(Canvas!.ActualHeight * (1.0 - value / 100f));
     }
 
     private sealed class CurvePoint

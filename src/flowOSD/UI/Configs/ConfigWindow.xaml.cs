@@ -159,9 +159,4 @@ public sealed partial class ConfigWindow : Window, IDisposable
 
         (performanceConfig.DataContext as PerformanceViewModel)?.RemoveProfile();
     }
-
-    private void SaveChanges(object sender, RoutedEventArgs e)
-    {
-        (performanceConfig.DataContext as PerformanceViewModel)?.SaveChanges(out var _);
-    }
 }

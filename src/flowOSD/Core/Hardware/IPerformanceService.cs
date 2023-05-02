@@ -24,4 +24,6 @@ public interface IPerformanceService
     IObservable<PerformanceProfile> ActiveProfile { get; }
 
     void SetActiveProfile(Guid id);
+
+    PerformanceProfile GetProfile(Guid id);
 }

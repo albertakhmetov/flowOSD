@@ -21,53 +21,39 @@ namespace flowOSD.Core.Hardware;
 
 public sealed class FanDataPoint
 {
-    public static IList<FanDataPoint> MakeSafe(IEnumerable<FanDataPoint> points, out bool isCorrected)
+    public static byte GetMinValue(int temperature)
     {
-        isCorrected = false;
-        var result = new List<FanDataPoint>(points.Take(points.Count() - 3));
-
-        var last = points.Skip(result.Count).ToArray();
-
-        if (last[0].Temperature < 70 || last[0].Temperature > 79 || last[0].Value < 35)
+        if (temperature >= 90)
         {
-            result.Add(new FanDataPoint(
-                Math.Min((byte)70, Math.Max((byte)79, last[0].Temperature)),
-                Math.Max((byte)35, last[0].Value)));
-
-            isCorrected = true;
+            return 60;
+        }
+        else if (temperature >= 80)
+        {
+            return 50;
+        }
+        else if (temperature >= 70)
+        {
+            return 35;
         }
         else
         {
-            result.Add(last[0]);
+            return 0;
         }
+    }
 
-        if (last[1].Temperature < 80 || last[1].Temperature > 89 || last[1].Value < 50)
+    public static FanDataPoint[] CreateDefaultCurve()
+    {
+        return new FanDataPoint[]
         {
-            result.Add(new FanDataPoint(
-                Math.Min((byte)80, Math.Max((byte)89, last[1].Temperature)),
-                Math.Max((byte)50, last[1].Value)));
-
-            isCorrected = true;
-        }
-        else
-        {
-            result.Add(last[1]);
-        }
-
-        if (last[2].Temperature < 90 || last[2].Value < 60)
-        {
-            result.Add(new FanDataPoint(
-                Math.Max((byte)90, last[2].Temperature),
-                Math.Max((byte)60, last[2].Value)));
-
-            isCorrected = true;
-        }
-        else
-        {
-            result.Add(last[2]);
-        }
-
-        return result;
+            new FanDataPoint(20, 0),
+            new FanDataPoint(30, 0),
+            new FanDataPoint(40, 0),
+            new FanDataPoint(50, 0),
+            new FanDataPoint(60, 10),
+            new FanDataPoint(70, 35),
+            new FanDataPoint(80, 50),
+            new FanDataPoint(90, 60),
+        };
     }
 
     public FanDataPoint(byte temperature, byte value)

@@ -31,17 +31,7 @@ public class FanCurveDataSource : IEnumerable<FanDataPoint>, INotifyPropertyChan
 
     public FanCurveDataSource()
     {
-        items = new FanDataPoint[]
-        {
-            new FanDataPoint(20, 0),
-            new FanDataPoint(30, 0),
-            new FanDataPoint(40, 0),
-            new FanDataPoint(50, 0),
-            new FanDataPoint(60, 10),
-            new FanDataPoint(70, 35),
-            new FanDataPoint(80, 50),
-            new FanDataPoint(90, 60),
-        };
+        items = FanDataPoint.CreateDefaultCurve();
     }
 
     public int Count => items.Length;
@@ -104,6 +94,12 @@ public class FanCurveDataSource : IEnumerable<FanDataPoint>, INotifyPropertyChan
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    public void Reset()
+    {
+        items = FanDataPoint.CreateDefaultCurve();
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
     public IEnumerator<FanDataPoint> GetEnumerator()
     {
         return ((IEnumerable<FanDataPoint>)items).GetEnumerator();
@@ -112,16 +108,6 @@ public class FanCurveDataSource : IEnumerable<FanDataPoint>, INotifyPropertyChan
     IEnumerator IEnumerable.GetEnumerator()
     {
         return items.GetEnumerator();
-    }
-
-    public sealed class ItemChangedEventArgs : EventArgs
-    {
-        public ItemChangedEventArgs(int index)
-        {
-            Index = index;
-        }
-
-        public int Index { get; private set; }
     }
 
     private FanDataPoint AdjustToGrid(ref FanDataPoint i)
@@ -137,5 +123,15 @@ public class FanCurveDataSource : IEnumerable<FanDataPoint>, INotifyPropertyChan
         {
             return i;
         }
+    }
+
+    public sealed class ItemChangedEventArgs : EventArgs
+    {
+        public ItemChangedEventArgs(int index)
+        {
+            Index = index;
+        }
+
+        public int Index { get; private set; }
     }
 }

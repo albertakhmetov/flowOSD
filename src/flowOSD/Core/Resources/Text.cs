@@ -131,7 +131,7 @@ public class Text
 
         public string Monitoring => "Monitoring";
 
-        public string Profiles => "Profiles";
+        public string Performance => "Performance";
 
         public string About => "About";
 
@@ -154,5 +154,7 @@ public class Text
         public string ShowBatteryChargeRate => "Show battery charge rate";
 
         public string ShowCpuTemperature => "Show CPU temperature";
+
+        public string UserProfileName => "User Profile";
     }
 }

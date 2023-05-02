@@ -62,10 +62,11 @@ sealed class AcrylicSystemBackdrop : IDisposable
             }
 
             configuration.IsInputActive = true;
-            SetConfigurationSourceTheme();
 
             controller = new DesktopAcrylicController();
             controller.LuminosityOpacity = .9f;
+
+            SetConfigurationSourceTheme();
 
             // Enable the system backdrop.
             controller.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
