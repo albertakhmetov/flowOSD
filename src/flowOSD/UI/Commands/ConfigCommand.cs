@@ -68,6 +68,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 new KeyboardViewModel(config, commandService),
                 new MonitoringViewModel(config),
                 new PerformanceViewModel(config, hardwareService),
+                new TabletViewModel(config, hardwareService),
                 new AboutViewModel(config, commandService)
             };
 

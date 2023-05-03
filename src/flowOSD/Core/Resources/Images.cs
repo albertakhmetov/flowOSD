@@ -129,6 +129,8 @@ public static class Images
 
     public static string Settings = "\ue713";
 
+    public static string Hardware_Tablet = "\uE70A";
+
     public static string Hardware_BrightnessDown = "\uec8a";
 
     public static string Hardware_BrightnessUp = "\ue706";

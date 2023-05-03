@@ -27,6 +27,10 @@ public interface IAtk
 
     IObservable<int> CpuTemperature { get; }
 
+    uint MinPowerLimit { get; }
+
+    uint MaxPowerLimit { get; }
+
     int Get(uint deviceId);
 
     byte[] Get(uint deviceId, uint status);
@@ -36,6 +40,8 @@ public interface IAtk
     byte[] Set(uint deviceId, byte[] parameters);
 
     bool SetCpuLimit(uint value);
+
+    bool SetApuLimit(uint value);
 
     void SetPerformanceMode(PerformanceMode performanceMode);
 

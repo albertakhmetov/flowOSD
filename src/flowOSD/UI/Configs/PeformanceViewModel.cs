@@ -47,7 +47,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private IReadOnlyCollection<PerformanceProfile> profiles;
     private PerformanceProfile currentProfile;
 
-    private uint cpuLimit;
+    private uint cpuLimit, apuLimit;
 
     public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
         : base(config, Text.Instance.Config.Performance, Images.Performance_Default)
@@ -70,8 +70,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
         UpdateProfiles(Guid.Empty);
 
-        CpuLimitMin = 5;
-        CpuLimitMax = 80;
+        MinPowerLimit = atk.MinPowerLimit;
+        MaxPowerLimit = atk.MaxPowerLimit;
 
         isDirtySubject
             .Throttle(TimeSpan.FromSeconds(2))
@@ -171,9 +171,19 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         }
     }
 
-    public uint CpuLimitMin { get; }
+    public uint ApuLimit
+    {
+        get => apuLimit;
+        set
+        {
+            SetProperty(ref apuLimit, value);
+            isDirtySubject.OnNext(true);
+        }
+    }
 
-    public uint CpuLimitMax { get; }
+    public uint MinPowerLimit { get; }
+
+    public uint MaxPowerLimit { get; }
 
     public FanCurveDataSource Cpu => cpu;
 
@@ -191,6 +201,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             Guid.NewGuid(),
             profileName,
             35,
+            80,
             FanDataPoint.CreateDefaultCurve(),
             FanDataPoint.CreateDefaultCurve());
 
@@ -218,6 +229,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             CurrentProfile.Id,
             newProfileName ?? CurrentProfile.Name,
             CpuLimit,
+            ApuLimit,
             Cpu.ToArray(),
             Gpu.ToArray());
 

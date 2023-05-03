@@ -61,6 +61,7 @@ public sealed partial class ConfigWindow : Window, IDisposable
         keyboardConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(KeyboardViewModel));
         monitoringConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(MonitoringViewModel));
         performanceConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(PerformanceViewModel));
+        tabletConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(TabletViewModel));
         aboutConfig.DataContext = ConfigViewModels.FirstOrDefault(i => i.GetType() == typeof(AboutViewModel));
 
         SystemBackdrop = new MicaBackdrop();

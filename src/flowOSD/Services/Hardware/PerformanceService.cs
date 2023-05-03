@@ -182,6 +182,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
             atk.SetFanCurve(FanType.Gpu, profile.GpuFanCurve);
 
             atk.SetCpuLimit(profile.CpuLimit);
+            atk.SetApuLimit(profile.ApuLimit);
         }
     }
 }

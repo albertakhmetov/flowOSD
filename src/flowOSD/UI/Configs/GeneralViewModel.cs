@@ -45,12 +45,6 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         set => Config.Common.RunAtStartup = value;
     }
 
-    public bool DisableTouchPadInTabletMode
-    {
-        get => Config.Common.DisableTouchPadInTabletMode;
-        set => Config.Common.DisableTouchPadInTabletMode = value;
-    }
-
     public bool ControlDisplayRefreshRate
     {
         get => Config.Common.ControlDisplayRefreshRate;

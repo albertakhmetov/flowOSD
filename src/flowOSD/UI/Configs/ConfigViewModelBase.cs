@@ -39,7 +39,26 @@ public abstract class ConfigViewModelBase : ViewModelBase
     public bool IsSelected
     {
         get => isSelected;
-        set => SetProperty(ref isSelected, value);
+        set
+        {
+            if (isSelected == value)
+            {
+                return;
+            }
+
+            if (isSelected)
+            {
+                OnDeactivated();
+            }
+
+            isSelected = value;
+            OnPropertyChanged();
+
+            if (isSelected)
+            {
+                OnActivated();
+            }
+        }
     }
 
     public bool IsFooterItem { get; }
@@ -49,4 +68,10 @@ public abstract class ConfigViewModelBase : ViewModelBase
     public string Icon { get; }
 
     protected IConfig Config { get; }
+
+    protected virtual void OnActivated()
+    { }
+
+    protected virtual void OnDeactivated()
+    { }
 }

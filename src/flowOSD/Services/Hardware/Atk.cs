@@ -51,10 +51,10 @@ sealed partial class Atk : IDisposable, IAtk
     private const uint GPU_FAN_CURVE = 0x00110025;
 
     private const int CPU_TEMPERATURE = 0x00120094;
-    private const int Temp_GPU = 0x00120097;
+    private const int GPU_TEMPERATURE = 0x00120097;
 
-    const int PPT_APUA3 = 0x001200A3;
-    const int PPT_TotalA0 = 0x001200A0;
+    const int PPT_APU = 0x001200A3;
+    const int PPT_CPU = 0x001200A0;
     const int PPT_CPUB0 = 0x001200B0;
 
     private CompositeDisposable? disposable = new CompositeDisposable();
@@ -123,10 +123,20 @@ sealed partial class Atk : IDisposable, IAtk
 
     public IObservable<int> CpuTemperature { get; }
 
+    public uint MinPowerLimit => 5;
+
+    public uint MaxPowerLimit => 80;
+
     public bool SetCpuLimit(uint value)
     {
-        Set(PPT_TotalA0, Math.Max(5, Math.Min(80, value)));
-        Set(PPT_APUA3, Math.Max(5, Math.Min(80, value)));
+        Set(PPT_CPU, Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value)));
+
+        return true;
+    }
+
+    public bool SetApuLimit(uint value)
+    {
+        Set(PPT_APU, Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value)));
 
         return true;
     }

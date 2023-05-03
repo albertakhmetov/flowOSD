@@ -174,12 +174,6 @@
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.DisableTouchPadInTabletMode}"
-                                IsOn="{Binding DisableTouchPadInTabletMode, Mode=TwoWay}" />
-                        </Border>
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch 
-                                HorizontalAlignment="Stretch"
                                 Header="{x:Bind resources:Text.Instance.Config.ControlDisplayRefreshRate}"
                                 IsOn="{Binding ControlDisplayRefreshRate, Mode=TwoWay}" />
                         </Border>
@@ -512,7 +506,7 @@
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
-                            
+
                             <Button 
                                 Grid.Column="3"
                                 Margin="5,0,0,0"
@@ -539,8 +533,7 @@
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
-                        <Border
-                            Style="{StaticResource CxConfigBorderStyle}">
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -553,12 +546,33 @@
                                     <Run Text="{Binding CpuLimit, Mode=OneWay}"/>
                                     <Run Text="W"/>
                                 </TextBlock>
-                                
+
                                 <Slider 
                                     Grid.Column="1" 
-                                    Minimum="{Binding CpuLimitMin}"
-                                    Maximum="{Binding CpuLimitMax}"
+                                    Minimum="{Binding MinPowerLimit}"
+                                    Maximum="{Binding MaxPowerLimit}"
                                     Value="{Binding CpuLimit, Mode=TwoWay}"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock VerticalAlignment="Center">
+                                    <Run Text="APU : "/>
+                                    <Run Text="{Binding ApuLimit, Mode=OneWay}"/>
+                                    <Run Text="W"/>
+                                </TextBlock>
+
+                                <Slider 
+                                    Grid.Column="1" 
+                                    Minimum="{Binding MinPowerLimit}"
+                                    Maximum="{Binding MaxPowerLimit}"
+                                    Value="{Binding ApuLimit, Mode=TwoWay}"/>
                             </Grid>
                         </Border>
 
@@ -586,6 +600,38 @@
                                 Height="200"/>
                         </Border>
 
+                    </StackPanel>
+
+                    <StackPanel 
+                        x:Name="tabletConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{x:Bind resources:Text.Instance.Config.DisableTouchPadInTabletMode}"
+                                IsOn="{Binding DisableTouchPadInTabletMode, Mode=TwoWay}" />
+                        </Border>
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock VerticalAlignment="Center" Text="Performance profile in tablet mode"/>
+
+                                <ComboBox 
+                                    Grid.Column="1"
+                                    ItemsSource="{Binding Profiles, Mode=OneWay}"
+                                    SelectedItem="{Binding TabletProfile, Mode=TwoWay}"
+                                    DisplayMemberPath="Name"
+                                    HorizontalAlignment="Stretch"  
+                                    VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
                     </StackPanel>
 
                     <StackPanel 

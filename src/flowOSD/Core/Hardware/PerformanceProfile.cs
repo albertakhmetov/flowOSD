@@ -42,6 +42,7 @@ public class PerformanceProfile
         Guid id,
         string name,
         uint cpuLimit,
+        uint apuLimit,
         IList<FanDataPoint> cpuFanCurve,
         IList<FanDataPoint> gpuFanCurve)
     {
@@ -49,6 +50,7 @@ public class PerformanceProfile
         Id = id;
         Name = name ?? throw new ArgumentNullException(nameof(name));
         CpuLimit = cpuLimit;
+        ApuLimit = apuLimit;
         CpuFanCurve = new ReadOnlyCollection<FanDataPoint>(cpuFanCurve);
         GpuFanCurve = new ReadOnlyCollection<FanDataPoint>(gpuFanCurve);
     }
@@ -61,6 +63,7 @@ public class PerformanceProfile
         Id = id;
         Name = name ?? throw new ArgumentNullException(nameof(name));
         CpuLimit = 0;
+        ApuLimit = 0;
         CpuFanCurve = new FanDataPoint[0];
         GpuFanCurve = new FanDataPoint[0];
     }
@@ -73,6 +76,8 @@ public class PerformanceProfile
     public string Name { get; }
 
     public uint CpuLimit { get; }
+
+    public uint ApuLimit { get; }
 
     public IList<FanDataPoint> CpuFanCurve { get; }
 
@@ -89,6 +94,7 @@ public class PerformanceProfile
             Id,
             profileName,
             CpuLimit,
+            ApuLimit,
             CpuFanCurve.ToArray(),
             GpuFanCurve.ToArray());
     }
