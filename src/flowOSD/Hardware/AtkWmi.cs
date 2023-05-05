@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+using System.ComponentModel;
 using System.Management;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -39,6 +40,7 @@ sealed class AtkWmi : IDisposable, IAtkWmi, IKeyboard
     private const int POWER_SOURCE_FULL = 0x2A;
 
     private IAtk atk;
+    private bool doNotUseAtk = false;
 
     private ManagementEventWatcher? watcher;
     private readonly BehaviorSubject<TabletMode> tabletModeSubject;
@@ -48,7 +50,7 @@ sealed class AtkWmi : IDisposable, IAtkWmi, IKeyboard
     {
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
 
-        tabletModeSubject = new BehaviorSubject<TabletMode>(GetTabletMode());
+        tabletModeSubject = new BehaviorSubject<TabletMode>(Api.Hardware.TabletMode.Notebook);
         keyPressedSubject = new Subject<AtkKey>();
 
         TabletMode = tabletModeSubject.AsObservable();
@@ -57,6 +59,8 @@ sealed class AtkWmi : IDisposable, IAtkWmi, IKeyboard
         watcher = new ManagementEventWatcher("root\\wmi", "SELECT * FROM AsusAtkWmiEvent");
         watcher.EventArrived += OnWmiEvent;
         watcher.Start();
+
+        RaiseTabletMode();
     }
 
     public void Dispose()
@@ -88,23 +92,42 @@ sealed class AtkWmi : IDisposable, IAtkWmi, IKeyboard
         switch (code)
         {
             case AK_TABLET_STATE:
-                var tabletMode = GetTabletMode();
-
-                // Ignore rotated mode:
-                // - it reasonable in tablet mode (no touchpad manipulation is required)
-                // - it annoying when notebook mode (when device is tilted)
-
-                if (tabletMode != Api.Hardware.TabletMode.Rotated)
-                {
-                    tabletModeSubject.OnNext(tabletMode);
-                }
+                RaiseTabletMode();
 
                 break;
         }
     }
 
-    private TabletMode GetTabletMode()
+    private async void RaiseTabletMode()
     {
-        return (TabletMode)atk.Get(DEVID_TABLET);
+        await Task.Delay(500);
+
+        if (doNotUseAtk)
+        {
+            const int SM_CONVERTIBLESLATEMODE = 0x2003;
+            var isTablet = Native.User32.GetSystemMetrics(SM_CONVERTIBLESLATEMODE);
+
+            tabletModeSubject.OnNext(isTablet == 0 ? Api.Hardware.TabletMode.Tablet : Api.Hardware.TabletMode.Notebook);
+            return;
+        }
+
+        try
+        {
+            var tabletMode = (TabletMode)atk.Get(DEVID_TABLET);
+
+            // Ignore rotated mode:
+            // - it reasonable in tablet mode (no touchpad manipulation is required)
+            // - it annoying when notebook mode (when device is tilted)
+
+            if (tabletMode != Api.Hardware.TabletMode.Rotated)
+            {
+                tabletModeSubject.OnNext(tabletMode);
+            }
+        }
+        catch (Win32Exception)
+        {
+            doNotUseAtk = true;
+            RaiseTabletMode();
+        }
     }
 }

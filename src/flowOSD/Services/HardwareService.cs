@@ -71,7 +71,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         atk = new Atk(config.UserConfig.PerformanceModeOverrideEnabled ? config.UserConfig.PerformanceModeOverride : null);
         atkWmi = new AtkWmi(atk);
-        cpu = new Cpu();
+        cpu = new Cpu(atk);
 
         if (config.UseOptimizationMode)
         {

@@ -18,6 +18,7 @@
  */
 namespace flowOSD.Hardware;
 
+using System.ComponentModel;
 using System.Management;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -33,8 +34,14 @@ sealed class Cpu : IDisposable, ICpu
     private readonly CountableSubject<uint> temperatureSubject;
     private IDisposable? updateSubscription;
 
-    public Cpu()
+    private IAtk atk;
+
+    private bool doNotUseAtk = false;
+
+    public Cpu(IAtk atk)
     {
+        this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
+
         try
         {
             temperatureSubject = new CountableSubject<uint>(GetTemperature());
@@ -88,15 +95,29 @@ sealed class Cpu : IDisposable, ICpu
 
     private uint GetTemperature()
     {
-        var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_Counters_ThermalZoneInformation");
-        foreach (ManagementObject obj in searcher.Get())
+        if (doNotUseAtk)
         {
-            if (obj["Temperature"] is uint temperature)
+            using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_Counters_ThermalZoneInformation");
+            foreach (ManagementObject obj in searcher.Get())
             {
-                return temperature - 273;
+                if (obj["Temperature"] is uint temperature)
+                {
+                    return temperature - 273;
+                }
             }
+
+            return 0;
         }
 
-        return 0;
+        try
+        {
+            const int CPU_TEMPERATURE = 0x00120094;
+            return Convert.ToUInt32(atk.Get(CPU_TEMPERATURE));
+        }
+        catch (Win32Exception)
+        {
+            doNotUseAtk = true;
+            return GetTemperature();
+        }
     }
 }
