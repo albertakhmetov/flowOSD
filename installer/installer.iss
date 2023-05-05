@@ -1,7 +1,7 @@
 [Setup]
 AppName=flowOSD
-AppVersion=2.1.1
-AppVerName=flowOSD 2.1.1
+AppVersion=2.1.2
+AppVerName=flowOSD 2.1.2
 AppCopyright=© 2021-2023, Albert Akhmetov
 WizardStyle=modern
 DefaultDirName={autopf}\flowOSD
@@ -18,11 +18,11 @@ AppPublisherURL=https://albertakhmetov.com
 
 AppSupportURL=https://github.com/albertakhmetov/flowOSD
 
-VersionInfoVersion=2.1.1
+VersionInfoVersion=2.1.2
 VersionInfoProductName=flowOSD
 
 DisableProgramGroupPage=yes
-OutputBaseFilename=flowOSD-2.1.1
+OutputBaseFilename=flowOSD-2.1.2
 
 [Files]
 Source: "..\output\publish\*.*"; DestDir: "{app}"; Flags: recursesubdirs
