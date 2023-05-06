@@ -34,6 +34,20 @@ public sealed class VisibilityConverter : IValueConverter
                 : (b ? Visibility.Visible : Visibility.Collapsed);
         }
 
+        if (targetType == typeof(Visibility) && value is int i)
+        {
+            return parameter as string == "!"
+                ? (i != 0 ? Visibility.Collapsed : Visibility.Visible)
+                : (i == 0 ? Visibility.Collapsed : Visibility.Visible);
+        }
+
+        if (targetType == typeof(Visibility) && value is string s)
+        {
+            return parameter as string == "!"
+                ? (!string.IsNullOrEmpty(s) ? Visibility.Collapsed : Visibility.Visible)
+                : (string.IsNullOrEmpty(s) ? Visibility.Collapsed : Visibility.Visible);
+        }
+
         if (targetType == typeof(Visibility) && value is object)
         {
             return parameter as string == "!"

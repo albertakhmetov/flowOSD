@@ -142,7 +142,7 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
         get => parameterInfo;
         set
         {
-            if (parameterInfo == value)
+            if (parameterInfo == value && value != null)
             {
                 return;
             }

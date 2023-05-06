@@ -127,6 +127,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             }
 
             cpuLimit = currentProfile.CpuLimit;
+            apuLimit = currentProfile.ApuLimit;
 
             OnPropertyChanged(null);
 

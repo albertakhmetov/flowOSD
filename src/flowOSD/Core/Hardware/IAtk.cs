@@ -27,6 +27,10 @@ public interface IAtk
 
     IObservable<int> CpuTemperature { get; }
 
+    uint MinBatteryChargeLimit { get; }
+
+    uint MaxBatteryChargeLimit { get; }
+
     uint MinPowerLimit { get; }
 
     uint MaxPowerLimit { get; }
@@ -38,6 +42,8 @@ public interface IAtk
     byte[] Set(uint deviceId, uint status);
 
     byte[] Set(uint deviceId, byte[] parameters);
+
+    bool SetBatteryChargeLimit(uint value);
 
     bool SetCpuLimit(uint value);
 

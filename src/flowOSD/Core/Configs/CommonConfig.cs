@@ -41,8 +41,8 @@ public sealed class CommonConfig : ConfigBase
     private bool showBatteryChargeRate;
     private bool showCpuTemperature;
 
-    private PerformanceMode performanceModeOverride;
-    private bool performanceModeOverrideEnabled;
+    private bool useBatteryChargeLimit;
+    private uint batteryChargeLimit;
 
     public CommonConfig()
     {
@@ -60,8 +60,8 @@ public sealed class CommonConfig : ConfigBase
         showBatteryChargeRate = true;
         showCpuTemperature = true;
 
-        performanceModeOverride = PerformanceMode.Silent;
-        performanceModeOverrideEnabled = false;
+        useBatteryChargeLimit = false;
+        batteryChargeLimit = 80;
     }
 
     [JsonIgnore]
@@ -125,15 +125,16 @@ public sealed class CommonConfig : ConfigBase
         set => SetProperty(ref showCpuTemperature, value);
     }
 
-    public PerformanceMode PerformanceModeOverride
+    public bool UseBatteryChargeLimit
     {
-        get => performanceModeOverride;
-        set => SetProperty(ref performanceModeOverride, value);
+        get => useBatteryChargeLimit;
+        set => SetProperty(ref useBatteryChargeLimit, value);
     }
 
-    public bool PerformanceModeOverrideEnabled
+    public uint BatteryChargeLimit
     {
-        get => performanceModeOverrideEnabled;
-        set => SetProperty(ref performanceModeOverrideEnabled, value);
+        get => batteryChargeLimit;
+        set => SetProperty(ref batteryChargeLimit, value);
     }
+
 }

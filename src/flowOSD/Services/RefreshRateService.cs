@@ -16,6 +16,9 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
+namespace flowOSD.Services;
+
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -24,9 +27,7 @@ using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using static flowOSD.Extensions.Common;
 
-namespace flowOSD.Services;
-
-internal class RefreshRateService : IDisposable
+internal sealed class RefreshRateService : IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 

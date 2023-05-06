@@ -17,6 +17,7 @@
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="../Styles/CxToggleSwitch.xaml"/>
+                    <ResourceDictionary Source="../Styles/CxExpander.xaml"/>
                     <ResourceDictionary>
                         <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
                         <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent"/>
@@ -29,6 +30,16 @@
                             <Setter Property="Margin" Value="10, 5"/>
                             <Setter Property="Padding" Value="20, 10, 10, 10"/>
                             <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
+                        </Style>
+
+                        <Style x:Key="CxConfigExpanderStyle" TargetType="Expander" BasedOn="{StaticResource CxExpanderStyle}">
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}"/>
+                            <Setter Property="Background" Value="{ThemeResource ControlFillColorDefaultBrush}"/>
+                            <Setter Property="Margin" Value="10, 5"/>
+                            <Setter Property="Padding" Value="20, 10, 10, 10"/>
+                            <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
                         </Style>
 
                         <Style TargetType="controls:FanCurveTuner">
@@ -161,6 +172,7 @@
                 </ScrollViewer.Resources>
 
                 <Grid>
+                    <!-- General -->
                     <StackPanel 
                         x:Name="generalConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -191,6 +203,7 @@
                         </Border>
                     </StackPanel>
 
+                    <!-- Notifications -->
                     <StackPanel 
                         x:Name="notificationsConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -293,6 +306,7 @@
                         </Border>
                     </StackPanel>
 
+                    <!-- Keyboard -->
                     <StackPanel 
                         x:Name="keyboardConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -408,6 +422,7 @@
                         </ItemsControl>
                     </StackPanel>
 
+                    <!-- Monitoring -->
                     <StackPanel 
                         x:Name="monitoringConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -440,6 +455,7 @@
                         </Border>
                     </StackPanel>
 
+                    <!-- Performance -->
                     <StackPanel
                         x:Name="performanceConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -602,6 +618,7 @@
 
                     </StackPanel>
 
+                    <!-- Tablet -->
                     <StackPanel 
                         x:Name="tabletConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
@@ -634,6 +651,136 @@
                         </Border>
                     </StackPanel>
 
+                    <!-- Battery -->
+                    <StackPanel
+                        x:Name="batteryConfig"
+                        Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Border 
+                                    Margin="-20,0,-10,0" 
+                                    BorderThickness="0,0,0,1" 
+                                    BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0, 10, 10">
+                                        <FontIcon 
+                                            Margin="5,0,5,0"
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{Binding StatusImage}"/>
+                                        <TextBlock 
+                                            FontSize="21" 
+                                            FontWeight="SemiBold"
+                                            VerticalAlignment="Center" >
+                                        
+                                            <Run Text="{Binding Percentage}"/>
+                                            <Run Text="%"/>
+                                        </TextBlock>
+
+                                        <TextBlock 
+                                            Margin="15,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding PowerState}"/>
+
+                                        <TextBlock
+                                            Margin="15,0,0,0"
+                                            VerticalAlignment="Center"                                            
+                                            Visibility="{Binding Rate, Converter={StaticResource VisibilityConverter}}">
+                                        
+                                            <Run Text="{Binding Rate}" FontWeight="SemiBold"/>
+                                            <Run Text="mW"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <Grid Grid.Row="1" Margin="0, 10, 0, 10">
+                                    <Grid.Resources>
+                                        <Style x:Key="Header" TargetType="TextBlock">
+                                            <Setter Property="Margin" Value="40, 0, 40, 5"/>
+                                        </Style>
+
+                                        <Style x:Key="Value" TargetType="TextBlock">
+                                            <Setter Property="Margin" Value="10, 0, 20, 5"/>
+                                            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        </Style>
+                                    </Grid.Resources>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Style="{StaticResource Header}" Text="{Binding Text.Name}"/>
+                                    <TextBlock Grid.Row="0" Style="{StaticResource Value}" Grid.Column="1" Text="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="{Binding Text.ManufactureName}"/>
+                                    <TextBlock Grid.Row="1" Style="{StaticResource Value}" Grid.Column="1" Text="{Binding ManufactureName}"/>
+
+                                    <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="{Binding Text.EstimatedTime}"/>
+                                    <TextBlock Grid.Row="2" Style="{StaticResource Value}" Grid.Column="1" Text="{Binding EstimatedTime}"/>
+
+                                    <TextBlock Grid.Row="3" Style="{StaticResource Header}" Text="{Binding Text.Capacity}"/>
+                                    <TextBlock Grid.Row="3" Style="{StaticResource Value}" Grid.Column="1">
+                                        <Run Text="{Binding Capacity}" FontWeight="SemiBold"/>
+                                        <Run Text="mWh"/>
+                                    </TextBlock>
+
+                                    <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="{Binding Text.FullChargedCapacity}"/>
+                                    <TextBlock Grid.Row="4" Style="{StaticResource Value}" Grid.Column="1">
+                                        <Run Text="{Binding FullChargedCapacity}" FontWeight="SemiBold"/>
+                                        <Run Text="mWh"/>
+                                    </TextBlock>
+
+                                    <TextBlock Grid.Row="5" Style="{StaticResource Header}" Text="{Binding Text.DesignedCapacity}"/>
+                                    <TextBlock Grid.Row="5" Style="{StaticResource Value}" Grid.Column="1">
+                                        <Run Text="{Binding DesignedCapacity}" FontWeight="SemiBold"/>
+                                        <Run Text="mWh"/>
+                                    </TextBlock>
+
+                                    <TextBlock Grid.Row="6" Style="{StaticResource Header}" Text="{Binding Text.WearPercentage}"/>
+                                    <TextBlock Grid.Row="6" Style="{StaticResource Value}" Grid.Column="1">
+                                        <Run Text="{Binding WearPercentage}" FontWeight="SemiBold"/>
+                                        <Run Text="%"/>
+                                    </TextBlock>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch" 
+                                VerticalAlignment="Center"
+                                IsOn="{Binding UseBatteryChargeLimit, Mode=TwoWay}">
+                                <ToggleSwitch.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Text.BatteryChargeLimit}" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                                        <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+                                            <Run Text="{Binding Text.BatteryChargeLimitDescription}"/>
+                                            <Run Text="{Binding BatteryChargeLimit}" FontWeight="SemiBold"/>
+                                            <Run Text="%"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- About -->
                     <StackPanel 
                         x:Name="aboutConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">

@@ -69,6 +69,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 new MonitoringViewModel(config),
                 new PerformanceViewModel(config, hardwareService),
                 new TabletViewModel(config, hardwareService),
+                new BatteryViewModel(config, hardwareService),
                 new AboutViewModel(config, commandService)
             };
 

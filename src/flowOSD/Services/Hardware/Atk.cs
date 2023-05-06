@@ -50,8 +50,10 @@ sealed partial class Atk : IDisposable, IAtk
     private const uint CPU_FAN_CURVE = 0x00110024;
     private const uint GPU_FAN_CURVE = 0x00110025;
 
-    private const int CPU_TEMPERATURE = 0x00120094;
-    private const int GPU_TEMPERATURE = 0x00120097;
+    private const uint CPU_TEMPERATURE = 0x00120094;
+    private const uint GPU_TEMPERATURE = 0x00120097;
+
+    private const uint DEVID_BATTERY_LIMIT = 0x00120057;
 
     const int PPT_APU = 0x001200A3;
     const int PPT_CPU = 0x001200A0;
@@ -123,9 +125,20 @@ sealed partial class Atk : IDisposable, IAtk
 
     public IObservable<int> CpuTemperature { get; }
 
+    public uint MinBatteryChargeLimit => 40;
+
+    public uint MaxBatteryChargeLimit => 100;
+
     public uint MinPowerLimit => 5;
 
     public uint MaxPowerLimit => 80;
+
+    public bool SetBatteryChargeLimit(uint value)
+    {
+        Set(DEVID_BATTERY_LIMIT, Math.Max(MinBatteryChargeLimit, Math.Min(MaxBatteryChargeLimit, value)));
+
+        return true;
+    }
 
     public bool SetCpuLimit(uint value)
     {

@@ -79,7 +79,7 @@ sealed class NotificationService : IDisposable
     private void Init(CompositeDisposable disposable)
     {
         atk.PerformanceMode
-            .Skip(1)
+            .Skip(2)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)

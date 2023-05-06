@@ -29,8 +29,6 @@ public interface IBattery
 
     uint FullChargedCapacity { get; }
 
-    uint CycleCount { get; }
-
     IObservable<int> Rate { get; }
 
     IObservable<uint> Capacity { get; }

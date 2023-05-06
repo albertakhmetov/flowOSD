@@ -16,7 +16,7 @@
 		<Copyright>© 2021-2023, Albert Akhmetov</Copyright>
 		<Authors>Albert Akhmetov</Authors>
 		<Product>flowOSD</Product>
-		<Version>3.0.0-dev424</Version>
+		<Version>3.0.0-dev506</Version>
 		<Platforms>x64</Platforms>
 		<PackageIcon></PackageIcon>
 		<PackageIconUrl />
@@ -85,6 +85,9 @@
 	  <None Update="App.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </None>
+	  <Page Update="UI\Styles\CxExpander.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="UI\Styles\CxSplitButton.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -136,6 +139,7 @@
 	  <None Remove="UI\NotifyMenuWindow.xaml" />
 	  <None Remove="UI\OsdWindow.xaml" />
 	  <None Remove="UI\Styles\CxConfig.xaml" />
+	  <None Remove="UI\Styles\CxExpander.xaml" />
 	  <None Remove="UI\Styles\CxProgressBar.xaml" />
 	  <None Remove="UI\Styles\CxSplitButton.xaml" />
 	  <None Remove="UI\Styles\CxToggleSwitch.xaml" />

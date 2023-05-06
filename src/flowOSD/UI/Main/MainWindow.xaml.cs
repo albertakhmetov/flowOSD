@@ -204,11 +204,11 @@ public sealed partial class MainWindow : Window, IDisposable
 
             if (config.Common.ShowBatteryChargeRate)
             {
-                battery.Rate
+                battery.Rate.DistinctUntilChanged()
                     .CombineLatest(
-                        battery.Capacity,
-                        battery.PowerState,
-                        battery.EstimatedTime,
+                        battery.Capacity.DistinctUntilChanged(),
+                        battery.PowerState.DistinctUntilChanged(),
+                        battery.EstimatedTime.DistinctUntilChanged(),
                         (rate, capacity, powerState, estimatedTime) => new { rate, capacity, powerState, estimatedTime })
                     .ObserveOn(SynchronizationContext.Current!)
                     .Subscribe(x => UpdateBattery(x.rate, x.capacity, x.powerState, x.estimatedTime))

@@ -57,6 +57,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private KeyboardBacklightService? keyboardBacklightService;
     private RefreshRateService refreshRateService;
+    private BatteryChargeService batteryChargeService;
 
     public HardwareService(IConfig config, IMessageQueue messageQueue, IKeysSender keysSender)
     {
@@ -70,7 +71,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         InitHid();
 
-        atk = new Atk(config.Common.PerformanceModeOverrideEnabled ? config.Common.PerformanceModeOverride : null);
+        atk = new Atk(PerformanceMode.Default);
         atkWmi = new AtkWmi(atk);
 
         if (config.UseOptimizationMode)
@@ -142,6 +143,10 @@ sealed class HardwareService : IDisposable, IHardwareService
             this.config,
             display,
             powerManagement).DisposeWith(disposable);
+
+        batteryChargeService = new BatteryChargeService(
+            this.config,
+            atk).DisposeWith(disposable);
     }
 
     public void Dispose()
@@ -194,11 +199,6 @@ sealed class HardwareService : IDisposable, IHardwareService
     {
         battery.Reconnect();
 
-        if (config.Common.PerformanceModeOverrideEnabled)
-        {
-            atk.SetPerformanceMode(config.Common.PerformanceModeOverride);
-        }
-
         if (!config.UseOptimizationMode)
         {
             InitHid();
@@ -208,6 +208,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         refreshRateService.Update();
         performanceService.Update();
+        batteryChargeService.Update();
     }
 
     private void InitHid()

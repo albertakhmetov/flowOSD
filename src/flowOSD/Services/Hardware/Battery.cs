@@ -103,8 +103,6 @@ sealed partial class Battery : IDisposable, IBattery
 
     public uint FullChargedCapacity { get; private set; }
 
-    public uint CycleCount { get; private set; }
-
     public IObservable<int> Rate { get; }
 
     public IObservable<uint> Capacity { get; }
@@ -214,9 +212,9 @@ sealed partial class Battery : IDisposable, IBattery
                     {
                         Name = GetDeviceName(battery, batteryTag, BATTERY_QUERY_INFORMATION_LEVEL.BatteryDeviceName);
                         ManufactureName = GetDeviceName(battery, batteryTag, BATTERY_QUERY_INFORMATION_LEVEL.BatteryManufactureName);
+
                         DesignedCapacity = batteryInformation.DesignedCapacity;
                         FullChargedCapacity = batteryInformation.FullChargedCapacity;
-                        CycleCount = batteryInformation.CycleCount;
 
                         if (Name == "ASUS Battery" && ManufactureName == "ASUSTeK")
                         {
@@ -374,6 +372,41 @@ sealed partial class Battery : IDisposable, IBattery
         }
     }
 
+    private static uint GetEstimatedTime(SafeFileHandle batteryHandle, uint batteryTag)
+    {
+        BATTERY_QUERY_INFORMATION query = default;
+        query.BatteryTag = batteryTag;
+        query.InformationLevel = BATTERY_QUERY_INFORMATION_LEVEL.BatteryEstimatedTime;
+
+        var inBuffer = Marshal.AllocHGlobal(Marshal.SizeOf(query));
+        try
+        {
+            var outBuffer = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(BATTERY_INFORMATION)));
+            try
+            {
+                Marshal.StructureToPtr(query, inBuffer, false);
+
+                DeviceIoControl(
+                    batteryHandle,
+                    IOCTL_BATTERY_QUERY_INFORMATION,
+                    inBuffer,
+                    Marshal.SizeOf(query),
+                    outBuffer,
+                    Marshal.SizeOf(typeof(uint)));
+
+                return Marshal.PtrToStructure<uint>(outBuffer);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(outBuffer);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(inBuffer);
+        }
+    }
+
     private static string GetDeviceName(SafeFileHandle batteryHandle, uint batteryTag, BATTERY_QUERY_INFORMATION_LEVEL level)
     {
         const int maxLoadString = 100;
@@ -400,41 +433,6 @@ sealed partial class Battery : IDisposable, IBattery
                     maxLoadString);
 
                 return Marshal.PtrToStringUni(outBuffer) ?? string.Empty;
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(outBuffer);
-            }
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(inBuffer);
-        }
-    }
-
-    private static uint GetEstimatedTime(SafeFileHandle batteryHandle, uint batteryTag)
-    {
-        BATTERY_QUERY_INFORMATION query = default;
-        query.BatteryTag = batteryTag;
-        query.InformationLevel = BATTERY_QUERY_INFORMATION_LEVEL.BatteryEstimatedTime;
-
-        var inBuffer = Marshal.AllocHGlobal(Marshal.SizeOf(query));
-        try
-        {
-            var outBuffer = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(BATTERY_INFORMATION)));
-            try
-            {
-                Marshal.StructureToPtr(query, inBuffer, false);
-
-                DeviceIoControl(
-                    batteryHandle,
-                    IOCTL_BATTERY_QUERY_INFORMATION,
-                    inBuffer,
-                    Marshal.SizeOf(query),
-                    outBuffer,
-                    Marshal.SizeOf(typeof(uint)));
-
-                return Marshal.PtrToStructure<uint>(outBuffer);
             }
             finally
             {
