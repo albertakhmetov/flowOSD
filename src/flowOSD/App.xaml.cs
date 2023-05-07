@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD;
 
 using System;
@@ -55,6 +56,15 @@ public partial class App : Application
 
     public App()
     {
+        var instanceMutex = new Mutex(true, "com.albertakhmetov.flowosd", out bool isMutexCreated);
+        if (!isMutexCreated)
+        {
+            User32.SendMessage(Messages.HWND_BROADCAST, Messages.WM_HELLO_FLOWOSD, IntPtr.Zero, IntPtr.Zero);
+
+            instanceMutex = null;
+            Exit();
+        }
+
         InitializeComponent();  
         
         disposable = new CompositeDisposable();
@@ -78,6 +88,8 @@ public partial class App : Application
             commandService,
             hardwareService.ResolveNotNull<IAtkWmi>()).DisposeWith(disposable);
         notifyIconService.Show();
+
+        messageQueue.Subscribe(Messages.WM_HELLO_FLOWOSD, ProcessMessage).DisposeWith(disposable);
     }
 
     public void ShutDown()
@@ -94,5 +106,13 @@ public partial class App : Application
         disposable = null;
 
         Exit();
+    }
+
+    private void ProcessMessage(int messageId, IntPtr wParam, IntPtr lParam)
+    {
+        if (messageId == Messages.WM_HELLO_FLOWOSD)
+        {
+            commandService.ResolveNotNull<MainUICommand>().Execute();
+        }
     }
 }
