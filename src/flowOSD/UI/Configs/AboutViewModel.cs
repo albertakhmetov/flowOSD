@@ -30,11 +30,10 @@ using flowOSD.UI.Commands;
 
 public sealed class AboutViewModel : ConfigViewModelBase
 {
-
     public AboutViewModel(IConfig config, ICommandService commandService)
         : base(config, Text.Instance.Config.About, Images.Info, isFooterItem: true)
     {
-        if(commandService == null)
+        if (commandService == null)
         {
             throw new ArgumentNullException(nameof(commandService));
         }
@@ -69,5 +68,5 @@ public sealed class AboutViewModel : ConfigViewModelBase
 
     public string ModelName { get; }
 
-    public CommandBase UpdateCommand { get; } 
+    public CommandBase UpdateCommand { get; }
 }

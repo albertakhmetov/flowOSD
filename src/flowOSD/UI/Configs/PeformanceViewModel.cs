@@ -37,7 +37,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 {
     private readonly FanCurveDataSource cpu, gpu;
 
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable = null;
 
     private IAtk atk;
     private IPerformanceService performanceService;
@@ -72,36 +72,6 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
         MinPowerLimit = atk.MinPowerLimit;
         MaxPowerLimit = atk.MaxPowerLimit;
-
-        isDirtySubject
-            .Throttle(TimeSpan.FromSeconds(2))
-            .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(_ => SaveChanges())
-            .DisposeWith(disposable);
-
-        Config.Performance.ProfileChanged
-            .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(UpdateProfiles)
-            .DisposeWith(disposable);
-    }
-
-    private void UpdateProfiles(Guid changedProfileId)
-    {
-        Profiles = new ReadOnlyCollection<PerformanceProfile>(Config.Performance.GetProfiles());
-
-        var profile = performanceService.GetProfile(changedProfileId);
-        if (profile.IsUserProfile)
-        {
-            CurrentProfile = profile;
-        }
-        else if (Profiles.Count > 0)
-        {
-            CurrentProfile = Profiles.First();
-        }
-        else
-        {
-            CreateProfile(Text.Instance.Config.UserProfileName);
-        }
     }
 
     private void FanCurveChanged(object? sender, EventArgs e)
@@ -192,8 +162,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     public void Dispose()
     {
-        disposable?.Dispose();
-        disposable = null;
+        OnDeactivated();
     }
 
     public void CreateProfile(string profileName)
@@ -219,6 +188,51 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         if (CurrentProfile.IsUserProfile)
         {
             Config.Performance[CurrentProfile.Id] = null;
+        }
+    }
+
+    protected override void OnActivated()
+    {
+        disposable = new CompositeDisposable();
+
+        isDirtySubject
+            .Throttle(TimeSpan.FromSeconds(2))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => SaveChanges())
+            .DisposeWith(disposable);
+
+        Config.Performance.ProfileChanged
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(UpdateProfiles)
+            .DisposeWith(disposable);
+
+        UpdateProfiles(Guid.Empty);
+    }
+
+    protected override void OnDeactivated()
+    {
+        SaveChanges();
+
+        disposable?.Dispose();
+        disposable = null;
+    }
+
+    private void UpdateProfiles(Guid changedProfileId)
+    {
+        Profiles = new ReadOnlyCollection<PerformanceProfile>(Config.Performance.GetProfiles());
+
+        var profile = performanceService.GetProfile(changedProfileId);
+        if (profile.IsUserProfile)
+        {
+            CurrentProfile = profile;
+        }
+        else if (Profiles.Count > 0)
+        {
+            CurrentProfile = Profiles.First();
+        }
+        else
+        {
+            CreateProfile(Text.Instance.Config.UserProfileName);
         }
     }
 

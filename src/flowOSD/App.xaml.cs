@@ -77,7 +77,7 @@ public partial class App : Application
             systemEvents,
             commandService,
             hardwareService.ResolveNotNull<IAtkWmi>()).DisposeWith(disposable);
-        notifyIconService.Show();     
+        notifyIconService.Show();
     }
 
     public void ShutDown()

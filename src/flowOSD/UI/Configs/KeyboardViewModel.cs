@@ -32,7 +32,7 @@ using flowOSD.UI.Commands;
 
 public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 {
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable = null;
 
     public KeyboardViewModel(IConfig config, ICommandService commandService)
             : base(config, Text.Instance.Config.Keyboard, Images.KeyboardSettings)
@@ -68,11 +68,6 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
             new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Sleep, commands),
             new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Wireless, commands),
         });
-
-        Config.Common.PropertyChanged
-            .SubscribeOn(SynchronizationContext.Current!)
-            .Subscribe(OnPropertyChanged)
-            .DisposeWith(disposable);
     }
 
     public int KeyboardBacklightTimeout
@@ -93,12 +88,34 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 
     public void Dispose()
     {
+        OnDeactivated();
+    }
+
+    protected override void OnActivated()
+    {
+        disposable = new CompositeDisposable();
+
+        Config.Common.PropertyChanged
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(OnPropertyChanged)
+            .DisposeWith(disposable);
+
+        OnPropertyChanged(null);
+
+        foreach(var i in HotKeys)
+        {
+            i.Activate();
+        }
+    }
+
+    protected override void OnDeactivated()
+    {
         disposable?.Dispose();
         disposable = null;
 
         foreach (var i in HotKeys)
         {
-            i.Dispose();
+            i.Deactivate();
         }
     }
 }

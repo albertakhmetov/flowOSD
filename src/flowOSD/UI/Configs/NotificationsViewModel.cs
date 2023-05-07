@@ -28,15 +28,11 @@ using flowOSD.Extensions;
 
 public class NotificationsViewModel : ConfigViewModelBase, IDisposable
 {
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable = null;
 
     public NotificationsViewModel(IConfig config)
         : base(config, Text.Instance.Config.Notifications, Images.Notification)
     {
-        Config.Notifications.NotificationChanged
-            .SubscribeOn(SynchronizationContext.Current!)
-            .Subscribe(notificationType => OnPropertyChanged(Enum.GetName(notificationType)))
-            .DisposeWith(disposable);
     }
 
     public bool PerformanceMode
@@ -87,6 +83,23 @@ public class NotificationsViewModel : ConfigViewModelBase, IDisposable
     }
 
     public void Dispose()
+    {
+        OnDeactivated();
+    }
+
+    protected override void OnActivated()
+    {
+        disposable = new CompositeDisposable();
+
+        Config.Notifications.NotificationChanged
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(notificationType => OnPropertyChanged(Enum.GetName(notificationType)))
+            .DisposeWith(disposable);
+
+        OnPropertyChanged(null);
+    }
+
+    protected override void OnDeactivated()
     {
         disposable?.Dispose();
         disposable = null;

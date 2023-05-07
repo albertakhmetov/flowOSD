@@ -28,15 +28,11 @@ using flowOSD.Extensions;
 
 public class GeneralViewModel : ConfigViewModelBase, IDisposable
 {
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable = null;
 
     public GeneralViewModel(IConfig config)
         : base(config, Text.Instance.Config.General, Images.Home)
     {
-        Config.Common.PropertyChanged
-            .SubscribeOn(SynchronizationContext.Current!)
-            .Subscribe(OnPropertyChanged)
-            .DisposeWith(disposable);
     }
 
     public bool RunAtStartup
@@ -64,6 +60,21 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
     }
 
     public void Dispose()
+    {
+        OnDeactivated();
+    }
+
+    protected override void OnActivated()
+    {
+        disposable = new CompositeDisposable();
+
+        Config.Common.PropertyChanged
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(OnPropertyChanged)
+            .DisposeWith(disposable);
+    }
+
+    protected override void OnDeactivated()
     {
         disposable?.Dispose();
         disposable = null;

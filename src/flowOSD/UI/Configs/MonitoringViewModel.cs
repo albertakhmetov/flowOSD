@@ -28,16 +28,11 @@ using flowOSD.Extensions;
 
 public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 {
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable = null;
 
     public MonitoringViewModel(IConfig config)
         : base(config, Text.Instance.Config.Monitoring, Images.Diagnostic)
     {
-        Config.Common.PropertyChanged
-            .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature))
-            .SubscribeOn(SynchronizationContext.Current!)
-            .Subscribe(OnPropertyChanged)
-            .DisposeWith(disposable);
     }
 
     public bool ShowBatteryChargeRate
@@ -53,6 +48,24 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
     }
 
     public void Dispose()
+    {
+        OnDeactivated();
+    }
+
+    protected override void OnActivated()
+    {
+        disposable = new CompositeDisposable();
+
+        Config.Common.PropertyChanged
+            .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature))
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(OnPropertyChanged)
+            .DisposeWith(disposable);
+
+        OnPropertyChanged(null);
+    }
+
+    protected override void OnDeactivated()
     {
         disposable?.Dispose();
         disposable = null;

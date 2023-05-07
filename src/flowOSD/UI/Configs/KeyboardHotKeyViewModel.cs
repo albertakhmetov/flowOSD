@@ -33,7 +33,7 @@ using Microsoft.UI.Xaml;
 
 public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
 {
-    private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? disposable = null;
 
     private HotKeysConfig hotKeysConfig;
     private ICommandService commandService;
@@ -56,12 +56,6 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
         command = CommandBase.Empty;
 
         UpdateFromConfig();
-
-        this.hotKeysConfig.KeyChanged
-            .Where(key => Key == key)
-            .ObserveOn(SynchronizationContext.Current)
-            .Subscribe(_ => UpdateFromConfig())
-            .DisposeWith(disposable);
     }
 
     public IReadOnlyCollection<CommandBase> Commands { get; }
@@ -159,6 +153,24 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
     public Visibility AppVisibility => Command?.Name == nameof(UI.Commands.MainUICommand) ? Visibility.Visible : Visibility.Collapsed;
 
     public void Dispose()
+    {
+        Deactivate();
+    }
+
+    public void Activate()
+    {
+        disposable = new CompositeDisposable();
+
+        hotKeysConfig.KeyChanged
+            .Where(key => Key == key)
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => UpdateFromConfig())
+            .DisposeWith(disposable);
+
+        UpdateFromConfig();
+    }
+
+    public void Deactivate()
     {
         disposable?.Dispose();
         disposable = null;
