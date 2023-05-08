@@ -28,15 +28,15 @@ public class PerformanceProfile
 {
     public readonly static PerformanceProfile Default = new PerformanceProfile(
         Guid.Parse("{8ACA6E25-592B-49B7-8A9F-6612AD5B52C4}"),
-        Text.ToText(PerformanceMode.Default));
+        Text.Instance.PerformanceMode.Performance);
 
     public readonly static PerformanceProfile Turbo = new PerformanceProfile(
         Guid.Parse("{B0D2F613-FE12-4B77-9A51-1AB4CC9CE676}"),
-        Text.ToText(PerformanceMode.Turbo));
+        Text.Instance.PerformanceMode.Turbo);
 
     public readonly static PerformanceProfile Silent = new PerformanceProfile(
         Guid.Parse("{908F1186-ECCD-42A1-B581-D5E7F02DC385}"),
-        Text.ToText(PerformanceMode.Silent));
+        Text.Instance.PerformanceMode.Silent);
 
     public PerformanceProfile(
         Guid id,

@@ -58,6 +58,8 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
         UpdateFromConfig();
     }
 
+    public Text TextResources => Core.Resources.Text.Instance;
+
     public IReadOnlyCollection<CommandBase> Commands { get; }
 
     public AtkKey Key { get; }

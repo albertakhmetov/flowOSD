@@ -145,20 +145,10 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        switch (performanceMode)
-        {
-            case PerformanceMode.Default:
-                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Instance.Performance.Performance));
-                break;
+        osd.Show(new OsdMessage(
+            $"{Text.Instance.PerformanceMode.From(performanceMode)} performance mode", 
+            Images.Instance.PerformanceMode.From(performanceMode)));
 
-            case PerformanceMode.Turbo:
-                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Instance.Performance.Turbo));
-                break;
-
-            case PerformanceMode.Silent:
-                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Instance.Performance.Silent));
-                break;
-        }
     }
 
     private void ShowPowerModeNotification(PowerMode powerMode)
@@ -168,20 +158,9 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        switch (powerMode)
-        {
-            case PowerMode.BestPowerEfficiency:
-                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Instance.Power.BestPowerEfficiency));
-                break;
-
-            case PowerMode.Balanced:
-                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Instance.Power.Balanced));
-                break;
-
-            case PowerMode.BestPerformance:
-                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Instance.Power.BestPerformance));
-                break;
-        }
+        osd.Show(new OsdMessage(
+            $"{Text.Instance.PowerMode.From(powerMode)} power mode", 
+            Images.Instance.PowerMode.From(powerMode)));
     }
 
     private void ShowPowerSourceNotification(PowerSource powerSource)

@@ -85,9 +85,6 @@
 	  <None Update="App.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </None>
-	  <Page Update="UI\Styles\CxExpander.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
 	  <Page Update="UI\Styles\CxSplitButton.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -139,7 +136,6 @@
 	  <None Remove="UI\NotifyMenuWindow.xaml" />
 	  <None Remove="UI\OsdWindow.xaml" />
 	  <None Remove="UI\Styles\CxConfig.xaml" />
-	  <None Remove="UI\Styles\CxExpander.xaml" />
 	  <None Remove="UI\Styles\CxProgressBar.xaml" />
 	  <None Remove="UI\Styles\CxSplitButton.xaml" />
 	  <None Remove="UI\Styles\CxToggleSwitch.xaml" />

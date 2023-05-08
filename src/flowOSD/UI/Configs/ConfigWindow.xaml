@@ -17,7 +17,6 @@
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="../Styles/CxToggleSwitch.xaml"/>
-                    <ResourceDictionary Source="../Styles/CxExpander.xaml"/>
                     <ResourceDictionary>
                         <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
                         <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent"/>
@@ -57,14 +56,14 @@
                                         <Grid Background="Transparent">
                                             <TextBlock 
                                                 Text="{TemplateBinding Title}" 
-                                                Margin="55, 20" 
+                                                Margin="25, 10" 
                                                 Opacity=".5" 
                                                 FontSize="25" 
                                                 Foreground="{ThemeResource ControlStrongStrokeColorDefaultBrush}"/>
 
                                             <Canvas
                                                 Name="CANVAS_PART" 
-                                                Margin="50, 20, 20, 50" 
+                                                Margin="20, 10, 10, 20" 
                                                 Background="Transparent">
 
                                                 <Canvas.Resources>
@@ -487,7 +486,7 @@
                                         <StackPanel MinWidth="250">
                                             <TextBox
                                                 x:Name="createProfileName"
-                                                PlaceholderText="{Binding TextResources.Peformance.NewProfileNamePlaceholder}"/>
+                                                PlaceholderText="{Binding TextResources.Performance.NewProfileNamePlaceholder}"/>
                                             <Button 
                                                 IsEnabled="{Binding ElementName=createProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
                                                 Style="{StaticResource AccentButtonStyle}"
@@ -512,7 +511,7 @@
                                             <TextBox
                                                 x:Name="renameProfileName"
                                                 Text="{Binding Name, Mode=OneWay}"
-                                                PlaceholderText="{Binding TextResources.Peformance.NewProfileNamePlaceholder}"/>
+                                                PlaceholderText="{Binding TextResources.Performance.NewProfileNamePlaceholder}"/>
                                             <Button 
                                                 IsEnabled="{Binding ElementName=renameProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
                                                 Style="{StaticResource AccentButtonStyle}"
@@ -602,19 +601,19 @@
                         <Border 
                             Style="{StaticResource CxConfigBorderStyle}">
 
-                            <controls:FanCurveTuner 
+                            <controls:FanCurveTuner
+                                x:Name="cpuCurveTuner"
                                 IsEnabled="{Binding IsUserData, Mode=OneWay}"
                                 DataContext="{Binding Cpu, Mode=OneTime}"
-                                Title="{Binding TextResources.Performance.CpuFanCurve}"
                                 Height="200"/>
                         </Border>
 
                         <Border Style="{StaticResource CxConfigBorderStyle}">
 
                             <controls:FanCurveTuner 
+                                x:Name="gpuCurveTuner"
                                 IsEnabled="{Binding IsUserData, Mode=OneWay}"
                                 DataContext="{Binding Gpu, Mode=OneTime}"
-                                Title="{Binding TextResources.Performance.GpuFanCurve}"
                                 Height="200"/>
                         </Border>
 

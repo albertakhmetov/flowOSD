@@ -48,6 +48,8 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
         performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
     }
 
+    public Text TextResources => Text.Instance;
+
     public bool DisableTouchPadInTabletMode
     {
         get => Config.Common.DisableTouchPadInTabletMode;

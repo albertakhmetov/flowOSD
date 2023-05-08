@@ -17,10 +17,10 @@
  *
  */
 
+namespace flowOSD.Core.Resources;
+
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
-
-namespace flowOSD.Core.Resources;
 
 public class Images
 {
@@ -30,8 +30,8 @@ public class Images
     {
         Common = new CommonSection();
         Hardware = new HardwareSection();
-        Power = new PowerSection();
-        Performance = new PerformanceSection();
+        PowerMode = new PowerModeSection();
+        PerformanceMode = new PerformanceModeSection();
         Notification = new NotificationSection(this);
     }
 
@@ -39,9 +39,9 @@ public class Images
 
     public HardwareSection Hardware { get; }
 
-    public PowerSection Power { get; }
+    public PowerModeSection PowerMode { get; }
 
-    public PerformanceSection Performance { get; }
+    public PerformanceModeSection PerformanceMode { get; }
 
     public NotificationSection Notification { get; }
 
@@ -106,7 +106,7 @@ public class Images
 
     }
 
-    public sealed class PowerSection
+    public sealed class PowerModeSection
     {
         public string BatterySaver => "\uebc0";
 
@@ -115,9 +115,27 @@ public class Images
         public string Balanced => "\uec49";
 
         public string BestPerformance => "\uec4a";
+
+        public string From(PowerMode powerMode)
+        {
+            switch (powerMode)
+            {
+                case Core.Hardware.PowerMode.BestPowerEfficiency:
+                    return BestPowerEfficiency;
+
+                case Core.Hardware.PowerMode.Balanced:
+                    return Balanced;
+
+                case Core.Hardware.PowerMode.BestPerformance:
+                    return BestPerformance;
+
+                default:
+                    return string.Empty;
+            }
+        }
     }
 
-    public sealed class PerformanceSection
+    public sealed class PerformanceModeSection
     {
         public string Performance => "\ue945";
 
@@ -126,6 +144,24 @@ public class Images
         public string Silent => "\uec0a";
 
         public string User => "\uEE57";
+
+        public string From(PerformanceMode performanceMode)
+        {
+            switch (performanceMode)
+            {
+                case Core.Hardware.PerformanceMode.Default:
+                    return Performance;
+
+                case Core.Hardware.PerformanceMode.Silent:
+                    return Silent;
+
+                case Core.Hardware.PerformanceMode.Turbo:
+                    return Turbo;
+
+                default:
+                    return string.Empty;
+            }
+        }
     }
 
     public sealed class NotificationSection
@@ -137,9 +173,9 @@ public class Images
             this.root = root ?? throw new ArgumentNullException(nameof(root));
         }
 
-        public string PerformanceMode => root.Performance.Turbo;
+        public string PerformanceMode => root.PerformanceMode.Performance;
 
-        public string PowerMode => root.Power.Balanced;
+        public string PowerMode => root.PowerMode.Balanced;
 
         public string PowerSource => root.Hardware.AC;
 
@@ -152,6 +188,39 @@ public class Images
         public string Mic => root.Hardware.Mic;
 
         public string Gpu => root.Hardware.Gpu;
+
+        public string From(NotificationType notificationType)
+        {
+            switch (notificationType)
+            {
+                case NotificationType.PerformanceMode:
+                    return PerformanceMode;
+
+                case NotificationType.PowerMode:
+                    return PowerMode;
+
+                case NotificationType.PowerSource:
+                    return PowerSource;
+
+                case NotificationType.Boost:
+                    return Boost;
+
+                case NotificationType.TouchPad:
+                    return TouchPad;
+
+                case NotificationType.DisplayRefreshRate:
+                    return DisplayRefreshRate;
+
+                case NotificationType.Mic:
+                    return Mic;
+
+                case NotificationType.Gpu:
+                    return Gpu;
+
+                default:
+                    return "";
+            }
+        }
     }
 
     public string GetBatteryIcon(uint capacity, uint fullChargedCapacity, BatteryPowerState powerState)
@@ -162,74 +231,5 @@ public class Images
         var c = Math.Round((capacity * 10f) / fullChargedCapacity);
 
         return new string((char)(0xf5f2 + c + power), 1);
-    }
-
-    public string ToImage(PerformanceMode performanceMode)
-    {
-        switch (performanceMode)
-        {
-            case PerformanceMode.Default:
-                return Performance.Performance;
-
-            case PerformanceMode.Silent:
-                return Performance.Silent;
-
-            case PerformanceMode.Turbo:
-                return Performance.Turbo;
-
-            default:
-                return "";
-        }
-    }
-
-    public string ToImage(PowerMode powerMode)
-    {
-        switch (powerMode)
-        {
-            case PowerMode.BestPowerEfficiency:
-                return Power.BestPowerEfficiency;
-
-            case PowerMode.Balanced:
-                return Power.Balanced;
-
-            case PowerMode.BestPerformance:
-                return Power.BestPerformance;
-
-            default:
-                return "";
-        }
-    }
-
-    public string ToImage(NotificationType notificationType)
-    {
-        switch (notificationType)
-        {
-            case NotificationType.PerformanceMode:
-                return Performance.Turbo;
-
-            case NotificationType.PowerMode:
-                return Power.Balanced;
-
-            case NotificationType.PowerSource:
-                return Hardware.AC;
-
-            case NotificationType.Boost:
-                return Hardware.Cpu;
-
-            case NotificationType.TouchPad:
-                return Hardware.TouchPad;
-
-            case NotificationType.DisplayRefreshRate:
-                return Hardware.Screen;
-
-            case NotificationType.Mic:
-                return Hardware.Mic;
-
-            case NotificationType.Gpu:
-                return Hardware.Gpu;
-
-            default:
-                return "";
-        }
     }
 }

@@ -50,7 +50,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private uint cpuLimit, apuLimit;
 
     public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.Performance, Images.Instance.Performance.Performance)
+        : base(config, Text.Instance.Config.Performance, Images.Instance.PerformanceMode.Performance)
     {
         if (hardwareService == null)
         {

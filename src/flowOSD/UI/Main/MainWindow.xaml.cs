@@ -83,10 +83,11 @@ public sealed partial class MainWindow : Window, IDisposable
 
         config.Performance.ProfileChanged
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(_=>UpdatePerformanceProfilesMenu())
+            .Subscribe(_ => UpdatePerformanceProfilesMenu())
             .DisposeWith(disposable);
 
         UpdatePerformanceProfilesMenu();
+        UpdatePowerModesMenu();
     }
 
     private void UpdatePerformanceProfilesMenu()
@@ -97,28 +98,28 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PerformanceCommand,
             CommandParameter = PerformanceProfile.Default.Id,
-            Icon = new FontIcon { Glyph = Images.Instance.ToImage(PerformanceMode.Default) },
-            Text = Text.ToText(PerformanceMode.Default),
+            Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Performance },
+            Text = Text.Instance.PerformanceMode.Performance,
         });
 
         performanceProfilesMenu.Items.Add(new MenuFlyoutItem
         {
             Command = ViewModel.PerformanceCommand,
             CommandParameter = PerformanceProfile.Turbo.Id,
-            Icon = new FontIcon { Glyph = Images.Instance.ToImage(PerformanceMode.Turbo) },
-            Text = Text.ToText(PerformanceMode.Turbo),
+            Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Turbo },
+            Text = Text.Instance.PerformanceMode.Turbo,
         });
 
         performanceProfilesMenu.Items.Add(new MenuFlyoutItem
         {
             Command = ViewModel.PerformanceCommand,
             CommandParameter = PerformanceProfile.Silent.Id,
-            Icon = new FontIcon { Glyph = Images.Instance.ToImage(PerformanceMode.Silent) },
-            Text = Text.ToText(PerformanceMode.Silent),
+            Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Silent },
+            Text = Text.Instance.PerformanceMode.Silent
         });
 
         var userProfiles = config.Performance.GetProfiles();
-        if(userProfiles.Count == 0)
+        if (userProfiles.Count == 0)
         {
             return;
         }
@@ -135,6 +136,35 @@ public sealed partial class MainWindow : Window, IDisposable
             });
         }
 
+    }
+
+    private void UpdatePowerModesMenu()
+    {
+        powerModesMenu.Items.Clear();
+
+        powerModesMenu.Items.Add(new MenuFlyoutItem
+        {
+            Command = ViewModel.PowerModeCommand,
+            CommandParameter = PowerMode.BestPowerEfficiency,
+            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.BestPowerEfficiency },
+            Text = Text.Instance.PowerMode.BestPowerEfficiency
+        });
+
+        powerModesMenu.Items.Add(new MenuFlyoutItem
+        {
+            Command = ViewModel.PowerModeCommand,
+            CommandParameter = PowerMode.Balanced,
+            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.Balanced },
+            Text = Text.Instance.PowerMode.Balanced
+        });
+
+        powerModesMenu.Items.Add(new MenuFlyoutItem
+        {
+            Command = ViewModel.PowerModeCommand,
+            CommandParameter = PowerMode.BestPerformance,
+            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.BestPerformance },
+            Text = Text.Instance.PowerMode.BestPerformance
+        });
     }
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)

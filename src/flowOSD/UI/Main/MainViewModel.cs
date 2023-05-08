@@ -74,6 +74,10 @@ public class MainViewModel : ViewModelBase, IDisposable
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
     }
 
+    public Text TextResources => Text.Instance;
+
+    public Images ImageResources => Images.Instance;
+
     public CommandBase BoostCommand { get; }
 
     public CommandBase PerformanceCommand { get; }
@@ -154,19 +158,19 @@ public class MainViewModel : ViewModelBase, IDisposable
 
                 if (profile.Id == PerformanceProfile.Default.Id)
                 {
-                    PerformanceProfileImage = Images.Instance.Performance.Performance;
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.Performance;
                 }
                 else if (profile.Id == PerformanceProfile.Turbo.Id)
                 {
-                    PerformanceProfileImage = Images.Instance.Performance.Turbo;
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.Turbo;
                 }
                 else if (profile.Id == PerformanceProfile.Silent.Id)
                 {
-                    PerformanceProfileImage = Images.Instance.Performance.Silent;
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.Silent;
                 }
                 else
                 {
-                    PerformanceProfileImage = Images.Instance.Performance.User;
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.User;
                 }
             })
             .DisposeWith(localDisposable);
@@ -175,8 +179,8 @@ public class MainViewModel : ViewModelBase, IDisposable
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(powerMode =>
             {
-                PowerModeText = Text.ToText(powerMode);
-                PowerModeImage = Images.Instance.ToImage(powerMode);
+                PowerModeText = Text.Instance.PowerMode.From(powerMode);
+                PowerModeImage = Images.Instance.PowerMode.From(powerMode);
             })
             .DisposeWith(localDisposable);
 

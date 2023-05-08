@@ -16,95 +16,35 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
-using flowOSD.Core.Configs;
-using flowOSD.Core.Hardware;
 
 namespace flowOSD.Core.Resources;
+
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 
 public class Text
 {
     public readonly static Text Instance = new Text();
 
-    public static string ToText(PerformanceMode performanceMode)
-    {
-        switch (performanceMode)
-        {
-            case PerformanceMode.Silent:
-                return "Silent";
-
-            case PerformanceMode.Default:
-                return "Default";
-
-            case PerformanceMode.Turbo:
-                return "Turbo";
-
-            default:
-                return "";
-        }
-    }
-
-    public static string ToText(PowerMode powerMode)
-    {
-        switch (powerMode)
-        {
-            case PowerMode.BestPowerEfficiency:
-                return "Power Effeciency";
-
-            case PowerMode.Balanced:
-                return "Balanced";
-
-            case PowerMode.BestPerformance:
-                return "Performance";
-
-            default:
-                return "";
-        }
-    }
-
-    public static string ToText(NotificationType notificationType)
-    {
-        switch (notificationType)
-        {
-            case NotificationType.PerformanceMode:
-                return "Performance mode notifications";
-
-            case NotificationType.PowerMode:
-                return "Power mode notifications";
-
-            case NotificationType.PowerSource:
-                return "Power source notifications";
-
-            case NotificationType.Boost:
-                return "CPU boost mode notifications";
-
-            case NotificationType.TouchPad:
-                return "TouchPad state notifications";
-
-            case NotificationType.DisplayRefreshRate:
-                return "Display refresh rate notifications";
-
-            case NotificationType.Mic:
-                return "Microphone status notifications";
-
-            case NotificationType.Gpu:
-                return "dGPU notifications";
-
-            default:
-                return "";
-        }
-    }
-
     private Text()
     {
+        PerformanceMode = new PerformanceModeSection();
+        PowerMode = new PowerModeSection();
+
         Main = new MainSection();
         Config = new ConfigSection();
 
         Common = new CommonSection();
         Battery = new BatterySection();
         Notification = new NotificationSection();
+        Performance = new PerformanceSection();
         Tablet = new TabletSection();
         About = new AboutSection();
     }
+
+    public PerformanceModeSection PerformanceMode { get; }
+
+    public PowerModeSection PowerMode { get; }
 
     public MainSection Main { get; }
 
@@ -114,11 +54,69 @@ public class Text
 
     public NotificationSection Notification { get; }
 
+    public PerformanceSection Performance { get; }
+
     public TabletSection Tablet { get; }
 
     public BatterySection Battery { get; }
 
     public AboutSection About { get; }
+
+    public sealed class PerformanceModeSection
+    {
+        public string Performance => "Performance";
+
+        public string Silent => "Silent";
+
+        public string Turbo => "Turbo";
+
+        public string From(PerformanceMode performanceMode)
+        {
+            switch (performanceMode)
+            {
+                case Hardware.PerformanceMode.Default:
+                    return Performance;
+
+                case Hardware.PerformanceMode.Silent:
+                    return Silent;
+
+                case Hardware.PerformanceMode.Turbo:
+                    return Turbo;
+
+                default:
+                    return string.Empty;
+            }
+        }
+    }
+
+    public sealed class PowerModeSection
+    {
+        public string BatterySaver => "Battery Saver is on";
+
+        public string BestPowerEfficiency => "Power Effeciency";
+
+        public string Balanced => "Balanced";
+
+        public string BestPerformance => "Performance";
+
+        public string From(PowerMode powerMode)
+        {
+            switch (powerMode)
+            {
+                case Hardware.PowerMode.BestPowerEfficiency:
+                    return BestPowerEfficiency;
+
+                case Hardware.PowerMode.Balanced:
+                    return Balanced;
+
+                case Hardware.PowerMode.BestPerformance:
+                    return BestPerformance;
+
+                default:
+                    return string.Empty;
+            }
+        }
+    }
 
     public sealed class MainSection
     {
@@ -129,8 +127,6 @@ public class Text
         public string Gpu => "dGPU";
 
         public string TouchPad => "Touchpad";
-
-        public string BatterySaver => "Battery Saver is on";
     }
 
     public sealed class ConfigSection
@@ -202,9 +198,42 @@ public class Text
         public string Mic => "Microphone status notifications";
 
         public string Gpu => "dGPU notifications";
+
+        public string From(NotificationType notificationType)
+        {
+            switch (notificationType)
+            {
+                case NotificationType.PerformanceMode:
+                    return PerformanceMode;
+
+                case NotificationType.PowerMode:
+                    return PowerMode;
+
+                case NotificationType.PowerSource:
+                    return PowerSource;
+
+                case NotificationType.Boost:
+                    return Boost;
+
+                case NotificationType.TouchPad:
+                    return TouchPad;
+
+                case NotificationType.DisplayRefreshRate:
+                    return DisplayRefreshRate;
+
+                case NotificationType.Mic:
+                    return Mic;
+
+                case NotificationType.Gpu:
+                    return Gpu;
+
+                default:
+                    return "";
+            }
+        }
     }
 
-    public sealed class PeformanceSection
+    public sealed class PerformanceSection
     {
         public string NewProfileToolTip => "Create a new profile";
 
