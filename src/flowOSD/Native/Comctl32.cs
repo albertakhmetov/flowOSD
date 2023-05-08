@@ -24,6 +24,19 @@ using System.Runtime.InteropServices;
 
 static class Comctl32
 {
+    public const int TDCBF_OK_BUTTON = 0x0001;
+    public const int TDCBF_YES_BUTTON = 0x0002;
+    public const int TDCBF_NO_BUTTON = 0x0004;
+    public const int TDCBF_CANCEL_BUTTON = 0x0008;
+    public const int TDCBF_RETRY_BUTTON = 0x0010;
+    public const int TDCBF_CLOSE_BUTTON = 0x0020;
+
+    public const int IDOK = 0x0001;
+    public const int IDCANCEL = 0x0002;
+    public const int IDYES = 0x0006;
+    public const int IDNO = 0x0007;
+    public const int IDRETRY = 0x0010;
+
     public delegate IntPtr SUBCLASSPROC(
         IntPtr hWnd,
         int uMsg,
@@ -51,4 +64,30 @@ static class Comctl32
         int uMsg,
         IntPtr wParam,
         IntPtr lParam);
+
+    [DllImport(nameof(Comctl32), CharSet = CharSet.Unicode, EntryPoint = "TaskDialog")]
+    public static extern int TaskDialog(
+        IntPtr hWndParent,
+        IntPtr hInstance,
+        string pszWindowTitle,
+        string pszMainInstruction,
+        string pszContent,
+        int dwCommonButtons,
+        IntPtr pszIcon,
+        out int pnButton);
+
+    public static bool Confirm(string title, string message, string details)
+    {
+        var r = TaskDialog(
+             IntPtr.Zero,
+             IntPtr.Zero,
+             title,
+             message,
+             details,
+             TDCBF_YES_BUTTON | TDCBF_NO_BUTTON,
+             IntPtr.Zero,
+             out var buttonId);
+
+        return r == 0 && buttonId == IDYES;
+    }
 }

@@ -26,6 +26,7 @@ using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
+using Microsoft.UI.Xaml.Controls;
 using static flowOSD.Extensions.Common;
 
 sealed class GpuCommand : CommandBase
@@ -50,7 +51,7 @@ sealed class GpuCommand : CommandBase
     public async override void Execute(object? parameter = null)
     {
         var isGpuEnabled = await atk.GpuMode.FirstAsync() == GpuMode.dGpu;
-        if (!Confirm(isGpuEnabled))
+        if (Confirm(isGpuEnabled) == false)
         {
             return;
         }
@@ -67,12 +68,19 @@ sealed class GpuCommand : CommandBase
 
     private bool Confirm(bool isGpuEnabled)
     {
-        return true;
-        //return !config.Common.ConfirmGpuModeChange || DialogResult.Yes == MessageBox.Show(
-        //    isGpuEnabled ? "Do you want to turn off dGPU?" : "Do you want to turn on dGPU?",
-        //    "Discrete GPU",
-        //    MessageBoxButtons.YesNo,
-        //    MessageBoxIcon.Question);
+        // TODO: ASK if GPU is used by any app
+
+        if (!config.Common.ConfirmGpuModeChange)
+        {
+            return true;
+        }
+        else
+        {
+           return Native.Comctl32.Confirm(
+                "Discrete GPU",
+                isGpuEnabled ? "Do you want to turn off dGPU?" : "Do you want to turn on dGPU?",
+                "");
+        }
     }
 
     private void Update(GpuMode gpuMode)
