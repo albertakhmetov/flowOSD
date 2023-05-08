@@ -31,9 +31,11 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     public GeneralViewModel(IConfig config)
-        : base(config, Text.Instance.Config.General, Images.Home)
+        : base(config, Text.Instance.Config.General, Images.Instance.Common.Home)
     {
     }
+
+    public Text TextResources => Text.Instance;
 
     public bool RunAtStartup
     {

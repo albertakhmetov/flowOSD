@@ -36,8 +36,8 @@ sealed class DisplayBrightnessCommand : CommandBase
     private static int WM_SHELLHOOK = RegisterWindowMessage("SHELLHOOK");
 
     private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(DOWN, "Down", Images.Hardware_BrightnessDown),
-        new CommandParameterInfo(UP, "Up", Images.Hardware_BrightnessUp));
+        new CommandParameterInfo(DOWN, "Down", Images.Instance.Hardware.BrightnessDown),
+        new CommandParameterInfo(UP, "Up", Images.Instance.Hardware.BrightnessUp));
 
     private IConfig config;
     private IOsd osd;
@@ -89,8 +89,8 @@ sealed class DisplayBrightnessCommand : CommandBase
         // fail back:
 
         var icon = direction == DOWN
-            ? Images.Hardware_BrightnessDown
-            : Images.Hardware_BrightnessUp;
+            ? Images.Instance.Hardware.BrightnessDown
+            : Images.Instance.Hardware.BrightnessUp;
 
         osd.Show(new OsdValue(displayBrightness.GetLevel(), icon));
     }

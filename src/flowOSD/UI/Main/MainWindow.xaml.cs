@@ -97,7 +97,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PerformanceCommand,
             CommandParameter = PerformanceProfile.Default.Id,
-            Icon = new FontIcon { Glyph = Images.ToImage(PerformanceMode.Default) },
+            Icon = new FontIcon { Glyph = Images.Instance.ToImage(PerformanceMode.Default) },
             Text = Text.ToText(PerformanceMode.Default),
         });
 
@@ -105,7 +105,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PerformanceCommand,
             CommandParameter = PerformanceProfile.Turbo.Id,
-            Icon = new FontIcon { Glyph = Images.ToImage(PerformanceMode.Turbo) },
+            Icon = new FontIcon { Glyph = Images.Instance.ToImage(PerformanceMode.Turbo) },
             Text = Text.ToText(PerformanceMode.Turbo),
         });
 
@@ -113,7 +113,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PerformanceCommand,
             CommandParameter = PerformanceProfile.Silent.Id,
-            Icon = new FontIcon { Glyph = Images.ToImage(PerformanceMode.Silent) },
+            Icon = new FontIcon { Glyph = Images.Instance.ToImage(PerformanceMode.Silent) },
             Text = Text.ToText(PerformanceMode.Silent),
         });
 
@@ -239,7 +239,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             var isEmptyRate = Math.Abs(rate) < 100;
 
-            window.batteryChargeRateIcon.Glyph = Images.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
+            window.batteryChargeRateIcon.Glyph = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
             window.batteryChargeRate.Text = isEmptyRate ? "" : $"{rate / 1000f:N1} W";
 
             /* var time = TimeSpan.FromSeconds(estimatedTime);

@@ -56,6 +56,7 @@ public partial class App : Application
 
     public App()
     {
+#if !DEBUG
         var instanceMutex = new Mutex(true, "com.albertakhmetov.flowosd", out bool isMutexCreated);
         if (!isMutexCreated)
         {
@@ -64,6 +65,7 @@ public partial class App : Application
             instanceMutex = null;
             Exit();
         }
+#endif
 
         InitializeComponent();  
         

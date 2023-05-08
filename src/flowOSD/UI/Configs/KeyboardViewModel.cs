@@ -35,7 +35,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     public KeyboardViewModel(IConfig config, ICommandService commandService)
-            : base(config, Text.Instance.Config.Keyboard, Images.KeyboardSettings)
+            : base(config, Text.Instance.Config.Keyboard, Images.Instance.Common.KeyboardSettings)
     {
         if (config == null)
         {
@@ -69,6 +69,8 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
             new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Wireless, commands),
         });
     }
+
+    public Text TextResources => Text.Instance;
 
     public int KeyboardBacklightTimeout
     {

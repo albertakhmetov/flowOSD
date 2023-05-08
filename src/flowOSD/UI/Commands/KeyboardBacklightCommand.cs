@@ -77,8 +77,8 @@ sealed class KeyboardBacklightCommand : CommandBase
         var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
 
         var icon = direction == UP
-            ? Images.Hardware_KeyboardLightUp
-            : Images.Hardware_KeyboardLightDown;
+            ? Images.Instance.Hardware.KeyboardLightUp
+            : Images.Instance.Hardware.KeyboardLightDown;
 
         osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
     }

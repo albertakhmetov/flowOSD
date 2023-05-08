@@ -40,7 +40,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
     private string? estimatedTime;
 
     public BatteryViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Core.Resources.Text.Instance.Config.Battery, Images.Hardware_Battery)
+        : base(config, Text.Instance.Config.Battery, Images.Instance.Hardware.Battery)
     {
         if (hardwareService == null)
         {
@@ -54,7 +54,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
         estimatedTime = string.Empty;
     }
 
-    public TextResources Text { get; } = new TextResources();
+    public Text TextResources => Text.Instance;
 
     public bool UseBatteryChargeLimit
     {
@@ -159,7 +159,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
 
     private void UpdateBattery(int rate, uint capacity, BatteryPowerState powerState)
     {
-        StatusImage = Images.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
+        StatusImage = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
         Percentage = Convert.ToInt32(Math.Round(100f * capacity / battery.FullChargedCapacity));
         Rate = Math.Abs(rate) > 100 ? rate : 0;
         Capacity = capacity;
@@ -178,7 +178,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
 
         if ((powerState & BatteryPowerState.PowerOnLine) == BatteryPowerState.PowerOnLine)
         {
-            text.Append("Plugged-in");
+            text.Append(TextResources.Battery.PluggedIn);
         }
 
         if ((powerState & BatteryPowerState.Critical) == BatteryPowerState.Critical)
@@ -188,7 +188,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
                 text.Append(", ");
             }
 
-            text.Append("Critical");
+            text.Append(TextResources.Battery.Critical);
         }
 
         if ((powerState & BatteryPowerState.Charging) == BatteryPowerState.Charging && Math.Abs(Rate) > 100)
@@ -198,7 +198,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
                 text.Append(", ");
             }
 
-            text.Append("Charging");
+            text.Append(TextResources.Battery.Charging);
         }
 
         if ((powerState & BatteryPowerState.Discharging) == BatteryPowerState.Discharging && Math.Abs(Rate) > 100)
@@ -208,30 +208,9 @@ public sealed class BatteryViewModel : ConfigViewModelBase
                 text.Append(", ");
             }
 
-            text.Append("Discharging");
+            text.Append(TextResources.Battery.Discharging);
         }
 
         PowerState = text.ToString();
-    }
-
-    public sealed class TextResources
-    {
-        public string Name => "Name";
-
-        public string ManufactureName => "Manufacture Name";
-
-        public string Capacity => "Capacity";
-
-        public string DesignedCapacity => "Designed Capacity";
-
-        public string FullChargedCapacity => "Full Charged Capacity";
-
-        public string WearPercentage => "Wear Percentage";
-
-        public string EstimatedTime => "Estimated Time";
-
-        public string BatteryChargeLimit => "Use Battery Charge Limit";
-
-        public string BatteryChargeLimitDescription => "The battery charge will be limited by";
     }
 }

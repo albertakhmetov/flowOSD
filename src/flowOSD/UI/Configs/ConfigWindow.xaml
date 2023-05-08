@@ -180,25 +180,25 @@
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.RunAtStartup}"
+                                Header="{Binding TextResources.Common.RunAtStartup}"
                                 IsOn="{Binding RunAtStartup, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.ControlDisplayRefreshRate}"
+                                Header="{Binding TextResources.Common.ControlDisplayRefreshRate}"
                                 IsOn="{Binding ControlDisplayRefreshRate, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.ConfirmGpuModeChange}"
+                                Header="{Binding TextResources.Common.ConfirmGpuModeChange}"
                                 IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
                         </Border>
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.CheckForUpdates}"
+                                Header="{Binding TextResources.Common.CheckForUpdates}"
                                 IsOn="{Binding CheckForUpdates, Mode=TwoWay}" />
                         </Border>
                     </StackPanel>
@@ -214,8 +214,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PerformanceMode)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PerformanceMode)}"/>
+                                            Glyph="{Binding ImageResources.Notification.PerformanceMode}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.PerformanceMode}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -226,8 +226,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerMode)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PowerMode)}"/>
+                                            Glyph="{Binding ImageResources.Notification.PowerMode}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.PowerMode}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -238,8 +238,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.PowerSource)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.PowerSource)}"/>
+                                            Glyph="{Binding ImageResources.Notification.PowerSource}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.PowerSource}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -250,8 +250,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Boost)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Boost)}"/>
+                                            Glyph="{Binding ImageResources.Notification.Boost}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.Boost}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -262,8 +262,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.TouchPad)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.TouchPad)}"/>
+                                            Glyph="{Binding ImageResources.Notification.TouchPad}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.TouchPad}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -274,8 +274,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.DisplayRefreshRate)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.DisplayRefreshRate)}"/>
+                                            Glyph="{Binding ImageResources.Notification.DisplayRefreshRate}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.DisplayRefreshRate}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -286,8 +286,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Mic)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Mic)}"/>
+                                            Glyph="{Binding ImageResources.Notification.Mic}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.Mic}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -298,8 +298,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.ToImage(configs:NotificationType.Gpu)}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.ToText(configs:NotificationType.Gpu)}"/>
+                                            Glyph="{Binding ImageResources.Notification.Gpu}"/>
+                                        <TextBlock Text="{Binding TextResources.Notification.Gpu}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -320,7 +320,7 @@
 
                                 <TextBlock 
                                     VerticalAlignment="Center"
-                                    Text="{x:Bind resources:Text.Instance.Config.KeyboardBacklightTimeout}"/>
+                                    Text="{Binding TextResources.Config.KeyboardBacklightTimeout}"/>
                                 <ComboBox 
                                     Grid.Column="1"
                                     HorizontalAlignment="Stretch"
@@ -338,12 +338,12 @@
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.KeyboardBacklightWithDisplay}"
+                                Header="{Binding TextResources.Config.KeyboardBacklightWithDisplay}"
                                 IsOn="{Binding KeyboardBacklightWithDisplay, Mode=TwoWay}" />
                         </Border>
 
                         <TextBlock 
-                            Text="{x:Bind resources:Text.Instance.Config.HotKeys}"
+                            Text="{Binding TextResources.Config.HotKeys}"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
@@ -398,7 +398,7 @@
                                                 Grid.Column="1"
                                                 Grid.Row="1" 
                                                 Visibility="{Binding ParametersVisibility, Mode=OneWay}" 
-                                                Text="{x:Bind resources:Text.Instance.Config.HotKeyAction}"/>
+                                                Text="{Binding TextResources.Config.HotKeyAction}"/>
 
                                             <ComboBox 
                                                 HorizontalAlignment="Stretch"
@@ -433,8 +433,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.Hardware_AC}"/>
-                                        <TextBlock Text="{x:Bind resources:Text.Instance.Config.ShowBatteryChargeRate}"/>
+                                            Glyph="{Binding ImageResources.Hardware.AC}"/>
+                                        <TextBlock Text="{Binding TextResources.Config.ShowBatteryChargeRate}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -446,9 +446,9 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{x:Bind resources:Images.Temperature}"/>
+                                            Glyph="{Binding ImageResources.Common.Temperature}"/>
 
-                                        <TextBlock Text="{x:Bind resources:Text.Instance.Config.ShowCpuTemperature}"/>
+                                        <TextBlock Text="{Binding TextResources.Config.ShowCpuTemperature}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
@@ -479,7 +479,7 @@
                                 Grid.Column="1"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center"
-                                ToolTipService.ToolTip="Create a new profile">
+                                ToolTipService.ToolTip="{Binding TextResources.Performance.NewProfileToolTip}">
 
                                 <FontIcon FontSize="18" Glyph="&#xE710;" Margin="0"/>
                                 <Button.Flyout>
@@ -487,13 +487,13 @@
                                         <StackPanel MinWidth="250">
                                             <TextBox
                                                 x:Name="createProfileName"
-                                                PlaceholderText="Enter a new profile name"/>
+                                                PlaceholderText="{Binding TextResources.Peformance.NewProfileNamePlaceholder}"/>
                                             <Button 
                                                 IsEnabled="{Binding ElementName=createProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
                                                 Style="{StaticResource AccentButtonStyle}"
                                                 HorizontalAlignment="Right" 
                                                 Click="CreateProfile"
-                                                Content="Create Profile" Margin="0,10,0,0"/>
+                                                Content="{Binding TextResources.Performance.CreateProfile}" Margin="0,10,0,0"/>
                                         </StackPanel>
                                     </Flyout>
                                 </Button.Flyout>
@@ -502,7 +502,8 @@
                             <Button 
                                 Grid.Column="2"
                                 Margin="5,0,0,0"
-                                VerticalAlignment="Center">
+                                VerticalAlignment="Center"
+                                ToolTipService.ToolTip="{Binding TextResources.Performance.RenameProfileToolTip}">                                
 
                                 <FontIcon FontSize="18" Glyph="&#xE8AC;" Margin="0"/>
                                 <Button.Flyout>
@@ -511,13 +512,13 @@
                                             <TextBox
                                                 x:Name="renameProfileName"
                                                 Text="{Binding Name, Mode=OneWay}"
-                                                PlaceholderText="Enter a new profile name"/>
+                                                PlaceholderText="{Binding TextResources.Peformance.NewProfileNamePlaceholder}"/>
                                             <Button 
                                                 IsEnabled="{Binding ElementName=renameProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
                                                 Style="{StaticResource AccentButtonStyle}"
                                                 HorizontalAlignment="Right" 
                                                 Click="RenameProfile"
-                                                Content="Rename Profile" Margin="0,10,0,0"/>
+                                                Content="{Binding TextResources.Performance.RenameProfile}" Margin="0,10,0,0"/>
                                         </StackPanel>
                                     </Flyout>
                                 </Button.Flyout>
@@ -526,18 +527,19 @@
                             <Button 
                                 Grid.Column="3"
                                 Margin="5,0,0,0"
-                                VerticalAlignment="Center">
+                                VerticalAlignment="Center"
+                                ToolTipService.ToolTip="{Binding TextResources.Performance.RemoveProfileToolTip}">
 
                                 <FontIcon FontSize="18" Glyph="&#xE74D;" Margin="0" />
                                 <Button.Flyout>
                                     <Flyout x:Name="removeProfileFlyout">
                                         <StackPanel MinWidth="250">
-                                            <TextBlock>Remove the current profile?</TextBlock>
+                                            <TextBlock Text="{Binding TextResources.Performance.RemoveProfileConfirmation}"/>
                                             <Button 
                                                 Style="{StaticResource AccentButtonStyle}"
                                                 HorizontalAlignment="Right" 
                                                 Click="RemoveProfile"
-                                                Content="Remove Profile" Margin="0,10,0,0"/>
+                                                Content="{Binding TextResources.Performance.RemoveProfile}" Margin="0,10,0,0"/>
                                         </StackPanel>
                                     </Flyout>
                                 </Button.Flyout>
@@ -558,7 +560,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock VerticalAlignment="Center">
-                                    <Run Text="CPU : "/>
+                                    <Run Text="{Binding TextResources.Performance.Cpu}"/>
                                     <Run Text="{Binding CpuLimit, Mode=OneWay}"/>
                                     <Run Text="W"/>
                                 </TextBlock>
@@ -579,7 +581,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock VerticalAlignment="Center">
-                                    <Run Text="APU : "/>
+                                    <Run Text="{Binding TextResources.Performance.Apu}"/>
                                     <Run Text="{Binding ApuLimit, Mode=OneWay}"/>
                                     <Run Text="W"/>
                                 </TextBlock>
@@ -603,7 +605,7 @@
                             <controls:FanCurveTuner 
                                 IsEnabled="{Binding IsUserData, Mode=OneWay}"
                                 DataContext="{Binding Cpu, Mode=OneTime}"
-                                Title="CPU Fan Curve"
+                                Title="{Binding TextResources.Performance.CpuFanCurve}"
                                 Height="200"/>
                         </Border>
 
@@ -612,7 +614,7 @@
                             <controls:FanCurveTuner 
                                 IsEnabled="{Binding IsUserData, Mode=OneWay}"
                                 DataContext="{Binding Gpu, Mode=OneTime}"
-                                Title="GPU Fan Curve"
+                                Title="{Binding TextResources.Performance.GpuFanCurve}"
                                 Height="200"/>
                         </Border>
 
@@ -626,7 +628,7 @@
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
-                                Header="{x:Bind resources:Text.Instance.Config.DisableTouchPadInTabletMode}"
+                                Header="{Binding TextResources.Tablet.DisableTouchPadInTabletMode}"
                                 IsOn="{Binding DisableTouchPadInTabletMode, Mode=TwoWay}" />
                         </Border>
 
@@ -638,7 +640,7 @@
                                     <ColumnDefinition Width="200"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock VerticalAlignment="Center" Text="Performance profile in tablet mode"/>
+                                <TextBlock VerticalAlignment="Center" Text= "{Binding TextResources.Tablet.Profile}"/>
 
                                 <ComboBox 
                                     Grid.Column="1"
@@ -725,34 +727,34 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Row="0" Style="{StaticResource Header}" Text="{Binding Text.Name}"/>
+                                    <TextBlock Grid.Row="0" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.Name}"/>
                                     <TextBlock Grid.Row="0" Style="{StaticResource Value}" Grid.Column="1" Text="{Binding Name}"/>
 
-                                    <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="{Binding Text.ManufactureName}"/>
+                                    <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.ManufactureName}"/>
                                     <TextBlock Grid.Row="1" Style="{StaticResource Value}" Grid.Column="1" Text="{Binding ManufactureName}"/>
 
-                                    <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="{Binding Text.EstimatedTime}"/>
+                                    <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.EstimatedTime}"/>
                                     <TextBlock Grid.Row="2" Style="{StaticResource Value}" Grid.Column="1" Text="{Binding EstimatedTime}"/>
 
-                                    <TextBlock Grid.Row="3" Style="{StaticResource Header}" Text="{Binding Text.Capacity}"/>
+                                    <TextBlock Grid.Row="3" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.Capacity}"/>
                                     <TextBlock Grid.Row="3" Style="{StaticResource Value}" Grid.Column="1">
                                         <Run Text="{Binding Capacity}" FontWeight="SemiBold"/>
                                         <Run Text="mWh"/>
                                     </TextBlock>
 
-                                    <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="{Binding Text.FullChargedCapacity}"/>
+                                    <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.FullChargedCapacity}"/>
                                     <TextBlock Grid.Row="4" Style="{StaticResource Value}" Grid.Column="1">
                                         <Run Text="{Binding FullChargedCapacity}" FontWeight="SemiBold"/>
                                         <Run Text="mWh"/>
                                     </TextBlock>
 
-                                    <TextBlock Grid.Row="5" Style="{StaticResource Header}" Text="{Binding Text.DesignedCapacity}"/>
+                                    <TextBlock Grid.Row="5" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.DesignedCapacity}"/>
                                     <TextBlock Grid.Row="5" Style="{StaticResource Value}" Grid.Column="1">
                                         <Run Text="{Binding DesignedCapacity}" FontWeight="SemiBold"/>
                                         <Run Text="mWh"/>
                                     </TextBlock>
 
-                                    <TextBlock Grid.Row="6" Style="{StaticResource Header}" Text="{Binding Text.WearPercentage}"/>
+                                    <TextBlock Grid.Row="6" Style="{StaticResource Header}" Text="{Binding TextResources.Battery.WearPercentage}"/>
                                     <TextBlock Grid.Row="6" Style="{StaticResource Value}" Grid.Column="1">
                                         <Run Text="{Binding WearPercentage}" FontWeight="SemiBold"/>
                                         <Run Text="%"/>
@@ -768,9 +770,9 @@
                                 IsOn="{Binding UseBatteryChargeLimit, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Text.BatteryChargeLimit}" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                                        <TextBlock Text="{Binding TextResources.Battery.BatteryChargeLimit}" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
                                         <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
-                                            <Run Text="{Binding Text.BatteryChargeLimitDescription}"/>
+                                            <Run Text="{Binding TextResources.Battery.BatteryChargeLimitDescription}"/>
                                             <Run Text="{Binding BatteryChargeLimit}" FontWeight="SemiBold"/>
                                             <Run Text="%"/>
                                         </TextBlock>
@@ -831,9 +833,9 @@
                                     TextWrapping="Wrap"
                                     Margin="0,10,0,20" />
 
-                                <TextBlock Grid.Row="2" Text="Version" Style="{StaticResource Header}"/>
-                                <TextBlock Grid.Row="3" Text="Runtime" Style="{StaticResource Header}"/>
-                                <TextBlock Grid.Row="4" Text="Device" Style="{StaticResource Header}"/>
+                                <TextBlock Grid.Row="2" Text="{Binding TextResources.About.Version}" Style="{StaticResource Header}"/>
+                                <TextBlock Grid.Row="3" Text="{Binding TextResources.About.Runtime}" Style="{StaticResource Header}"/>
+                                <TextBlock Grid.Row="4" Text="{Binding TextResources.About.Device}" Style="{StaticResource Header}"/>
 
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ProductVersion}" Style="{StaticResource Value}"/>
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Runtime}" Style="{StaticResource Value}"/>

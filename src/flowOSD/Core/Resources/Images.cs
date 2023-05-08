@@ -22,9 +22,139 @@ using flowOSD.Core.Hardware;
 
 namespace flowOSD.Core.Resources;
 
-public static class Images
+public class Images
 {
-    public static string GetBatteryIcon(uint capacity, uint fullChargedCapacity, BatteryPowerState powerState)
+    public static readonly Images Instance = new Images();
+
+    private Images()
+    {
+        Common = new CommonSection();
+        Hardware = new HardwareSection();
+        Power = new PowerSection();
+        Performance = new PerformanceSection();
+        Notification = new NotificationSection(this);
+    }
+
+    public CommonSection Common { get;  }
+
+    public HardwareSection Hardware { get; }
+
+    public PowerSection Power { get; }
+
+    public PerformanceSection Performance { get; }
+
+    public NotificationSection Notification { get; }
+
+    public sealed class CommonSection
+    {
+        public string Info => "\uE946";
+
+        public string Diagnostic => "\uE9D9";
+
+        public string Home => "\uE80F";
+
+        public string KeyboardSettings => "\uF210";
+
+        public string Notification => "\uEC42";
+
+        public string Game => "\ue7fc";
+
+        public string Paste => "\ue77f";
+
+        public string Copy => "\ue8c8";
+
+        public string Airplane => "\ue709";
+
+        public string Suspend => "\ue823";
+
+        public string Updater => "\ue895";
+
+        public string Temperature => "\ue9ca";
+
+        public string Settings => "\ue713";
+    }
+
+    public sealed class HardwareSection
+    {
+        public string Battery => "\uF5FC";
+
+        public string Tablet => "\uE70A";
+
+        public string BrightnessDown => "\uec8a";
+
+        public string BrightnessUp => "\ue706";
+
+        public string AC => "\ue83e";
+
+        public string DC => "\ue83f";
+
+        public string Mic => "\ue720";
+
+        public string MicMuted => "\uf781";
+
+        public string KeyboardLightUp => "\ued39";
+
+        public string KeyboardLightDown => "\ued3a";
+
+        public string Cpu => "\ue950";
+
+        public string Gpu => "\uf211";
+
+        public string Screen => "\ue7f4";
+
+        public string TouchPad => "\uefa5";
+
+    }
+
+    public sealed class PowerSection
+    {
+        public string BatterySaver => "\uebc0";
+
+        public string BestPowerEfficiency => "\uec48";
+
+        public string Balanced => "\uec49";
+
+        public string BestPerformance => "\uec4a";
+    }
+
+    public sealed class PerformanceSection
+    {
+        public string Performance => "\ue945";
+
+        public string Turbo => "\uECAD";
+
+        public string Silent => "\uec0a";
+
+        public string User => "\uEE57";
+    }
+
+    public sealed class NotificationSection
+    {
+        private Images root;
+
+        public NotificationSection(Images root)
+        {
+            this.root = root ?? throw new ArgumentNullException(nameof(root));
+        }
+
+        public string PerformanceMode => root.Performance.Turbo;
+
+        public string PowerMode => root.Power.Balanced;
+
+        public string PowerSource => root.Hardware.AC;
+
+        public string Boost => root.Hardware.Cpu;
+
+        public string TouchPad => root.Hardware.TouchPad;
+
+        public string DisplayRefreshRate => root.Hardware.Screen;
+
+        public string Mic => root.Hardware.Mic;
+
+        public string Gpu => root.Hardware.Gpu;
+    }
+
+    public string GetBatteryIcon(uint capacity, uint fullChargedCapacity, BatteryPowerState powerState)
     {
         var power = (powerState & BatteryPowerState.PowerOnLine) == BatteryPowerState.PowerOnLine
             ? 11
@@ -34,143 +164,72 @@ public static class Images
         return new string((char)(0xf5f2 + c + power), 1);
     }
 
-    public static string ToImage(PerformanceMode performanceMode)
+    public string ToImage(PerformanceMode performanceMode)
     {
         switch (performanceMode)
         {
             case PerformanceMode.Default:
-                return Performance_Default;
+                return Performance.Performance;
 
             case PerformanceMode.Silent:
-                return Performance_Silent;
+                return Performance.Silent;
 
             case PerformanceMode.Turbo:
-                return Performance_Turbo;
+                return Performance.Turbo;
 
             default:
                 return "";
         }
     }
 
-    public static string ToImage(PowerMode powerMode)
+    public string ToImage(PowerMode powerMode)
     {
         switch (powerMode)
         {
             case PowerMode.BestPowerEfficiency:
-                return Power_BestPowerEfficiency;
+                return Power.BestPowerEfficiency;
 
             case PowerMode.Balanced:
-                return Power_Balanced;
+                return Power.Balanced;
 
             case PowerMode.BestPerformance:
-                return Power_BestPerformance;
+                return Power.BestPerformance;
 
             default:
                 return "";
         }
     }
 
-    public static string ToImage(NotificationType notificationType)
+    public string ToImage(NotificationType notificationType)
     {
         switch (notificationType)
         {
             case NotificationType.PerformanceMode:
-                return Performance_Turbo;
+                return Performance.Turbo;
 
             case NotificationType.PowerMode:
-                return Power_Balanced;
+                return Power.Balanced;
 
             case NotificationType.PowerSource:
-                return Hardware_AC;
+                return Hardware.AC;
 
             case NotificationType.Boost:
-                return Hardware_Cpu;
+                return Hardware.Cpu;
 
             case NotificationType.TouchPad:
-                return Hardware_TouchPad;
+                return Hardware.TouchPad;
 
             case NotificationType.DisplayRefreshRate:
-                return Hardware_Screen;
+                return Hardware.Screen;
 
             case NotificationType.Mic:
-                return Hardware_Mic;
+                return Hardware.Mic;
 
             case NotificationType.Gpu:
-                return Hardware_Gpu;
+                return Hardware.Gpu;
 
             default:
                 return "";
         }
     }
-
-    public static string Info = "\uE946";
-
-    public static string Diagnostic = "\uE9D9";
-
-    public static string Home = "\uE80F";
-
-    public static string KeyboardSettings = "\uF210";
-
-    public static string Notification = "\uEC42";
-
-    public static string Game = "\ue7fc";
-
-    public static string Paste = "\ue77f";
-
-    public static string Copy = "\ue8c8";
-
-    public static string Airplane = "\ue709";
-
-    public static string Suspend = "\ue823";
-
-    public static string Updater = "\ue895";
-
-    public static string Temperature = "\ue9ca";
-
-    public static string Settings = "\ue713";
-
-    public static string Hardware_Battery = "\uF5FC";
-
-    public static string Hardware_Tablet = "\uE70A";
-
-    public static string Hardware_BrightnessDown = "\uec8a";
-
-    public static string Hardware_BrightnessUp = "\ue706";
-
-    public static string Hardware_AC = "\ue83e";
-
-    public static string Hardware_DC = "\ue83f";
-
-    public static string Hardware_Mic = "\ue720";
-
-    public static string Hardware_MicMuted = "\uf781";
-
-    public static string Hardware_KeyboardLightUp = "\ued39";
-
-    public static string Hardware_KeyboardLightDown = "\ued3a";
-
-    public static string Hardware_Cpu => "\ue950";
-
-    public static string Hardware_Gpu => "\uf211";
-
-    public static string Hardware_Screen => "\ue7f4";
-
-    public static string Hardware_TouchPad => "\uefa5";
-
-    public static string Performance_Default => "\ue945";
-
-    public static string Performance_Turbo => "\uECAD";
-
-    public static string Performance_Silent => "\uec0a";
-
-    public static string Performance_User => "\uEE57";
-
-    public static string Power_BatterySaver => "\uebc0";
-
-    public static string Power_BestPowerEfficiency => "\uec48";
-
-    public static string Power_Balanced => "\uec49";
-
-    public static string Power_BestPerformance => "\uec4a";
-
 }

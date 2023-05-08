@@ -154,19 +154,19 @@ public class MainViewModel : ViewModelBase, IDisposable
 
                 if (profile.Id == PerformanceProfile.Default.Id)
                 {
-                    PerformanceProfileImage = Images.Performance_Default;
+                    PerformanceProfileImage = Images.Instance.Performance.Performance;
                 }
                 else if (profile.Id == PerformanceProfile.Turbo.Id)
                 {
-                    PerformanceProfileImage = Images.Performance_Turbo;
+                    PerformanceProfileImage = Images.Instance.Performance.Turbo;
                 }
                 else if (profile.Id == PerformanceProfile.Silent.Id)
                 {
-                    PerformanceProfileImage = Images.Performance_Silent;
+                    PerformanceProfileImage = Images.Instance.Performance.Silent;
                 }
                 else
                 {
-                    PerformanceProfileImage = Images.Performance_User;
+                    PerformanceProfileImage = Images.Instance.Performance.User;
                 }
             })
             .DisposeWith(localDisposable);
@@ -176,7 +176,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             .Subscribe(powerMode =>
             {
                 PowerModeText = Text.ToText(powerMode);
-                PowerModeImage = Images.ToImage(powerMode);
+                PowerModeImage = Images.Instance.ToImage(powerMode);
             })
             .DisposeWith(localDisposable);
 

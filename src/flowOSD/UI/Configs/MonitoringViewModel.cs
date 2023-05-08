@@ -31,9 +31,13 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     public MonitoringViewModel(IConfig config)
-        : base(config, Text.Instance.Config.Monitoring, Images.Diagnostic)
+        : base(config, Text.Instance.Config.Monitoring, Images.Instance.Common.Diagnostic)
     {
     }
+
+    public Text TextResources => Text.Instance;
+
+    public Images ImageResources => Images.Instance;
 
     public bool ShowBatteryChargeRate
     {

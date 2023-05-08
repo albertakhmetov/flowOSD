@@ -148,15 +148,15 @@ sealed class NotificationService : IDisposable
         switch (performanceMode)
         {
             case PerformanceMode.Default:
-                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Performance_Default));
+                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Instance.Performance.Performance));
                 break;
 
             case PerformanceMode.Turbo:
-                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Performance_Turbo));
+                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Instance.Performance.Turbo));
                 break;
 
             case PerformanceMode.Silent:
-                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Performance_Silent));
+                osd.Show(new OsdMessage($"{Text.ToText(performanceMode)} performance mode", Images.Instance.Performance.Silent));
                 break;
         }
     }
@@ -171,15 +171,15 @@ sealed class NotificationService : IDisposable
         switch (powerMode)
         {
             case PowerMode.BestPowerEfficiency:
-                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Power_BestPowerEfficiency));
+                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Instance.Power.BestPowerEfficiency));
                 break;
 
             case PowerMode.Balanced:
-                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Power_Balanced));
+                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Instance.Power.Balanced));
                 break;
 
             case PowerMode.BestPerformance:
-                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Power_BestPerformance));
+                osd.Show(new OsdMessage($"{Text.ToText(powerMode)} power mode", Images.Instance.Power.BestPerformance));
                 break;
         }
     }
@@ -193,7 +193,7 @@ sealed class NotificationService : IDisposable
 
         osd.Show(new OsdMessage(
             powerSource == PowerSource.Battery ? "On Battery" : "Plugged In",
-            powerSource == PowerSource.Battery ? Images.Hardware_DC : Images.Hardware_AC));
+            powerSource == PowerSource.Battery ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
     }
 
     private void ShowDisplayRefreshRateNotification(uint refreshRate)
@@ -203,7 +203,7 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate", Images.Hardware_Screen));
+        osd.Show(new OsdMessage(DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate", Images.Instance.Hardware.Screen));
     }
 
     private void ShowBoostNotification(bool isEnabled)
@@ -213,7 +213,7 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(isEnabled ? "Boost Mode is on" : "Boost Mode is off", Images.Hardware_Cpu));
+        osd.Show(new OsdMessage(isEnabled ? "Boost Mode is on" : "Boost Mode is off", Images.Instance.Hardware.Cpu));
     }
 
     private void ShowTouchPadNotification(DeviceState state)
@@ -223,7 +223,7 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", Images.Hardware_TouchPad));
+        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", Images.Instance.Hardware.TouchPad));
     }
 
     private void ShowGpuNotification(GpuMode gpuMode)
@@ -233,6 +233,6 @@ sealed class NotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", Images.Hardware_Gpu));
+        osd.Show(new OsdMessage(gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", Images.Instance.Hardware.Gpu));
     }
 }

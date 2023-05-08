@@ -90,8 +90,6 @@ public sealed partial class ConfigWindow : Window, IDisposable
 
     public void Dispose()
     {
-        Bindings.StopTracking();
-
         disposable?.Dispose();
         disposable = null;
 
