@@ -74,6 +74,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         MaxPowerLimit = atk.MaxPowerLimit;
     }
 
+    public Text TextResources => Text.Instance;
+
     private void FanCurveChanged(object? sender, EventArgs e)
     {
         isDirtySubject.OnNext(true);

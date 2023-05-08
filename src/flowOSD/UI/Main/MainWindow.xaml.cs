@@ -92,39 +92,75 @@ public sealed partial class MainWindow : Window, IDisposable
 
     private void UpdatePerformanceProfilesMenu()
     {
-        performanceProfilesMenu.Items.Clear();
-
-        performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+        if (performanceProfilesMenu.Items.Count == 0)
         {
-            Command = ViewModel.PerformanceCommand,
-            CommandParameter = PerformanceProfile.Default.Id,
-            Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Performance },
-            Text = Text.Instance.PerformanceMode.Performance,
-        });
+            performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+            {
+                Command = ViewModel.PerformanceCommand,
+                CommandParameter = PerformanceProfile.Default.Id,
+                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Performance },
+                Text = Text.Instance.PerformanceMode.Performance,
+            });
 
-        performanceProfilesMenu.Items.Add(new MenuFlyoutItem
-        {
-            Command = ViewModel.PerformanceCommand,
-            CommandParameter = PerformanceProfile.Turbo.Id,
-            Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Turbo },
-            Text = Text.Instance.PerformanceMode.Turbo,
-        });
+            performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+            {
+                Command = ViewModel.PerformanceCommand,
+                CommandParameter = PerformanceProfile.Turbo.Id,
+                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Turbo },
+                Text = Text.Instance.PerformanceMode.Turbo,
+            });
 
-        performanceProfilesMenu.Items.Add(new MenuFlyoutItem
-        {
-            Command = ViewModel.PerformanceCommand,
-            CommandParameter = PerformanceProfile.Silent.Id,
-            Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Silent },
-            Text = Text.Instance.PerformanceMode.Silent
-        });
+            performanceProfilesMenu.Items.Add(new MenuFlyoutItem
+            {
+                Command = ViewModel.PerformanceCommand,
+                CommandParameter = PerformanceProfile.Silent.Id,
+                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Silent },
+                Text = Text.Instance.PerformanceMode.Silent
+            });
+        }
 
-        var userProfiles = config.Performance.GetProfiles();
+        var userProfiles = config.Performance.GetProfiles().ToList();
         if (userProfiles.Count == 0)
         {
+            while (performanceProfilesMenu.Items.Count > 3)
+            {
+                performanceProfilesMenu.Items.RemoveAt(performanceProfilesMenu.Items.Count - 1);
+            }
+
             return;
         }
 
-        performanceProfilesMenu.Items.Add(new MenuFlyoutSeparator());
+        if (performanceProfilesMenu.Items.Count == 3)
+        {
+            performanceProfilesMenu.Items.Add(new MenuFlyoutSeparator());
+        }
+
+        var i = 4; // skip standard profiles + separator
+        while (i < performanceProfilesMenu.Items.Count)
+        {
+            var menuItem = performanceProfilesMenu.Items[i] as MenuFlyoutItem;
+            if (menuItem?.CommandParameter is Guid id)
+            {
+                var profile = userProfiles.FirstOrDefault(i => i.Id == id);
+                if (profile == null)
+                {
+                    performanceProfilesMenu.Items.RemoveAt(i);
+                    continue;
+                }
+
+                if (profile.Name != menuItem.Text)
+                {
+                    menuItem.Text = profile.Name;
+                }
+
+                userProfiles.Remove(profile);
+                i++;
+            }
+            else
+            {
+                performanceProfilesMenu.Items.RemoveAt(i);
+            }
+        }
 
         foreach (var profile in userProfiles)
         {
@@ -135,7 +171,6 @@ public sealed partial class MainWindow : Window, IDisposable
                 Text = profile.Name,
             });
         }
-
     }
 
     private void UpdatePowerModesMenu()
