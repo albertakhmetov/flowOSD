@@ -253,8 +253,6 @@ public class Text
 
         public string Cpu => "Cpu";
 
-        public string Apu => "Apu";
-
         public string CpuFanCurve => "CPU Fan Curve";
 
         public string GpuFanCurve => "GPU Fan Curve";

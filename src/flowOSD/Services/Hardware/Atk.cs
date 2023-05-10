@@ -131,7 +131,7 @@ sealed partial class Atk : IDisposable, IAtk
 
     public uint MinPowerLimit => 5;
 
-    public uint MaxPowerLimit => 80;
+    public uint MaxPowerLimit => 45;
 
     public bool SetBatteryChargeLimit(uint value)
     {
@@ -143,12 +143,6 @@ sealed partial class Atk : IDisposable, IAtk
     public bool SetCpuLimit(uint value)
     {
         Set(PPT_CPU, Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value)));
-
-        return true;
-    }
-
-    public bool SetApuLimit(uint value)
-    {
         Set(PPT_APU, Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value)));
 
         return true;
@@ -200,9 +194,9 @@ sealed partial class Atk : IDisposable, IAtk
         var r = Get(device, mode);
 
         var points = new FanDataPoint[8];
-        for (var i = 0; i < 15; i += 2)
+        for (var i = 0; i < points.Length; i++)
         {
-            points[i / 2] = new FanDataPoint(r[i], r[i + 1]);
+            points[i] = new FanDataPoint(r[i], r[i + 8]);
         }
 
         return points;

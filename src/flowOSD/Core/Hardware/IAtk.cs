@@ -47,8 +47,6 @@ public interface IAtk
 
     bool SetCpuLimit(uint value);
 
-    bool SetApuLimit(uint value);
-
     void SetPerformanceMode(PerformanceMode performanceMode);
 
     void SetGpuMode(GpuMode gpuMode);

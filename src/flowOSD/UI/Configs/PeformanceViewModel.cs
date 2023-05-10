@@ -47,7 +47,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private IReadOnlyCollection<PerformanceProfile> profiles;
     private PerformanceProfile currentProfile;
 
-    private uint cpuLimit, apuLimit;
+    private uint cpuLimit;
 
     public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
         : base(config, Text.Instance.Config.Performance, Images.Instance.PerformanceMode.Performance)
@@ -99,11 +99,10 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             }
 
             cpuLimit = currentProfile.CpuLimit;
-            apuLimit = currentProfile.ApuLimit;
 
             OnPropertyChanged(null);
 
-            if (CurrentProfile.IsUserProfile)
+            if (CurrentProfile!.IsUserProfile)
             {
                 Cpu.Set(CurrentProfile.CpuFanCurve, true);
                 Gpu.Set(CurrentProfile.GpuFanCurve, true);
@@ -132,7 +131,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         }
     }
 
-    public bool IsUserProfile => CurrentProfile.IsUserProfile;
+    public bool IsUserProfile => CurrentProfile?.IsUserProfile ?? false;
 
     public uint CpuLimit
     {
@@ -140,16 +139,6 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         set
         {
             SetProperty(ref cpuLimit, value);
-            isDirtySubject.OnNext(true);
-        }
-    }
-
-    public uint ApuLimit
-    {
-        get => apuLimit;
-        set
-        {
-            SetProperty(ref apuLimit, value);
             isDirtySubject.OnNext(true);
         }
     }
@@ -173,7 +162,6 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             Guid.NewGuid(),
             profileName,
             35,
-            80,
             FanDataPoint.CreateDefaultCurve(),
             FanDataPoint.CreateDefaultCurve());
 
@@ -187,7 +175,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     public void RemoveProfile()
     {
-        if (CurrentProfile.IsUserProfile)
+        if (CurrentProfile?.IsUserProfile == true)
         {
             Config.Performance[CurrentProfile.Id] = null;
         }
@@ -221,7 +209,11 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private void UpdateProfiles(Guid changedProfileId)
     {
-        Profiles = new ReadOnlyCollection<PerformanceProfile>(Config.Performance.GetProfiles());
+        Profiles = new ReadOnlyCollection<PerformanceProfile>(new PerformanceProfile[] {
+            PerformanceProfile.Default,
+            PerformanceProfile.Turbo,
+            PerformanceProfile.Silent,
+        }.Union(Config.Performance.GetProfiles()).ToArray());
 
         var profile = performanceService.GetProfile(changedProfileId);
         if (profile.IsUserProfile)
@@ -234,19 +226,18 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         }
         else
         {
-            CreateProfile(Text.Instance.Config.UserProfileName);
+            CurrentProfile = PerformanceProfile.Default;
         }
     }
 
     private void SaveChanges(string? newProfileName = null)
     {
-        if (CurrentProfile.IsUserProfile && (!string.IsNullOrEmpty(newProfileName) || isDirtySubject.Value == true))
+        if (CurrentProfile?.IsUserProfile == true && (!string.IsNullOrEmpty(newProfileName) || isDirtySubject.Value == true))
         {
             var profile = new PerformanceProfile(
             CurrentProfile.Id,
             newProfileName ?? CurrentProfile.Name,
             CpuLimit,
-            ApuLimit,
             Cpu.ToArray(),
             Gpu.ToArray());
 

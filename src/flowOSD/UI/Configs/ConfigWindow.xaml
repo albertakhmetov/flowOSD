@@ -499,6 +499,7 @@
                             </Button>
 
                             <Button 
+                                Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"                                
                                 Grid.Column="2"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center"
@@ -524,6 +525,7 @@
                             </Button>
 
                             <Button 
+                                Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
                                 Grid.Column="3"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center"
@@ -546,11 +548,14 @@
                         </Grid>
 
                         <TextBlock 
+                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
                             Text="Power Limits"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"                            
+                            Style="{StaticResource CxConfigBorderStyle}">
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -569,27 +574,6 @@
                                     Minimum="{Binding MinPowerLimit}"
                                     Maximum="{Binding MaxPowerLimit}"
                                     Value="{Binding CpuLimit, Mode=TwoWay}"/>
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock VerticalAlignment="Center">
-                                    <Run Text="{Binding TextResources.Performance.Apu}"/>
-                                    <Run Text="{Binding ApuLimit, Mode=OneWay}"/>
-                                    <Run Text="W"/>
-                                </TextBlock>
-
-                                <Slider 
-                                    Grid.Column="1" 
-                                    Minimum="{Binding MinPowerLimit}"
-                                    Maximum="{Binding MaxPowerLimit}"
-                                    Value="{Binding ApuLimit, Mode=TwoWay}"/>
                             </Grid>
                         </Border>
 
