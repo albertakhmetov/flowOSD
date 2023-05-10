@@ -35,21 +35,21 @@ public interface IAtk
 
     uint MaxPowerLimit { get; }
 
-    int Get(uint deviceId);
+    bool Get(uint deviceId, out int value);
 
-    byte[] Get(uint deviceId, uint status);
+    bool Get(uint deviceId, uint status, out byte[] outBuffer);
 
-    byte[] Set(uint deviceId, uint status);
+    bool Set(uint deviceId, uint status, out byte[] outBuffer);
 
-    byte[] Set(uint deviceId, byte[] parameters);
+    bool Set(uint deviceId, byte[] parameters, out byte[] outBuffer);
 
     bool SetBatteryChargeLimit(uint value);
 
     bool SetCpuLimit(uint value);
 
-    void SetPerformanceMode(PerformanceMode performanceMode);
+    bool SetPerformanceMode(PerformanceMode performanceMode);
 
-    void SetGpuMode(GpuMode gpuMode);
+    bool SetGpuMode(GpuMode gpuMode);
 
     bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints);
 

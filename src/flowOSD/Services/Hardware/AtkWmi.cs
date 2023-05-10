@@ -104,6 +104,7 @@ sealed class AtkWmi : IDisposable, IAtkWmi, IKeyboard
 
     private TabletMode GetTabletMode()
     {
-        return (TabletMode)atk.Get(DEVID_TABLET);
+        atk.Get(DEVID_TABLET, out var mode);
+        return (TabletMode)mode;
     }
 }

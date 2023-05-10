@@ -88,9 +88,12 @@ sealed partial class Atk : IDisposable, IAtk
             throw new ApplicationException("Can't connect to ACPI.");
         }
 
+        Get(DEVID_GPU_ECO_MODE, out var gpuMode);
+        Get(CPU_TEMPERATURE, out var cpuTemperature);
+
         performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Default);
-        gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)Get(DEVID_GPU_ECO_MODE));
-        cpuTemperatureSubject = new CountableSubject<int>(Get(CPU_TEMPERATURE));
+        gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)gpuMode);
+        cpuTemperatureSubject = new CountableSubject<int>(cpuTemperature);
 
         PerformanceMode = performanceModeSubject.AsObservable();
         GpuMode = gpuModeSubject.AsObservable();
@@ -111,12 +114,18 @@ sealed partial class Atk : IDisposable, IAtk
                 if (sum > 0 && updateSubscription == null)
                 {
                     updateSubscription = Observable.Interval(TimeSpan.FromSeconds(1))
-                        .Subscribe(_ => cpuTemperatureSubject?.OnNext(Get(CPU_TEMPERATURE)));
+                        .Subscribe(_ =>
+                            {
+                                if (Get(CPU_TEMPERATURE, out var temperature))
+                                {
+                                    cpuTemperatureSubject?.OnNext(temperature);
+                                }
+                            });
                 }
             })
             .DisposeWith(disposable);
 
-        Invoke(ASUS_WMI_METHODID_INIT, new byte[8]);
+        Invoke(ASUS_WMI_METHODID_INIT, new byte[8], out var initBuffer);
     }
 
     public IObservable<PerformanceMode> PerformanceMode { get; }
@@ -135,17 +144,19 @@ sealed partial class Atk : IDisposable, IAtk
 
     public bool SetBatteryChargeLimit(uint value)
     {
-        Set(DEVID_BATTERY_LIMIT, Math.Max(MinBatteryChargeLimit, Math.Min(MaxBatteryChargeLimit, value)));
+        var limit = Math.Max(MinBatteryChargeLimit, Math.Min(MaxBatteryChargeLimit, value));
 
-        return true;
+        byte[] buffer;
+        return Set(DEVID_BATTERY_LIMIT, limit, out buffer) && IsOk(buffer);
     }
 
     public bool SetCpuLimit(uint value)
     {
-        Set(PPT_CPU, Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value)));
-        Set(PPT_APU, Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value)));
+        var limit = Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value));
 
-        return true;
+        byte[] buffer;
+        return Set(PPT_CPU, limit, out buffer) && IsOk(buffer)
+            && Set(PPT_APU, limit, out buffer) && IsOk(buffer);
     }
 
     public bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints)
@@ -162,13 +173,14 @@ sealed partial class Atk : IDisposable, IAtk
             data[8 + i] = Math.Min((byte)99, dataPoints[i].Value);
         }
 
+        byte[] buffer;
         switch (fanType)
         {
             case FanType.Cpu:
-                return BitConverter.ToInt32(Set(CPU_FAN_CURVE, data), 0) == 1;
+                return Set(CPU_FAN_CURVE, data, out buffer) && IsOk(buffer);
 
             case FanType.Gpu:
-                return BitConverter.ToInt32(Set(GPU_FAN_CURVE, data), 0) == 1;
+                return Set(GPU_FAN_CURVE, data, out buffer) && IsOk(buffer);
         }
 
         return false;
@@ -191,7 +203,7 @@ sealed partial class Atk : IDisposable, IAtk
             mode = 0;
         }
 
-        var r = Get(device, mode);
+        Get(device, mode, out var r);
 
         var points = new FanDataPoint[8];
         for (var i = 0; i < points.Length; i++)
@@ -202,22 +214,33 @@ sealed partial class Atk : IDisposable, IAtk
         return points;
     }
 
-    public void SetPerformanceMode(PerformanceMode performanceMode)
+    public bool SetPerformanceMode(PerformanceMode performanceMode)
     {
-        Set(DEVID_THROTTLE_THERMAL_POLICY, (uint)performanceMode);
-
-        performanceModeSubject.OnNext(performanceMode);
+        if (Set(DEVID_THROTTLE_THERMAL_POLICY, (uint)performanceMode, out var buffer) && IsOk(buffer))
+        {
+            performanceModeSubject.OnNext(performanceMode);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    public void SetGpuMode(GpuMode gpuMode)
+    public bool SetGpuMode(GpuMode gpuMode)
     {
-        var currentGpuMode = (GpuMode)Get(DEVID_GPU_ECO_MODE);
-
-        if (currentGpuMode != gpuMode)
+        if (Get(DEVID_GPU_ECO_MODE, out var value))
         {
-            Set(DEVID_GPU_ECO_MODE, (uint)gpuMode);
-            gpuModeSubject.OnNext(gpuMode);
+            var currentGpuMode = (GpuMode)value;
+
+            if (currentGpuMode != gpuMode && Set(DEVID_GPU_ECO_MODE, (uint)gpuMode, out var buffer) && IsOk(buffer))
+            {
+                gpuModeSubject.OnNext(gpuMode);
+                return true;
+            }
         }
+
+        return false;
     }
 
     public void Dispose()
@@ -226,54 +249,70 @@ sealed partial class Atk : IDisposable, IAtk
         disposable = null;
     }
 
-    public int Get(uint deviceId)
+    public bool Get(uint deviceId, out int value)
     {
         var args = new byte[8];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
 
-        return Convert.ToInt32(BitConverter.ToInt64(Get(deviceId, 0), 0) & ~DSTS_PRESENCE_BIT);
+        if (Get(deviceId, 0, out var buffer))
+        {
+            var raw = BitConverter.ToInt64(buffer, 0);
+            value = Convert.ToInt32(raw & ~DSTS_PRESENCE_BIT);
+
+            return (raw & DSTS_PRESENCE_BIT) == DSTS_PRESENCE_BIT;
+        }
+        else
+        {
+            value = 0;
+            return false;
+        }
     }
 
-    public byte[] Get(uint deviceId, uint status)
+    public bool Get(uint deviceId, uint status, out byte[] outBuffer)
     {
         var args = new byte[8];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         BitConverter.GetBytes(status).CopyTo(args, 4);
 
-        return Invoke(DSTS, args);
+        return Invoke(DSTS, args, out outBuffer);
     }
 
-    public byte[] Set(uint deviceId, uint status)
+    public bool Set(uint deviceId, uint status, out byte[] outBuffer)
     {
         var args = new byte[8];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         BitConverter.GetBytes(status).CopyTo(args, 4);
 
-        return Invoke(DEVS, args);
+        return Invoke(DEVS, args, out outBuffer);
     }
 
-    public byte[] Set(uint deviceId, byte[] parameters)
+    public bool Set(uint deviceId, byte[] parameters, out byte[] outBuffer)
     {
         var args = new byte[4 + parameters.Length];
         BitConverter.GetBytes(deviceId).CopyTo(args, 0);
         parameters.CopyTo(args, 4);
 
-        return Invoke(DEVS, args);
+        return Invoke(DEVS, args, out outBuffer);
     }
 
-    private byte[] Invoke(uint MethodId, byte[] args)
+    private static bool IsOk(byte[] buffer)
+    {
+        return BitConverter.ToInt32(buffer, 0) == 1;
+    }
+
+    private bool Invoke(uint MethodId, byte[] args, out byte[] outBuffer, bool throwException = false)
     {
         lock (ControlLocker)
         {
             var acpiBuffer = new byte[8 + args.Length];
-            var outBuffer = new byte[20];
+            outBuffer = new byte[20];
 
             BitConverter.GetBytes(MethodId).CopyTo(acpiBuffer, 0);
             BitConverter.GetBytes(args.Length).CopyTo(acpiBuffer, 4);
             Array.Copy(args, 0, acpiBuffer, 8, args.Length);
 
             uint lpBytesReturned = 0;
-            if (!DeviceIoControl(
+            var result = DeviceIoControl(
                 handle,
                 IO_CONTROL_CODE,
                 acpiBuffer,
@@ -281,12 +320,14 @@ sealed partial class Atk : IDisposable, IAtk
                 outBuffer,
                 (uint)outBuffer.Length,
                 ref lpBytesReturned,
-                IntPtr.Zero))
+                IntPtr.Zero);
+
+            if (!result && throwException)
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            return outBuffer;
+            return result;
         }
     }
 }
