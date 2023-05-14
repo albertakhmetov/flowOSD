@@ -36,7 +36,10 @@ using WinRT.Interop;
 
 public partial class App : Application
 {
+    private int WM_HELLO_FLOWOSD = User32.RegisterWindowMessage("Hello, it's me! #flowOSD");
+
     private CompositeDisposable? disposable;
+    private IDisposable? helloMessageSubsciption;
 
     private IUpdater updater;
 
@@ -60,42 +63,73 @@ public partial class App : Application
         var instanceMutex = new Mutex(true, "com.albertakhmetov.flowosd", out bool isMutexCreated);
         if (!isMutexCreated)
         {
-            User32.SendMessage(Messages.HWND_BROADCAST, Messages.WM_HELLO_FLOWOSD, IntPtr.Zero, IntPtr.Zero);
+            RegisterHelloMessage();
+            User32.SendMessage(Messages.HWND_BROADCAST, WM_HELLO_FLOWOSD, IntPtr.Zero, IntPtr.Zero);
 
             instanceMutex = null;
             Exit();
         }
 #endif
 
-        InitializeComponent();  
-        
-        disposable = new CompositeDisposable();
+        InitializeComponent();
 
-        configService = new ConfigService().DisposeWith(disposable);
-        updater = new Updater(configService);
-        messageQueue = new MessageQueue().DisposeWith(disposable);
-        keysSender = new KeysSender();
-        systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
-        osd = new Osd(configService, systemEvents);
+        try
+        {
+            disposable = new CompositeDisposable();
 
-        hardwareService = new HardwareService(configService, messageQueue, keysSender).DisposeWith(disposable);
-        commandService = new CommandService(configService, hardwareService, keysSender, systemEvents, updater, osd).DisposeWith(disposable);
-        hotKeyService = new HotKeysService(configService, commandService, hardwareService.ResolveNotNull<IKeyboard>()).DisposeWith(disposable);
+            configService = new ConfigService().DisposeWith(disposable);
+            updater = new Updater(configService);
+            messageQueue = new MessageQueue().DisposeWith(disposable);
+            keysSender = new KeysSender();
+            systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
+            osd = new Osd(configService, systemEvents);
 
-        notificationService = new NotificationService(configService, osd, hardwareService).DisposeWith(disposable);
-        notifyIconService = new NotifyIconService(
-            configService,
-            messageQueue,
-            systemEvents,
-            commandService,
-            hardwareService.ResolveNotNull<IAtkWmi>()).DisposeWith(disposable);
-        notifyIconService.Show();
+            hardwareService = new HardwareService(configService, messageQueue, keysSender).DisposeWith(disposable);
+            commandService = new CommandService(configService, hardwareService, keysSender, systemEvents, updater, osd).DisposeWith(disposable);
+            hotKeyService = new HotKeysService(configService, commandService, hardwareService.ResolveNotNull<IKeyboard>()).DisposeWith(disposable);
 
-        messageQueue.Subscribe(Messages.WM_HELLO_FLOWOSD, ProcessMessage).DisposeWith(disposable);
+            notificationService = new NotificationService(configService, osd, hardwareService).DisposeWith(disposable);
+            notifyIconService = new NotifyIconService(
+                configService,
+                messageQueue,
+                systemEvents,
+                commandService,
+                hardwareService.ResolveNotNull<IAtkWmi>()).DisposeWith(disposable);
+            notifyIconService.Show();
+
+            var powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
+
+            powerManagement.PowerEvent
+               .Where(x => x == PowerEvent.Suspend)
+               .Throttle(TimeSpan.FromMicroseconds(50))
+               .ObserveOn(SynchronizationContext.Current!)
+               .Subscribe(_ => OnSuspend())
+               .DisposeWith(disposable);
+
+            powerManagement.PowerEvent
+               .Where(x => x == PowerEvent.Resume)
+               .Throttle(TimeSpan.FromSeconds(5))
+               .ObserveOn(SynchronizationContext.Current!)
+               .Subscribe(_ => OnResume())
+               .DisposeWith(disposable);
+
+            RegisterHelloMessage();
+            messageQueue.Subscribe(Messages.WM_TASKBARCREATED, ProcessMessage).DisposeWith(disposable);
+        }
+        catch (Exception ex)
+        {
+            Comctl32.Error("ERORR", "Error", "Something went wrong: " + ex.Message);
+            Common.TraceException(ex, "An exception has occured during initialization");
+
+            Exit();
+        }
     }
 
     public void ShutDown()
     {
+        helloMessageSubsciption?.Dispose();
+        helloMessageSubsciption = null;
+
         osd?.Dispose();
 
         commandService?.Resolve<ConfigCommand>()?.Dispose();
@@ -112,9 +146,32 @@ public partial class App : Application
 
     private void ProcessMessage(int messageId, IntPtr wParam, IntPtr lParam)
     {
-        if (messageId == Messages.WM_HELLO_FLOWOSD)
+        if (messageId == WM_HELLO_FLOWOSD)
         {
             commandService.ResolveNotNull<MainUICommand>().Execute();
         }
+        else if(messageId == Messages.WM_TASKBARCREATED)
+        {
+            osd.InitSystemOsd();
+        }
+    }
+
+    private void RegisterHelloMessage()
+    {
+        helloMessageSubsciption?.Dispose();
+        helloMessageSubsciption = null;
+
+        WM_HELLO_FLOWOSD = User32.RegisterWindowMessage("Hello, it's me! #flowOSD");
+        helloMessageSubsciption = messageQueue?.Subscribe(WM_HELLO_FLOWOSD, ProcessMessage);
+    }
+
+    private void OnSuspend()
+    {
+    }
+
+    private void OnResume()
+    {
+        RegisterHelloMessage();
+        osd.InitSystemOsd();
     }
 }

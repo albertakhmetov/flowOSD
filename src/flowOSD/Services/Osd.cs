@@ -38,6 +38,7 @@ sealed partial class Osd : IOsd, IDisposable
     // bottom - 90
 
     private CompositeDisposable? disposable = new CompositeDisposable();
+    private CompositeDisposable? systemOsdDisposable;
 
     private IConfig config;
     private ISystemEvents systemEvents;
@@ -53,12 +54,7 @@ sealed partial class Osd : IOsd, IDisposable
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
-        systemOsd = new SystemOsd();
-        systemOsd.IsVisible
-            .Where(i => i)
-            .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(_ => window?.AppWindow?.Hide())
-            .DisposeWith(disposable);
+        InitSystemOsd();
 
         messageSubject = new Subject<OsdMessage>();
         valueSubject = new Subject<OsdValue>();
@@ -79,10 +75,27 @@ sealed partial class Osd : IOsd, IDisposable
     {
         DisposeWindow();
 
+        systemOsdDisposable?.Dispose();
+        systemOsdDisposable = null;
+
         disposable?.Dispose();
         disposable = null;
     }
 
+    public void InitSystemOsd()
+    {
+        systemOsdDisposable?.Dispose();
+        systemOsdDisposable = null;
+
+        systemOsdDisposable = new CompositeDisposable();
+
+        systemOsd = new SystemOsd().DisposeWith(systemOsdDisposable);
+        systemOsd.IsVisible
+            .Where(i => i)
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => window?.AppWindow?.Hide())
+            .DisposeWith(systemOsdDisposable);
+    }
 
     public void Show(OsdMessage message)
     {

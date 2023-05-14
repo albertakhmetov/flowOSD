@@ -41,12 +41,20 @@ sealed class KeyboardBacklightCommand : CommandBase
     private IConfig config;
     private IOsd osd;
     private IKeyboardBacklight keyboardBacklight;
+    private IKeyboardBacklightControl? keyboardBacklightControl;
 
-    public KeyboardBacklightCommand(IConfig config, IOsd osd, IKeyboardBacklight keyboardBacklight)
+    public KeyboardBacklightCommand(IConfig config, IOsd osd, IHardwareService hardwareService)
     {
+        if(hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
-        this.keyboardBacklight = keyboardBacklight ?? throw new ArgumentNullException(nameof(keyboardBacklight));
+
+        keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
+        keyboardBacklightControl = hardwareService.Resolve<IKeyboardBacklightControl>();
 
         Text = "Keyboard Backlight";
         Description = Text;
@@ -59,19 +67,19 @@ sealed class KeyboardBacklightCommand : CommandBase
 
     public override async void Execute(object? parameter = null)
     {
-        if (parameter is string direction == false || !(direction != UP || direction != DOWN))
+        if (keyboardBacklightControl == null || parameter is string direction == false || !(direction != UP || direction != DOWN))
         {
             return;
         }
 
         if (direction == UP)
         {
-            keyboardBacklight.LevelUp();
+            keyboardBacklightControl.LevelUp();
         }
 
         if (direction == DOWN)
         {
-            keyboardBacklight.LevelDown();
+            keyboardBacklightControl.LevelDown();
         }
 
         var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();

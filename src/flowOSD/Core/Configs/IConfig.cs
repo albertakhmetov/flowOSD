@@ -37,8 +37,6 @@ public interface IConfig
 
     DirectoryInfo DataDirectory { get; }
 
-    bool UseOptimizationMode { get; }
-
     bool IsPreRelease { get; }
 
     string ProductName { get; }

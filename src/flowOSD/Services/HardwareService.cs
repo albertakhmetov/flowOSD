@@ -39,7 +39,7 @@ sealed class HardwareService : IDisposable, IHardwareService
     private IMessageQueue messageQueue;
     private IKeysSender keysSender;
 
-    private HidDevice hidDevice;
+    private HidDevice? hidDevice;
 
     private IAtk atk;
     private IAtkWmi atkWmi;
@@ -61,27 +61,39 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     public HardwareService(IConfig config, IMessageQueue messageQueue, IKeysSender keysSender)
     {
+        try
+        {
+            var service = new System.ServiceProcess.ServiceController("ASUSOptimization1");
+            UseOptimizationMode = service.Status != System.ServiceProcess.ServiceControllerStatus.Stopped;
+        }
+        catch
+        {
+            UseOptimizationMode = false;
+        }
+
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
 
-        hidDevice = HidDevice.Devices
-            .Where(i => i.VendorId == 0xB05 && i.ReadFeatureData(out byte[] data, Keyboard.FEATURE_KBD_REPORT_ID))
-            .FirstOrDefault() ?? throw new ApplicationException("Can't connect to HID");
-
-        InitHid();
-
         atk = new Atk(PerformanceMode.Default);
         atkWmi = new AtkWmi(atk);
 
-        if (config.UseOptimizationMode)
+        if (UseOptimizationMode)
         {
+            hidDevice = null;
+
             keyboard = (atkWmi as IKeyboard)!;
             keyboardBacklight = new Hardware.Optimization.KeyboardBacklight();
             touchPad = new Hardware.Optimization.TouchPad(this.messageQueue, this.keysSender);
         }
         else
         {
+            hidDevice = HidDevice.Devices
+                .Where(i => i.VendorId == 0xB05 && i.ReadFeatureData(out byte[] data, Keyboard.FEATURE_KBD_REPORT_ID))
+                .FirstOrDefault() ?? throw new ApplicationException("Can't connect to HID");
+
+            InitHid();
+
             keyboard = new Hardware.Hid.Keyboard(hidDevice);
             keyboardBacklight = new Hardware.Hid.KeyboardBacklight(hidDevice, config.Common.KeyboardBacklightLevel);
             keyboardBacklight.Level
@@ -104,6 +116,12 @@ sealed class HardwareService : IDisposable, IHardwareService
         Register<IAtkWmi>(atkWmi);
         Register<IKeyboard>(keyboard);
         Register<IKeyboardBacklight>(keyboardBacklight);
+
+        if (keyboardBacklight is IKeyboardBacklightControl keyboardBacklightControl)
+        {
+            Register<IKeyboardBacklightControl>(keyboardBacklightControl);
+        }
+
         Register<ITouchPad>(touchPad);
         Register<IDisplay>(display);
         Register<IDisplayBrightness>(displayBrightness);
@@ -132,12 +150,7 @@ sealed class HardwareService : IDisposable, IHardwareService
             .Subscribe(UpdateTouchPad)
             .DisposeWith(disposable);
 
-        keyboardBacklightService = config.UseOptimizationMode ? null : new KeyboardBacklightService(
-            config, 
-            keyboardBacklight,
-            keyboard,
-            powerManagement,
-            display).DisposeWith(disposable);
+        keyboardBacklightService = UseOptimizationMode ? null : new KeyboardBacklightService(config, this).DisposeWith(disposable);
 
         refreshRateService = new RefreshRateService(
             this.config,
@@ -148,6 +161,8 @@ sealed class HardwareService : IDisposable, IHardwareService
             this.config,
             atk).DisposeWith(disposable);
     }
+
+    public bool UseOptimizationMode { get; }
 
     public void Dispose()
     {
@@ -189,7 +204,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private void OnSuspend()
     {
-        if (!config.UseOptimizationMode)
+        if (!UseOptimizationMode)
         {
             keyboardBacklightService?.Disable();
         }
@@ -199,7 +214,7 @@ sealed class HardwareService : IDisposable, IHardwareService
     {
         battery.Reconnect();
 
-        if (!config.UseOptimizationMode)
+        if (!UseOptimizationMode)
         {
             InitHid();
             keyboardBacklightService?.ResetTimer();
@@ -213,6 +228,11 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private void InitHid()
     {
+        if (hidDevice == null)
+        {
+            return;
+        }
+
 #if !DEBUG
       //  hidDevice.WriteFeatureData(0x5a, 0x89);
         hidDevice.WriteFeatureData(0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e);

@@ -25,6 +25,7 @@ using static flowOSD.Native.Kernel32;
 using System.Reactive.Linq;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core;
 
 namespace flowOSD.Services;
 
@@ -33,7 +34,7 @@ sealed class KeyboardBacklightService : IDisposable
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private IConfig config;
-    private IKeyboardBacklight keyboardBacklight;
+    private IKeyboardBacklightControl keyboardBacklightControl;
     private IKeyboard keyboard;
     private IPowerManagement powerManagement; 
     private IDisplay display;
@@ -43,19 +44,28 @@ sealed class KeyboardBacklightService : IDisposable
 
     public KeyboardBacklightService(
         IConfig config,
-        IKeyboardBacklight keyboardBacklight,
-        IKeyboard keyboard,
-        IPowerManagement powerManagement,
-        IDisplay display)
+        IHardwareService hardwareService)
     {
-        this.config = config ?? throw new ArgumentNullException(nameof(config));
-        this.keyboardBacklight = keyboardBacklight ?? throw new ArgumentNullException(nameof(keyboardBacklight));
-        this.keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
-        this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
-        this.display = display ?? throw new ArgumentNullException(nameof(display)); 
-        this.timeout = TimeSpan.FromSeconds(config.Common.KeyboardBacklightTimeout);
+        if(hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
 
-        this.keyboard.Activity
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
+
+        keyboardBacklightControl = hardwareService.ResolveNotNull<IKeyboardBacklightControl>();
+        keyboard = hardwareService.ResolveNotNull<IKeyboard>();
+
+        powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
+        display = hardwareService.ResolveNotNull<IDisplay>();
+        timeout = TimeSpan.FromSeconds(config.Common.KeyboardBacklightTimeout);
+
+        this.config.Common.PropertyChanged
+            .Where(name => name == nameof(CommonConfig.KeyboardBacklightTimeout))
+            .Subscribe(_ => this.timeout = TimeSpan.FromSeconds(config.Common.KeyboardBacklightTimeout))
+            .DisposeWith(disposable);
+
+        keyboard.Activity
             .Subscribe(x =>
             {
                 lastActivityTime = x;
@@ -63,22 +73,17 @@ sealed class KeyboardBacklightService : IDisposable
             })
             .DisposeWith(disposable);
 
-        this.config.Common.PropertyChanged
-            .Where(name => name == nameof(CommonConfig.KeyboardBacklightTimeout))
-            .Subscribe(_ => this.timeout = TimeSpan.FromSeconds(config.Common.KeyboardBacklightTimeout))
-            .DisposeWith(disposable);
-
-        this.powerManagement.PowerEvent
+        powerManagement.PowerEvent
             .Where(x => x == PowerEvent.DisplayOff || x == PowerEvent.DisplayDimmed)
             .Subscribe(_ => Disable())
             .DisposeWith(disposable);
 
-        this.powerManagement.PowerEvent
+        powerManagement.PowerEvent
             .Where(x => x == PowerEvent.DisplayOn)
             .Subscribe(_ => lastActivityTime = GetTickCount())
             .DisposeWith(disposable); 
         
-        this.display.State
+        display.State
             .Where(x => x == DeviceState.Enabled)
             .Subscribe(_ => lastActivityTime = GetTickCount())
             .DisposeWith(disposable);
@@ -116,19 +121,19 @@ sealed class KeyboardBacklightService : IDisposable
             return;
         }
 
-        keyboardBacklight.SetState(DeviceState.Enabled, force: true);
+        keyboardBacklightControl.SetState(DeviceState.Enabled, force: true);
     }
 
     public void Disable()
     {
-        keyboardBacklight.SetState(DeviceState.Disabled, force: true);
+        keyboardBacklightControl.SetState(DeviceState.Disabled, force: true);
     }
 
     private void UpdateBacklightState(DeviceState displayState)
     {
         if (config.Common.KeyboardBacklightWithDisplay && displayState == DeviceState.Disabled)
         {
-            keyboardBacklight.SetState(DeviceState.Disabled);
+            keyboardBacklightControl.SetState(DeviceState.Disabled);
             return;
         }
 
@@ -141,13 +146,13 @@ sealed class KeyboardBacklightService : IDisposable
             {
                 var isIdle = timeout < TimeSpan.FromMilliseconds(GetTickCount() - Math.Max(lastActivityTime, lii.dwTime));
 
-                keyboardBacklight.SetState(isIdle ? DeviceState.Disabled : DeviceState.Enabled);
+                keyboardBacklightControl.SetState(isIdle ? DeviceState.Disabled : DeviceState.Enabled);
                 return;
             }
 
             if (TimeSpan.FromMilliseconds(GetTickCount() - Math.Max(lastActivityTime, lii.dwTime)) < TimeSpan.FromSeconds(2))
             {
-                keyboardBacklight.SetState(DeviceState.Enabled);
+                keyboardBacklightControl.SetState(DeviceState.Enabled);
             }
         }
     }

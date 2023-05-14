@@ -65,26 +65,6 @@ sealed class KeyboardBacklight : IKeyboardBacklight, IDisposable
         watcher = null;
     }
 
-    public void LevelUp()
-    {
-        throw new NotSupportedException();
-    }
-
-    public void LevelDown()
-    {
-        throw new NotSupportedException();
-    }
-
-    public void SetLevel(KeyboardBacklightLevel value, bool force = false)
-    {
-        throw new NotSupportedException();
-    }
-
-    public void SetState(DeviceState value, bool force = false)
-    {
-        throw new NotSupportedException();
-    }
-
     private void SetState(DeviceState value)
     {
         if (stateSubject.Value == value)

@@ -103,9 +103,6 @@ sealed class ConfigService : IConfig, IDisposable
             .Throttle(TimeSpan.FromMilliseconds(500))
             .Subscribe(x => Save())
             .DisposeWith(disposable);
-
-        var service = new System.ServiceProcess.ServiceController("ASUSOptimization");
-        UseOptimizationMode = service.Status != System.ServiceProcess.ServiceControllerStatus.Stopped;
     }
 
     public CommonConfig Common { get; }
@@ -121,8 +118,6 @@ sealed class ConfigService : IConfig, IDisposable
     public FileVersionInfo AppFileInfo { get; }
 
     public DirectoryInfo DataDirectory { get; }
-
-    public bool UseOptimizationMode { get; }
 
     public bool IsPreRelease { get; }
 

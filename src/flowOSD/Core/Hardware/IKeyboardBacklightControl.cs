@@ -19,9 +19,13 @@
 
 namespace flowOSD.Core.Hardware;
 
-public interface IKeyboardBacklight
+public interface IKeyboardBacklightControl
 {
-    IObservable<DeviceState> State { get; }
+    void LevelUp();
 
-    IObservable<KeyboardBacklightLevel> Level { get; }
+    void LevelDown();
+
+    void SetLevel(KeyboardBacklightLevel value, bool force = false);
+
+    void SetState(DeviceState value, bool force = false);
 }

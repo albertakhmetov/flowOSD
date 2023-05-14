@@ -79,7 +79,7 @@ sealed class CommandService : ICommandService, IDisposable
         Register(() => new UpdateCommand(this.updater));
 
         Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
-        Register(() => new KeyboardBacklightCommand(config, osd, hardwareService.ResolveNotNull<IKeyboardBacklight>()));
+        Register(() => new KeyboardBacklightCommand(config, osd, hardwareService));
     }
 
     public void Dispose()

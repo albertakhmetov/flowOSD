@@ -23,7 +23,7 @@ using flowOSD.Core.Hardware;
 
 namespace flowOSD.Services.Hardware.Hid;
 
-sealed class KeyboardBacklight : IKeyboardBacklight
+sealed class KeyboardBacklight : IKeyboardBacklight, IKeyboardBacklightControl
 {
     public const int FEATURE_KBD_REPORT_ID = 0x5a;
 

@@ -61,7 +61,7 @@ internal sealed class RefreshRateService : IDisposable
 
     private async void Update(PowerSource powerSource, DeviceState displayState)
     {
-        if (!config.Common.ControlDisplayRefreshRate && displayState == DeviceState.Disabled)
+        if (!config.Common.ControlDisplayRefreshRate || displayState == DeviceState.Disabled)
         {
             return;
         }

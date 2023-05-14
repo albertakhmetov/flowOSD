@@ -23,7 +23,6 @@ using static flowOSD.Native.User32;
 static class Messages
 {
     public readonly static int WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
-    public readonly static int WM_HELLO_FLOWOSD = RegisterWindowMessage("Hello, it's me! #flowOSD");
 
     public const int HWND_BROADCAST = 0xFFFF;
 
