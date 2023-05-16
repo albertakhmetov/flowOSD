@@ -310,7 +310,10 @@
                         x:Name="keyboardConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding BacklightControl, Converter={StaticResource VisibilityConverter}}">
+                            
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -334,7 +337,10 @@
                             </Grid>
                         </Border>
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding BacklightControl, Converter={StaticResource VisibilityConverter}}">
+                            
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
                                 Header="{Binding TextResources.Config.KeyboardBacklightWithDisplay}"

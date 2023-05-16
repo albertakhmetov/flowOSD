@@ -52,7 +52,7 @@ sealed class MicrophoneCommand : CommandBase
         {
             microphone.Toggle();
 
-            if(!config.Notifications[NotificationType.Mic])
+            if (!config.Notifications[NotificationType.Mic])
             {
                 return;
             }
@@ -61,7 +61,7 @@ sealed class MicrophoneCommand : CommandBase
 
             var isMuted = microphone.IsMicMuted();
             osd.Show(new OsdMessage(
-                isMuted ? "Muted" : "On air",
+                isMuted ? Core.Resources.Text.Instance.Main.MicOff : Core.Resources.Text.Instance.Main.MicOn,
                 isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
         }
         catch (Exception ex)

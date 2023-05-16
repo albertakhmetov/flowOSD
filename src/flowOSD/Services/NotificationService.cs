@@ -68,6 +68,11 @@ sealed class NotificationService : IDisposable
         microphone = hardwareService.ResolveNotNull<IMicrophone>();
 
         Init(disposable);
+
+        if (hardwareService.ResolveNotNull<IHardwareFeatures>().OptimizationService)
+        {
+            InitForOptimizationService(disposable);
+        }
     }
 
     public void Dispose()
@@ -138,6 +143,41 @@ sealed class NotificationService : IDisposable
             .DisposeWith(disposable);
     }
 
+    private void InitForOptimizationService(CompositeDisposable disposable)
+    {
+        keyboard.KeyPressed
+            .Where(key => key == AtkKey.BacklightDown || key == AtkKey.BacklightUp)
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowKeyboardBacklightNotification)
+            .DisposeWith(disposable);
+
+        keyboard.KeyPressed
+            .Where(key => key == AtkKey.Mic)
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => ShowMicNotification())
+            .DisposeWith(disposable);
+    }
+
+    private void ShowMicNotification()
+    {
+        var isMuted = microphone.IsMicMuted();
+        osd.Show(new OsdMessage(
+            isMuted ? Core.Resources.Text.Instance.Main.MicOff : Core.Resources.Text.Instance.Main.MicOn,
+            isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
+    }
+
+    private async void ShowKeyboardBacklightNotification(AtkKey key)
+    {
+        var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
+
+        var icon = key == AtkKey.BacklightUp
+            ? Images.Instance.Hardware.KeyboardLightUp
+            : Images.Instance.Hardware.KeyboardLightDown;
+
+        osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
+    }
+
     private void ShowPerformanceModeNotification(PerformanceMode performanceMode)
     {
         if (!config.Notifications[NotificationType.PerformanceMode])
@@ -146,7 +186,7 @@ sealed class NotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            $"{Text.Instance.PerformanceMode.From(performanceMode)} performance mode", 
+            $"{Text.Instance.PerformanceMode.From(performanceMode)} performance mode",
             Images.Instance.PerformanceMode.From(performanceMode)));
 
     }
@@ -159,7 +199,7 @@ sealed class NotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            $"{Text.Instance.PowerMode.From(powerMode)} power mode", 
+            $"{Text.Instance.PowerMode.From(powerMode)} power mode",
             Images.Instance.PowerMode.From(powerMode)));
     }
 

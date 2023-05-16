@@ -49,7 +49,7 @@ sealed partial class NotifyIconService : IDisposable
     private IMessageQueue messageQueue;
     private ISystemEvents systemEvents;
     private ICommandService commandService;
-    private IAtkWmi atkWmi;
+    private IAtk atk;
 
     private string? text;
     private Icon? icon;
@@ -59,15 +59,15 @@ sealed partial class NotifyIconService : IDisposable
         IMessageQueue messageQueue, 
         ISystemEvents systemEvents,
         ICommandService commandService,
-        IAtkWmi atkWmi)
+        IAtk atk)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-        this.atkWmi = atkWmi ?? throw new ArgumentNullException(nameof(atkWmi));
+        this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
 
-        this.atkWmi.TabletMode
+        this.atk.TabletMode
             .CombineLatest(
                 this.systemEvents.SystemDarkMode,
                 this.systemEvents.Dpi,

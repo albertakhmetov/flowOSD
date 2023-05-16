@@ -1,4 +1,4 @@
-/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
+﻿/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
  *
  *  This file is part of flowOSD.
  *
@@ -19,7 +19,10 @@
 
 namespace flowOSD.Core.Hardware;
 
-public interface IAtkWmi
+[Flags]
+public enum ChargerTypes
 {
-    IObservable<TabletMode> TabletMode { get; }
+    None = 0,
+    Connected = 0x01,
+    LowPower = 0x02,
 }

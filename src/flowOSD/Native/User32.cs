@@ -38,6 +38,8 @@ static class User32
 
     public const int CDS_UPDATEREGISTRY = 0x1;
 
+    public const int SM_CONVERTIBLESLATEMODE = 0x2003;
+
     public const int SM_CXSCREEN = 0;
     public const int SM_CYSCREEN = 1;
     public const int SSM_CXFULLSCREEN = 16;

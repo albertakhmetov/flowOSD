@@ -58,7 +58,7 @@ sealed class CommandService : ICommandService, IDisposable
         Register(() => new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new PerformanceCommand(
             config,
-            hardwareService.ResolveNotNull<IAtkWmi>(),
+            hardwareService.ResolveNotNull<IAtk>(),
             hardwareService.ResolveNotNull<IPowerManagement>(),
             hardwareService.ResolveNotNull<IPerformanceService>()));
         Register(() => new PowerModeCommand(hardwareService.ResolveNotNull<IPowerManagement>()));

@@ -27,6 +27,10 @@ public interface IAtk
 
     IObservable<int> CpuTemperature { get; }
 
+    IObservable<TabletMode> TabletMode { get; }
+
+    IObservable<ChargerTypes> Charger { get; }
+
     uint MinBatteryChargeLimit { get; }
 
     uint MaxBatteryChargeLimit { get; }

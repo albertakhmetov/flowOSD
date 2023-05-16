@@ -30,18 +30,18 @@ using flowOSD.Extensions;
 public class PerformanceCommand : CommandBase
 {
     private IConfig config;
-    private IAtkWmi atkWmi;
+    private IAtk atk;
     private IPowerManagement powerManagement;
     private IPerformanceService performanceService;
 
     public PerformanceCommand(
         IConfig config,
-        IAtkWmi atkWmi,
+        IAtk atk,
         IPowerManagement powerManagement,
         IPerformanceService performanceService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
-        this.atkWmi = atkWmi ?? throw new ArgumentNullException(nameof(atkWmi));
+        this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
         this.performanceService = performanceService ?? throw new ArgumentNullException(nameof(performanceService));
 
@@ -78,7 +78,7 @@ public class PerformanceCommand : CommandBase
 
     private async Task SaveActiveProfile(Guid profileId)
     {
-        if (await atkWmi.TabletMode.FirstOrDefaultAsync() == TabletMode.Tablet)
+        if (await atk.TabletMode.FirstOrDefaultAsync() == TabletMode.Tablet)
         {
             config.Performance.TabletProfile = profileId;
         }

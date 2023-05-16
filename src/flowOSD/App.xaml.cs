@@ -38,6 +38,8 @@ public partial class App : Application
 {
     private int WM_HELLO_FLOWOSD = User32.RegisterWindowMessage("Hello, it's me! #flowOSD");
 
+    private Mutex? instanceMutex;
+
     private CompositeDisposable? disposable;
     private IDisposable? helloMessageSubsciption;
 
@@ -60,12 +62,12 @@ public partial class App : Application
     public App()
     {
 #if !DEBUG
-        var instanceMutex = new Mutex(true, "com.albertakhmetov.flowosd", out bool isMutexCreated);
+        instanceMutex = new Mutex(true, "com.albertakhmetov.flowosd", out bool isMutexCreated);
         if (!isMutexCreated)
         {
-            RegisterHelloMessage();
             User32.SendMessage(Messages.HWND_BROADCAST, WM_HELLO_FLOWOSD, IntPtr.Zero, IntPtr.Zero);
 
+            instanceMutex.Dispose();
             instanceMutex = null;
             Exit();
         }
@@ -86,7 +88,7 @@ public partial class App : Application
 
             hardwareService = new HardwareService(configService, messageQueue, keysSender).DisposeWith(disposable);
             commandService = new CommandService(configService, hardwareService, keysSender, systemEvents, updater, osd).DisposeWith(disposable);
-            hotKeyService = new HotKeysService(configService, commandService, hardwareService.ResolveNotNull<IKeyboard>()).DisposeWith(disposable);
+            hotKeyService = new HotKeysService(configService, commandService, hardwareService).DisposeWith(disposable);
 
             notificationService = new NotificationService(configService, osd, hardwareService).DisposeWith(disposable);
             notifyIconService = new NotifyIconService(
@@ -94,7 +96,7 @@ public partial class App : Application
                 messageQueue,
                 systemEvents,
                 commandService,
-                hardwareService.ResolveNotNull<IAtkWmi>()).DisposeWith(disposable);
+                hardwareService.ResolveNotNull<IAtk>()).DisposeWith(disposable);
             notifyIconService.Show();
 
             var powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
@@ -113,7 +115,7 @@ public partial class App : Application
                .Subscribe(_ => OnResume())
                .DisposeWith(disposable);
 
-            RegisterHelloMessage();
+            messageQueue.Subscribe(WM_HELLO_FLOWOSD, ProcessMessage).DisposeWith(disposable);
             messageQueue.Subscribe(Messages.WM_TASKBARCREATED, ProcessMessage).DisposeWith(disposable);
         }
         catch (Exception ex)
@@ -127,6 +129,9 @@ public partial class App : Application
 
     public void ShutDown()
     {
+        instanceMutex?.Dispose();
+        instanceMutex = null;
+
         helloMessageSubsciption?.Dispose();
         helloMessageSubsciption = null;
 
@@ -156,22 +161,12 @@ public partial class App : Application
         }
     }
 
-    private void RegisterHelloMessage()
-    {
-        helloMessageSubsciption?.Dispose();
-        helloMessageSubsciption = null;
-
-        WM_HELLO_FLOWOSD = User32.RegisterWindowMessage("Hello, it's me! #flowOSD");
-        helloMessageSubsciption = messageQueue?.Subscribe(WM_HELLO_FLOWOSD, ProcessMessage);
-    }
-
     private void OnSuspend()
     {
     }
 
     private void OnResume()
     {
-        RegisterHelloMessage();
         osd.InitSystemOsd();
     }
 }

@@ -33,16 +33,14 @@ sealed class PerformanceService : IDisposable, IPerformanceService
 
     private IConfig config;
     private IAtk atk;
-    private IAtkWmi atkWmi;
     private IPowerManagement powerManagement;
 
     private BehaviorSubject<PerformanceProfile> activeProfileSubject;
 
-    public PerformanceService(IConfig config, IAtk atk, IAtkWmi atkWmi, IPowerManagement powerManagement)
+    public PerformanceService(IConfig config, IAtk atk, IPowerManagement powerManagement)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
-        this.atkWmi = atkWmi ?? throw new ArgumentNullException(nameof(atkWmi));
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
 
         activeProfileSubject = new BehaviorSubject<PerformanceProfile>(PerformanceProfile.Default);
@@ -55,7 +53,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
         ActiveProfile = activeProfileSubject.AsObservable();
 
         this.powerManagement.PowerSource
-            .CombineLatest(this.atkWmi.TabletMode, (powerSource, tabletMode) => new { powerSource, tabletMode })
+            .CombineLatest(this.atk.TabletMode, (powerSource, tabletMode) => new { powerSource, tabletMode })
             .Throttle(TimeSpan.FromMicroseconds(2000))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(x => ChangeActiveProfile(x.powerSource, x.tabletMode))
@@ -116,7 +114,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
     private async void ChangeActiveProfile()
     {
         var powerSource = await powerManagement.PowerSource.FirstAsync();
-        var tabletMode = await atkWmi.TabletMode.FirstAsync();
+        var tabletMode = await atk.TabletMode.FirstAsync();
 
         ChangeActiveProfile(powerSource, tabletMode);
     }

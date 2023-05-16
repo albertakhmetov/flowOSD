@@ -120,6 +120,10 @@ public class Text
 
     public sealed class MainSection
     {
+        public string MicOn => "On air";
+
+        public string MicOff => "Muted";
+
         public string CpuBoost => "CPU Boost";
 
         public string HighRefreshRate => "High Refesh Rate";

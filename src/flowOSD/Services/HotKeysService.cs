@@ -36,21 +36,29 @@ sealed class HotKeysService : IDisposable
     private IConfig config;
     private ICommandService commandService;
     private IKeyboard keyboard;
+    private IHardwareFeatures hardwareFeatures;
 
     private Dictionary<AtkKey, Binding> keys = new Dictionary<AtkKey, Binding>();
 
-    public HotKeysService(IConfig config, ICommandService commandService, IKeyboard keyboard)
+    public HotKeysService(IConfig config, ICommandService commandService, IHardwareService hardwareService)
     {
+        if(hardwareService== null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-        this.keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
 
-        this.config.HotKeys.KeyChanged
+        keyboard = hardwareService.ResolveNotNull<IKeyboard>();
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+
+        config.HotKeys.KeyChanged
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateBindings)
             .DisposeWith(disposable);
 
-        this.keyboard.KeyPressed
+        keyboard.KeyPressed
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ExecuteCommand)
@@ -94,9 +102,25 @@ sealed class HotKeysService : IDisposable
 
     private void ExecuteCommand(AtkKey key)
     {
-        if (keys.TryGetValue(key, out Binding? binding))
+        if (keys.TryGetValue(key, out Binding? binding) && IsNotForOptimizationService(key))
         {
             binding.Execute();
+        }
+    }
+
+    private bool IsNotForOptimizationService(AtkKey key)
+    {
+        if (!hardwareFeatures.OptimizationService)
+        {
+            return true;
+        }
+        else
+        {
+            return key == AtkKey.Aura
+                || key == AtkKey.Fan
+                || key == AtkKey.Rog
+                || key == AtkKey.Copy
+                || key == AtkKey.Paste;
         }
     }
 

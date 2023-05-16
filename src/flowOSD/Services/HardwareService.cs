@@ -31,7 +31,7 @@ using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
-sealed class HardwareService : IDisposable, IHardwareService
+sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -41,16 +41,15 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private HidDevice? hidDevice;
 
-    private IAtk atk;
-    private IAtkWmi atkWmi;
+    private Atk atk;
     private IKeyboard keyboard;
     private IKeyboardBacklight keyboardBacklight;
     private ITouchPad touchPad;
-    private IDisplay display;
-    private IDisplayBrightness displayBrightness;
+    private Display display;
+    private DisplayBrightness displayBrightness;
     private Battery battery;
-    private IPowerManagement powerManagement;
-    private IMicrophone microphone;
+    private PowerManagement powerManagement;
+    private Microphone microphone;
     private PerformanceService performanceService;
 
     private Dictionary<Type, object> devices = new Dictionary<Type, object>();
@@ -63,12 +62,12 @@ sealed class HardwareService : IDisposable, IHardwareService
     {
         try
         {
-            var service = new System.ServiceProcess.ServiceController("ASUSOptimization1");
-            UseOptimizationMode = service.Status != System.ServiceProcess.ServiceControllerStatus.Stopped;
+            var service = new System.ServiceProcess.ServiceController("ASUSOptimization");
+            OptimizationService = service.Status != System.ServiceProcess.ServiceControllerStatus.Stopped;
         }
         catch
         {
-            UseOptimizationMode = false;
+            OptimizationService = false;
         }
 
         this.config = config ?? throw new ArgumentNullException(nameof(config));
@@ -76,13 +75,12 @@ sealed class HardwareService : IDisposable, IHardwareService
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
 
         atk = new Atk(PerformanceMode.Default);
-        atkWmi = new AtkWmi(atk);
 
-        if (UseOptimizationMode)
+        if (OptimizationService)
         {
             hidDevice = null;
 
-            keyboard = (atkWmi as IKeyboard)!;
+            keyboard = (atk as IKeyboard)!;
             keyboardBacklight = new Hardware.Optimization.KeyboardBacklight();
             touchPad = new Hardware.Optimization.TouchPad(this.messageQueue, this.keysSender);
         }
@@ -110,10 +108,9 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         microphone = new Microphone();
 
-        performanceService = new PerformanceService(config, atk, atkWmi, powerManagement);
+        performanceService = new PerformanceService(config, atk, powerManagement);
 
         Register<IAtk>(atk);
-        Register<IAtkWmi>(atkWmi);
         Register<IKeyboard>(keyboard);
         Register<IKeyboardBacklight>(keyboardBacklight);
 
@@ -129,6 +126,7 @@ sealed class HardwareService : IDisposable, IHardwareService
         Register<IPowerManagement>(powerManagement);
         Register<IMicrophone>(microphone);
         Register<IPerformanceService>(performanceService);
+        Register<IHardwareFeatures>(this);
 
         powerManagement.PowerEvent
            .Where(x => x == PowerEvent.Suspend)
@@ -144,13 +142,13 @@ sealed class HardwareService : IDisposable, IHardwareService
            .Subscribe(_ => OnResume())
            .DisposeWith(disposable);
 
-        atkWmi.TabletMode
+        atk.TabletMode
             .Throttle(TimeSpan.FromMicroseconds(2000))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateTouchPad)
             .DisposeWith(disposable);
 
-        keyboardBacklightService = UseOptimizationMode ? null : new KeyboardBacklightService(config, this).DisposeWith(disposable);
+        keyboardBacklightService = OptimizationService ? null : new KeyboardBacklightService(config, this).DisposeWith(disposable);
 
         refreshRateService = new RefreshRateService(
             this.config,
@@ -162,7 +160,19 @@ sealed class HardwareService : IDisposable, IHardwareService
             atk).DisposeWith(disposable);
     }
 
-    public bool UseOptimizationMode { get; }
+    public bool OptimizationService { get; }
+
+    public bool CpuTemperature => atk.CpuTemperatureSupported;
+
+    public bool PerformanceSwitch => atk.PerformanceSwitchSupported;
+
+    public bool GpuSwitch => atk.GpuSwitchSupported;
+
+    public bool Charger => atk.ChargerSupported;
+
+    public bool ChargeLimit => atk.ChargeLimitSupported;
+
+    public bool CpuPowerLimit => atk.CpuPowerLimitSupported;
 
     public void Dispose()
     {
@@ -204,7 +214,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private void OnSuspend()
     {
-        if (!UseOptimizationMode)
+        if (!OptimizationService)
         {
             keyboardBacklightService?.Disable();
         }
@@ -214,7 +224,7 @@ sealed class HardwareService : IDisposable, IHardwareService
     {
         battery.Reconnect();
 
-        if (!UseOptimizationMode)
+        if (!OptimizationService)
         {
             InitHid();
             keyboardBacklightService?.ResetTimer();

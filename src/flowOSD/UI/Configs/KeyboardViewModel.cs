@@ -34,7 +34,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 {
     private CompositeDisposable? disposable = null;
 
-    public KeyboardViewModel(IConfig config, ICommandService commandService)
+    public KeyboardViewModel(IConfig config, ICommandService commandService, IHardwareFeatures hardwareFeatures)
             : base(config, Text.Instance.Config.Keyboard, Images.Instance.Common.KeyboardSettings)
     {
         if (config == null)
@@ -47,30 +47,49 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
             throw new ArgumentNullException(nameof(commandService));
         }
 
+        if (hardwareFeatures == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareFeatures));
+        }
+
+        BacklightControl = !hardwareFeatures.OptimizationService;
         Timeouts = new ReadOnlyCollection<int>(new int[] { 5, 15, 30, 60, 600, 0 });
 
         var commands = new ReadOnlyCollection<CommandBase>(
             new CommandBase[] { CommandBase.Empty }.Union(commandService.Commands.Where(i => i.CanExecuteWithHotKey)).ToArray());
 
-        HotKeys = new ReadOnlyCollection<KeyboardHotKeyViewModel>(new KeyboardHotKeyViewModel[]
+        var hotkeys = new List<KeyboardHotKeyViewModel>()
         {
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Mic, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Rog, commands),
             new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Copy, commands),
             new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Paste, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightDown, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightUp, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Aura, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Fan, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessDown, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessUp, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.TouchPad, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Sleep, commands),
-            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Wireless, commands),
-        });
+            new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Rog, commands),
+        };
+
+        if (!hardwareFeatures.OptimizationService)
+        {
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Mic, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightDown, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BacklightUp, commands));
+        }
+
+        hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Aura, commands));
+        hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Fan, commands));
+
+        if (!hardwareFeatures.OptimizationService)
+        {
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessDown, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.BrightnessUp, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.TouchPad, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Sleep, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(config.HotKeys, commandService, AtkKey.Wireless, commands));
+        }
+
+        HotKeys = new ReadOnlyCollection<KeyboardHotKeyViewModel>(hotkeys);
     }
 
     public Text TextResources => Text.Instance;
+
+    public bool BacklightControl { get; }
 
     public int KeyboardBacklightTimeout
     {
@@ -104,7 +123,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 
         OnPropertyChanged(null);
 
-        foreach(var i in HotKeys)
+        foreach (var i in HotKeys)
         {
             i.Activate();
         }

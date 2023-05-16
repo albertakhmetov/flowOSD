@@ -29,8 +29,9 @@ using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using Microsoft.Win32.SafeHandles;
 using static flowOSD.Native.Kernel32;
+using static flowOSD.Native.User32;
 
-sealed partial class Atk : IDisposable, IAtk
+sealed partial class Atk : IDisposable, IAtk, IKeyboard
 {
     public const int FEATURE_KBD_REPORT_ID = 0x5a;
 
@@ -55,17 +56,31 @@ sealed partial class Atk : IDisposable, IAtk
 
     private const uint DEVID_BATTERY_LIMIT = 0x00120057;
 
-    const int PPT_APU = 0x001200A3;
-    const int PPT_CPU = 0x001200A0;
-    const int PPT_CPUB0 = 0x001200B0;
+    private const uint DEVID_CHARGER = 0x0012006c;
+    private const uint DEVID_TABLET = 0x00060077;
+
+    private const int PPT_APU = 0x001200A3;
+    private const int PPT_CPU = 0x001200A0;
+    private const int PPT_CPUB0 = 0x001200B0;
+
+    private const int AK_TABLET_STATE = 0xBD;
+    private const int AK_CHARGER = 0x7B;
+
+    private const int POWER_SOURCE_BATTERY = 0x00;
+    private const int POWER_SOURCE_LOW = 0x22;
+    private const int POWER_SOURCE_FULL = 0x2A;
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private readonly BehaviorSubject<PerformanceMode> performanceModeSubject;
     private readonly BehaviorSubject<GpuMode> gpuModeSubject;
     private readonly CountableSubject<int> cpuTemperatureSubject;
+    private readonly BehaviorSubject<TabletMode> tabletModeSubject;
+    private readonly BehaviorSubject<ChargerTypes> chargerSubject;
+    private Subject<AtkKey> keyPressedSubject;
 
     private SafeFileHandle handle;
+    private ManagementEventWatcher? watcher;
 
     private IDisposable? updateSubscription;
 
@@ -88,16 +103,26 @@ sealed partial class Atk : IDisposable, IAtk
             throw new ApplicationException("Can't connect to ACPI.");
         }
 
-        Get(DEVID_GPU_ECO_MODE, out var gpuMode);
-        Get(CPU_TEMPERATURE, out var cpuTemperature);
+        GpuSwitchSupported = Get(DEVID_GPU_ECO_MODE, out var gpuMode);
+        CpuTemperatureSupported = Get(CPU_TEMPERATURE, out var cpuTemperature);
+        PerformanceSwitchSupported = Get(DEVID_THROTTLE_THERMAL_POLICY, out _);
+        TabletModeSupported = Get(DEVID_TABLET, out var tabletMode);
+        ChargerSupported = Get(DEVID_CHARGER, out var charger);
+        ChargeLimitSupported = Get(DEVID_BATTERY_LIMIT, out _);
+        CpuPowerLimitSupported = Get(PPT_APU, out _) && Get(PPT_CPU, out _);
 
         performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Default);
         gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)gpuMode);
         cpuTemperatureSubject = new CountableSubject<int>(cpuTemperature);
+        tabletModeSubject = new BehaviorSubject<TabletMode>((TabletMode)tabletMode);
+        chargerSubject = new BehaviorSubject<ChargerTypes>(GetChargerTypes(charger));
+        keyPressedSubject = new Subject<AtkKey>();
 
         PerformanceMode = performanceModeSubject.AsObservable();
         GpuMode = gpuModeSubject.AsObservable();
         CpuTemperature = cpuTemperatureSubject.AsObservable();
+        TabletMode = tabletModeSubject.AsObservable();
+        KeyPressed = keyPressedSubject.AsObservable();
 
         SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Default);
 
@@ -126,13 +151,44 @@ sealed partial class Atk : IDisposable, IAtk
             .DisposeWith(disposable);
 
         Invoke(ASUS_WMI_METHODID_INIT, new byte[8], out var initBuffer);
+
+        watcher = new ManagementEventWatcher("root\\wmi", "SELECT * FROM AsusAtkWmiEvent");
+        watcher.EventArrived += OnWmiEvent;
+        watcher.Start();
+
+        if (!TabletModeSupported)
+        {
+            NotifySystemTabletState();
+        }
     }
+
+    public bool CpuTemperatureSupported { get; }
+
+    public bool PerformanceSwitchSupported { get; }
+
+    public bool GpuSwitchSupported { get; }
+
+    public bool TabletModeSupported { get; }
+
+    public bool ChargerSupported { get; }
+
+    public bool ChargeLimitSupported { get; }
+
+    public bool CpuPowerLimitSupported { get; }
 
     public IObservable<PerformanceMode> PerformanceMode { get; }
 
     public IObservable<GpuMode> GpuMode { get; }
 
     public IObservable<int> CpuTemperature { get; }
+
+    public IObservable<TabletMode> TabletMode { get; }
+
+    public IObservable<ChargerTypes> Charger { get; }
+
+    public IObservable<AtkKey> KeyPressed { get; }
+
+    IObservable<uint> IKeyboard.Activity { get; } = Observable.Empty<uint>();
 
     public uint MinBatteryChargeLimit => 40;
 
@@ -245,6 +301,9 @@ sealed partial class Atk : IDisposable, IAtk
 
     public void Dispose()
     {
+        watcher?.Dispose();
+        watcher = null;
+
         disposable?.Dispose();
         disposable = null;
     }
@@ -300,6 +359,30 @@ sealed partial class Atk : IDisposable, IAtk
         return BitConverter.ToInt32(buffer, 0) == 1;
     }
 
+    private static ChargerTypes GetChargerTypes(int code)
+    {
+        switch (code)
+        {
+            case POWER_SOURCE_BATTERY:
+                return ChargerTypes.None;
+
+            case POWER_SOURCE_LOW:
+                return ChargerTypes.Connected | ChargerTypes.LowPower;
+
+            default:
+                return ChargerTypes.Connected;
+        }
+    }
+
+    private async void NotifySystemTabletState()
+    {
+        await Task.Delay(500);
+
+        var isTablet = GetSystemMetrics(SM_CONVERTIBLESLATEMODE) == 0;
+
+        tabletModeSubject.OnNext(isTablet ? Core.Hardware.TabletMode.Tablet : Core.Hardware.TabletMode.Notebook);
+    }
+
     private bool Invoke(uint MethodId, byte[] args, out byte[] outBuffer, bool throwException = false)
     {
         lock (ControlLocker)
@@ -328,6 +411,47 @@ sealed partial class Atk : IDisposable, IAtk
             }
 
             return result;
+        }
+    }
+
+    private void OnWmiEvent(object sender, EventArrivedEventArgs e)
+    {
+        var v = e.NewEvent.Properties.FirstOrDefault<PropertyData>(x => x.Name == "EventID")?.Value;
+        if (v is not uint code)
+        {
+            return;
+        }
+
+        if (code >= byte.MinValue && code <= byte.MaxValue && Enum.IsDefined(typeof(AtkKey), (byte)code))
+        {
+            keyPressedSubject.OnNext((AtkKey)code);
+            return;
+        }
+
+        switch (code)
+        {
+            case AK_TABLET_STATE:
+                if (Get(DEVID_TABLET, out var tabletMode))
+                {
+                    // Ignore rotated mode:
+                    // - it reasonable in tablet mode (no touchpad manipulation is required)
+                    // - it annoying when notebook mode (when device is tilted)
+
+                    if ((TabletMode)tabletMode != Core.Hardware.TabletMode.Rotated)
+                    {
+                        tabletModeSubject.OnNext((TabletMode)tabletMode);
+                    }
+                }
+                else
+                {
+                    NotifySystemTabletState();
+                }
+
+                break;
+
+            case AK_CHARGER:
+                chargerSubject.OnNext(GetChargerTypes((int)code));
+                break;
         }
     }
 }
