@@ -155,27 +155,31 @@ sealed class ConfigService : IConfig, IDisposable
 
     private void Save()
     {
-        using var stream = configFile.Create();
-
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        options.Converters.Add(new NotificationConfigConverter());
-        options.Converters.Add(new HotKeysConfigConverter());
-
-        var poco = new POCO
+        var tempFile = new FileInfo(Path.GetTempFileName());
+        using (var stream = tempFile.Create())
         {
-            Common = this.Common,
-            Notifications = this.Notifications,
-            HotKeys = this.HotKeys,
-            Performance = new PerformancePOCO
-            {
-                ChargerProfile = this.Performance.ChargerProfile,
-                BatteryProfile = this.Performance.BatteryProfile,
-                TabletProfile = this.Performance.TabletProfile,
-                Profiles = this.Performance.GetProfiles().ToArray()
-            }
-        };
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            options.Converters.Add(new NotificationConfigConverter());
+            options.Converters.Add(new HotKeysConfigConverter());
 
-        JsonSerializer.Serialize<POCO>(stream, poco, options);
+            var poco = new POCO
+            {
+                Common = this.Common,
+                Notifications = this.Notifications,
+                HotKeys = this.HotKeys,
+                Performance = new PerformancePOCO
+                {
+                    ChargerProfile = this.Performance.ChargerProfile,
+                    BatteryProfile = this.Performance.BatteryProfile,
+                    TabletProfile = this.Performance.TabletProfile,
+                    Profiles = this.Performance.GetProfiles().ToArray()
+                }
+            };
+
+            JsonSerializer.Serialize<POCO>(stream, poco, options);
+        }
+
+        tempFile.Replace(configFile.FullName, configFile.FullName + ".backup");
     }
 
     private bool GetStartupOption()
