@@ -43,31 +43,23 @@ sealed partial class SystemEvents : ISystemEvents, IDisposable
 
     private BehaviorSubject<bool> systemDarkModeSubject;
     private BehaviorSubject<bool> appsDarkModeSubject;
-    private BehaviorSubject<Color> accentColorSubject;
     private BehaviorSubject<int> dpiSubject;
+    private Subject<Exception> appExceptionSubject;
 
     public SystemEvents(IMessageQueue messageQueue)
-    { 
+    {
         systemDarkModeSubject = new BehaviorSubject<bool>(IsSystemUseDarkMode());
         appsDarkModeSubject = new BehaviorSubject<bool>(IsAppUseDarkMode());
-        accentColorSubject = new BehaviorSubject<Color>(GetAccentColor());
 
         dpiSubject = new BehaviorSubject<int>(GetDpiForWindow(messageQueue.Handle));
+        appExceptionSubject = new Subject<Exception>();
 
         SystemDarkMode = systemDarkModeSubject.AsObservable();
         AppsDarkMode = appsDarkModeSubject.AsObservable();
-        AccentColor = accentColorSubject.AsObservable();
         Dpi = dpiSubject.AsObservable();
+        AppException = appExceptionSubject.AsObservable();
 
-    
-        //AppShutdown = Observable
-        //    .FromEventPattern<EventHandler, EventArgs>(h => Application.ApplicationExit += h, h => Application.ApplicationExit -= h)
-        //    .Select(_ => true)
-        //    .AsObservable();
-        //AppException = Observable
-        //    .FromEventPattern<ThreadExceptionEventHandler, ThreadExceptionEventArgs>(h => Application.ThreadException += h, h => Application.ThreadException -= h)
-        //    .Select(x => x.EventArgs.Exception)
-        //    .AsObservable();
+        App.Current.UnhandledException += AppUnhandledException;
 
         messageQueue.Subscribe(WM_WININICHANGE, ProcessMessage).DisposeWith(disposable);
         messageQueue.Subscribe(WM_DISPLAYCHANGE, ProcessMessage).DisposeWith(disposable);
@@ -78,16 +70,14 @@ sealed partial class SystemEvents : ISystemEvents, IDisposable
 
     public IObservable<bool> AppsDarkMode { get; }
 
-    public IObservable<Color> AccentColor { get; }
-
     public IObservable<int> Dpi { get; }
 
-    public IObservable<bool> AppShutdown { get; }
-
-    public IObservable<Exception> AppException { get; }
+    public IObservable<Exception?> AppException { get; }
 
     public void Dispose()
     {
+        App.Current.UnhandledException -= AppUnhandledException;
+
         disposable?.Dispose();
         disposable = null;
     }
@@ -98,7 +88,6 @@ sealed partial class SystemEvents : ISystemEvents, IDisposable
         {
             systemDarkModeSubject.OnNext(IsSystemUseDarkMode());
             appsDarkModeSubject.OnNext(IsAppUseDarkMode());
-            accentColorSubject.OnNext(GetAccentColor());
         }
 
         //if (messageId == WM_DISPLAYCHANGE)
@@ -126,5 +115,10 @@ sealed partial class SystemEvents : ISystemEvents, IDisposable
         {
             return key?.GetValue(PERSONALIZE_SYSTEM_VALUE)?.ToString() != "1";
         }
+    }
+
+    private void AppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        appExceptionSubject.OnNext(e.Exception);
     }
 }

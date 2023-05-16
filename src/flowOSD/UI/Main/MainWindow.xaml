@@ -255,7 +255,7 @@
                         Glyph="{Binding ImageResources.Common.Temperature}"/>
                     <TextBlock>
                         <Run Text="{Binding CpuTemperature}"/>
-                        <Run Text="°C"/>
+                        <Run Text="&#x2103;"/>
                     </TextBlock>
                 </StackPanel>
             </StackPanel>

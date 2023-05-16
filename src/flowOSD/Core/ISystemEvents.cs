@@ -28,11 +28,7 @@ public interface ISystemEvents
 
     IObservable<bool> AppsDarkMode { get; }
 
-    IObservable<Color> AccentColor { get; }
-
     IObservable<int> Dpi { get; }
 
-    IObservable<bool> AppShutdown { get; }
-
-    IObservable<Exception> AppException { get; }
+    IObservable<Exception?> AppException { get; }
 }

@@ -82,8 +82,20 @@ public partial class App : Application
             configService = new ConfigService().DisposeWith(disposable);
             updater = new Updater(configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
-            keysSender = new KeysSender();
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
+
+            systemEvents.AppException
+                .Subscribe(ex =>
+                {
+                    if (ex != null)
+                    {
+                        Common.TraceException(ex, "Unhandled application exception");
+                        Comctl32.Error("ERROR", "Unhandled application exception", ex.Message);
+                    }
+                })
+                .DisposeWith(disposable);
+
+            keysSender = new KeysSender();
             osd = new Osd(configService, systemEvents);
 
             hardwareService = new HardwareService(configService, messageQueue, keysSender).DisposeWith(disposable);
@@ -120,8 +132,8 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Comctl32.Error("ERORR", "Error", "Something went wrong: " + ex.Message);
             Common.TraceException(ex, "An exception has occured during initialization");
+            Comctl32.Error("ERORR", "Unhandled application exception", ex.Message);
 
             Exit();
         }
@@ -155,7 +167,7 @@ public partial class App : Application
         {
             commandService.ResolveNotNull<MainUICommand>().Execute();
         }
-        else if(messageId == Messages.WM_TASKBARCREATED)
+        else if (messageId == Messages.WM_TASKBARCREATED)
         {
             osd.InitSystemOsd();
         }
