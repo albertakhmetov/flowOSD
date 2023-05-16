@@ -47,7 +47,6 @@ public sealed partial class MainWindow : Window, IDisposable
 
     private CompositeDisposable? disposable = new CompositeDisposable();
     private AcrylicSystemBackdrop backdrop;
-    private Monitoring monitoring;
 
     private IConfig config;
     private ISystemEvents systemEvents;
@@ -58,8 +57,6 @@ public sealed partial class MainWindow : Window, IDisposable
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.hardwareServices = hardwareServices ?? throw new ArgumentNullException(nameof(hardwareServices));
-
-        monitoring = new Monitoring(this, config, hardwareServices).DisposeWith(disposable);
 
         ViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         InitializeComponent();
@@ -211,12 +208,10 @@ public sealed partial class MainWindow : Window, IDisposable
 
         if (args.WindowActivationState == WindowActivationState.Deactivated)
         {
-            monitoring.Deactivate();
             ViewModel.Deactivate();
         }
         else
         {
-            monitoring.Activate();
             ViewModel.Activate();
         }
     }
@@ -235,118 +230,6 @@ public sealed partial class MainWindow : Window, IDisposable
         if (Content is FrameworkElement content)
         {
             content.RequestedTheme = isDark ? ElementTheme.Dark : ElementTheme.Light;
-        }
-    }
-
-    private sealed class Monitoring : IDisposable
-    {
-        private MainWindow window;
-
-        private IConfig config;
-        private IBattery battery;
-        private IAtk atk;
-
-        private CompositeDisposable? disposable;
-
-        public Monitoring(MainWindow window, IConfig config, IHardwareService hardwareService)
-        {
-            this.window = window ?? throw new ArgumentNullException(nameof(window));
-            this.config = config ?? throw new ArgumentNullException(nameof(config));
-
-            if (hardwareService == null)
-            {
-                throw new ArgumentNullException(nameof(hardwareService));
-            }
-
-            battery = hardwareService.ResolveNotNull<IBattery>();
-            atk = hardwareService.ResolveNotNull<IAtk>();
-        }
-
-        public void Activate()
-        {
-            disposable?.Dispose();
-            disposable = new CompositeDisposable();
-
-            if (config.Common.ShowBatteryChargeRate)
-            {
-                battery.Rate.DistinctUntilChanged()
-                    .CombineLatest(
-                        battery.Capacity.DistinctUntilChanged(),
-                        battery.PowerState.DistinctUntilChanged(),
-                        battery.EstimatedTime.DistinctUntilChanged(),
-                        (rate, capacity, powerState, estimatedTime) => new { rate, capacity, powerState, estimatedTime })
-                    .ObserveOn(SynchronizationContext.Current!)
-                    .Subscribe(x => UpdateBattery(x.rate, x.capacity, x.powerState, x.estimatedTime))
-                    .DisposeWith(disposable);
-            }
-
-            if (config.Common.ShowCpuTemperature)
-            {
-                atk.CpuTemperature
-                    .ObserveOn(SynchronizationContext.Current!)
-                    .Subscribe(value => UpdateCpuTemperature(value))
-                    .DisposeWith(disposable);
-            }
-        }
-
-        public void Deactivate()
-        {
-            disposable?.Dispose();
-            disposable = null;
-        }
-
-        public void Dispose()
-        {
-            Deactivate();
-        }
-
-        private void UpdateBattery(int rate, uint capacity, BatteryPowerState powerState, uint estimatedTime)
-        {
-            var isEmptyRate = Math.Abs(rate) < 100;
-
-            window.batteryChargeRateIcon.Glyph = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
-            window.batteryChargeRate.Text = isEmptyRate ? "" : $"{rate / 1000f:N1} W";
-
-            /* var time = TimeSpan.FromSeconds(estimatedTime);
-             var builder = new StringBuilder();
-             builder.Append($"{capacity * 100f / battery.FullChargedCapacity:N0}%");
-
-             if (isEmptyRate)
-             {
-                 builder.Append("");
-             }
-             else if ((powerState & BatteryPowerState.Discharging) == BatteryPowerState.Discharging)
-             {
-                 builder.Append(" remaining");
-             }
-             else if ((powerState & BatteryPowerState.Charging) == BatteryPowerState.Charging)
-             {
-                 builder.Append(" available");
-             }
-
-             if ((powerState & BatteryPowerState.PowerOnLine) == BatteryPowerState.PowerOnLine)
-             {
-                 builder.Append(" (plugged in)");
-             }
-
-             if (!isEmptyRate && (powerState & BatteryPowerState.Discharging) == BatteryPowerState.Discharging && time.TotalMinutes > 1)
-             {
-                 builder.AppendLine();
-
-                 if (time.Hours > 0)
-                 {
-                     builder.Append($"{time.Hours}h ");
-                 }
-
-                 builder.Append($"{time.Minutes.ToString().PadLeft(2, '0')}min");
-             }
-
-             BatteryChargeRateInfo = builder.ToString();*/
-        }
-
-        private void UpdateCpuTemperature(int value)
-        {
-            window.cpuTemperature.Text = value == 0 ? string.Empty : $"{value} °C";
         }
     }
 }

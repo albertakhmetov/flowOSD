@@ -56,7 +56,7 @@ sealed partial class NotifyIconService : IDisposable
 
     public NotifyIconService(
         IConfig config,
-        IMessageQueue messageQueue, 
+        IMessageQueue messageQueue,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IAtk atk)
@@ -181,7 +181,9 @@ sealed partial class NotifyIconService : IDisposable
             return;
         }
 
-        switch(lParam.Low())
+        Trace.WriteLine(lParam.Low());
+
+        switch (lParam.Low())
         {
             case WM_LBUTTONUP:
                 ShowMainWindow();

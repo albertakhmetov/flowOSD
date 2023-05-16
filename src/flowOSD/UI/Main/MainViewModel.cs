@@ -36,13 +36,18 @@ public class MainViewModel : ViewModelBase, IDisposable
     private IConfig config;
     private IPowerManagement powerManagement;
     private IPerformanceService performanceService;
+    private IBattery battery;
+    private IAtk atk;
+    private IHardwareFeatures hardwareFeatures;
 
     private string performanceProfileText, performanceProfileImage;
 
     private string powerModeText, powerModeImage;
     private bool isBatterySaver;
 
-    private IDisposable? updatesDisposable;
+    private bool hasRate;
+    private string batteryImage;
+    private int rate, cpuTemperature;
 
     public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
     {
@@ -63,6 +68,9 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
         performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
+        battery = hardwareService.ResolveNotNull<IBattery>();
+        atk = hardwareService.ResolveNotNull<IAtk>();
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
 
         BoostCommand = commandService.ResolveNotNull<ToggleBoostCommand>();
         PerformanceCommand = commandService.ResolveNotNull<PerformanceCommand>();
@@ -122,8 +130,32 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public bool ShowCpuTemperature
     {
-        get => config.Common.ShowCpuTemperature;
+        get => config.Common.ShowCpuTemperature && hardwareFeatures.CpuTemperature;
         set => config.Common.ShowCpuTemperature = value;
+    }
+
+    public bool HasRate
+    {
+        get => hasRate;
+        set => SetProperty(ref hasRate, value);
+    }
+
+    public string BatteryImage
+    {
+        get => batteryImage;
+        set => SetProperty(ref batteryImage, value);
+    }
+
+    public int Rate
+    {
+        get => rate;
+        set => SetProperty(ref rate, value);
+    }
+
+    public int CpuTemperature
+    {
+        get => cpuTemperature;
+        set => SetProperty(ref cpuTemperature, value);
     }
 
     public CommandBase DisplayRefreshRateCommand { get; }
@@ -136,19 +168,8 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public void Activate()
     {
-        updatesDisposable?.Dispose();
-        updatesDisposable = InitSubscriptions();
-    }
-
-    public void Deactivate()
-    {
-        updatesDisposable?.Dispose();
-        updatesDisposable = null;
-    }
-
-    private IDisposable InitSubscriptions()
-    {
-        var localDisposable = new CompositeDisposable();
+        disposable?.Dispose();
+        disposable = new CompositeDisposable();
 
         performanceService.ActiveProfile
             .ObserveOn(SynchronizationContext.Current!)
@@ -173,7 +194,7 @@ public class MainViewModel : ViewModelBase, IDisposable
                     PerformanceProfileImage = Images.Instance.PerformanceMode.User;
                 }
             })
-            .DisposeWith(localDisposable);
+            .DisposeWith(disposable);
 
         powerManagement.PowerMode
             .ObserveOn(SynchronizationContext.Current!)
@@ -182,27 +203,57 @@ public class MainViewModel : ViewModelBase, IDisposable
                 PowerModeText = Text.Instance.PowerMode.From(powerMode);
                 PowerModeImage = Images.Instance.PowerMode.From(powerMode);
             })
-            .DisposeWith(localDisposable);
+            .DisposeWith(disposable);
 
         powerManagement.IsBatterySaver
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(isBatterySaver => IsBatterySaver = isBatterySaver)
-            .DisposeWith(localDisposable);
+            .DisposeWith(disposable);
 
         config.Common.PropertyChanged
             .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature))
             .SubscribeOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
-            .DisposeWith(localDisposable);
+            .DisposeWith(disposable);
 
-        return localDisposable;
+        if (config.Common.ShowBatteryChargeRate)
+        {
+            battery.Rate.DistinctUntilChanged()
+                .CombineLatest(
+                    battery.Capacity.DistinctUntilChanged(),
+                    battery.PowerState.DistinctUntilChanged(),
+                    battery.EstimatedTime.DistinctUntilChanged(),
+                    (rate, capacity, powerState, estimatedTime) => new { rate, capacity, powerState, estimatedTime })
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(x => UpdateBattery(x.rate, x.capacity, x.powerState, x.estimatedTime))
+                .DisposeWith(disposable);
+        }
+
+        if (config.Common.ShowCpuTemperature && hardwareFeatures.CpuTemperature)
+        {
+            atk.CpuTemperature
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(value => CpuTemperature = value)
+                .DisposeWith(disposable);
+        }
+    }
+
+    public void Deactivate()
+    {
+        disposable?.Dispose();
+        disposable = null;
     }
 
     public void Dispose()
     {
         Deactivate();
+    }
 
-        disposable?.Dispose();
-        disposable = null;
+    private void UpdateBattery(int rate, uint capacity, BatteryPowerState powerState, uint estimatedTime)
+    {
+        HasRate = Math.Abs(rate) > 500;
+        Rate = HasRate ? Convert.ToInt32(Math.Round(rate / 1000f)) : 0;
+
+        BatteryImage = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
     }
 }
