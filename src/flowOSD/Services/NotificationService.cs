@@ -48,6 +48,8 @@ sealed class NotificationService : IDisposable
     private IKeyboardBacklight keyboardBacklight;
     private IMicrophone microphone;
 
+    private IHardwareFeatures hardwareFeatures;
+
     public NotificationService(IConfig config, IOsd osd, IHardwareService hardwareService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
@@ -67,9 +69,11 @@ sealed class NotificationService : IDisposable
         keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
         microphone = hardwareService.ResolveNotNull<IMicrophone>();
 
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+
         Init(disposable);
 
-        if (hardwareService.ResolveNotNull<IHardwareFeatures>().OptimizationService)
+        if (hardwareFeatures.OptimizationService)
         {
             InitForOptimizationService(disposable);
         }
@@ -99,13 +103,25 @@ sealed class NotificationService : IDisposable
             .Subscribe(ShowPowerModeNotification)
             .DisposeWith(disposable);
 
-        powerManagement.PowerSource
-            .Skip(1)
-            .DistinctUntilChanged()
-            .Throttle(TimeSpan.FromSeconds(2))
-            .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(ShowPowerSourceNotification)
-            .DisposeWith(disposable);
+        if (hardwareFeatures.Charger)
+        {
+            atk.Charger
+                .DistinctUntilChanged()
+                .Throttle(TimeSpan.FromSeconds(2))
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(ShowPowerSourceNotification)
+                .DisposeWith(disposable);
+        }
+        else
+        {
+            powerManagement.PowerSource
+                .Skip(1)
+                .DistinctUntilChanged()
+                .Throttle(TimeSpan.FromSeconds(2))
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(ShowPowerSourceNotification)
+                .DisposeWith(disposable);
+        }
 
         touchPad.State
             .Skip(1)
@@ -211,8 +227,35 @@ sealed class NotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            powerSource == PowerSource.Battery ? "On Battery" : "Plugged In",
+            powerSource == PowerSource.Battery ? Text.Instance.Charger.Battery : Text.Instance.Charger.Connected,
             powerSource == PowerSource.Battery ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
+    }
+
+    private void ShowPowerSourceNotification(ChargerTypes chargerTypes)
+    {
+        if (!config.Notifications[NotificationType.PowerSource])
+        {
+            return;
+        }
+
+        string text;
+
+        if ((chargerTypes & ChargerTypes.LowPower) == ChargerTypes.LowPower)
+        {
+            text = Text.Instance.Charger.LowPower;
+        }
+        else if ((chargerTypes & ChargerTypes.Connected) == ChargerTypes.Connected)
+        {
+            text = Text.Instance.Charger.Connected;
+        }
+        else
+        {
+            text = Text.Instance.Charger.Battery;
+        }
+
+        osd.Show(new OsdMessage(
+            text,
+            (chargerTypes & ChargerTypes.None) == ChargerTypes.None ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
     }
 
     private void ShowDisplayRefreshRateNotification(uint refreshRate)

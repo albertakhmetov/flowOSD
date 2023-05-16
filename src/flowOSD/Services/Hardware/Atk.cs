@@ -122,6 +122,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         GpuMode = gpuModeSubject.AsObservable();
         CpuTemperature = cpuTemperatureSubject.AsObservable();
         TabletMode = tabletModeSubject.AsObservable();
+        Charger = chargerSubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
 
         SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Default);
@@ -450,7 +451,11 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
                 break;
 
             case AK_CHARGER:
-                chargerSubject.OnNext(GetChargerTypes((int)code));
+                if (Get(DEVID_CHARGER, out var charger))
+                {
+                    chargerSubject.OnNext(GetChargerTypes(charger));
+                }
+
                 break;
         }
     }

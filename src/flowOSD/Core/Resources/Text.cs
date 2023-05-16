@@ -30,7 +30,8 @@ public class Text
     {
         PerformanceMode = new PerformanceModeSection();
         PowerMode = new PowerModeSection();
-
+        Charger = new ChargerSection();
+        
         Main = new MainSection();
         Config = new ConfigSection();
 
@@ -45,6 +46,8 @@ public class Text
     public PerformanceModeSection PerformanceMode { get; }
 
     public PowerModeSection PowerMode { get; }
+
+    public ChargerSection Charger { get; }
 
     public MainSection Main { get; }
 
@@ -116,6 +119,15 @@ public class Text
                     return string.Empty;
             }
         }
+    }
+
+    public sealed class ChargerSection
+    {
+        public string Battery => "Battery";
+
+        public string Connected => "Plugged In";
+
+        public string LowPower => "Plugged In (Low Power Charger)";
     }
 
     public sealed class MainSection
