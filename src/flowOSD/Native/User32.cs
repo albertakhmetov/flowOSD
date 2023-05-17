@@ -464,4 +464,20 @@ static class User32
             Marshal.FreeHGlobal(ptr);
         }
     }
+
+    public static bool ShowScreenBrightnessOsd()
+    {
+        var hostHandle = FindWindowEx(IntPtr.Zero, IntPtr.Zero, "Shell_TrayWnd", "");
+        if (hostHandle > 0 && (hostHandle = FindWindowEx(hostHandle, IntPtr.Zero, "ReBarWindow32", "")) > 0)
+        {
+            var shellHandle = FindWindowEx(hostHandle, IntPtr.Zero, "MSTaskSwWClass", null);
+            if (shellHandle > 0)
+            {
+                SendMessage(shellHandle, Messages.WM_SHELLHOOK, 0x37, 0);
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

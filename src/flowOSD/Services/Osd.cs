@@ -132,105 +132,6 @@ sealed partial class Osd : IOsd, IDisposable
             window = null;
         }
     }
-    /* private sealed class OsdForm : Form
-     {
-         private CompositeDisposable disposable = new CompositeDisposable();
-         private IDisposable hideTimer;
-         private OsdData data;
-
-         private bool isDarkTheme;
-
-         private Brush textBrush;
-         private Pen accentPen, indicatorBackgroundPen, lightIndicatorBackgroundPen, darkIndicatorBackgroundPen;
-
-         public OsdForm(ISystemEvents systemEvents)
-         {
-             isDarkTheme = false;
-
-             FormBorderStyle = FormBorderStyle.None;
-
-             ShowInTaskbar = false;
-             DoubleBuffered = true;
-             TopMost = true;
-
-             Font = new Font("Segoe UI Light", this.DpiScale(Parameters.TextValueHeight), FontStyle.Bold, GraphicsUnit.Pixel);
-
-             darkIndicatorBackgroundPen = CreateIndicatorBackgroundPen(
-                 Parameters.IndicatorDarkBackgroundColor,
-                 this.DpiScale(Parameters.IndicatorValueHeight)).DisposeWith(disposable);
-             lightIndicatorBackgroundPen = CreateIndicatorBackgroundPen(
-                 Parameters.IndicatorLightBackgroundColor,
-                 this.DpiScale(Parameters.IndicatorValueHeight)).DisposeWith(disposable);
-
-             UpdateTheme();
-
-             systemEvents.AccentColor
-                 .Subscribe(color => InvalidateAccentColor(color))
-                 .DisposeWith(disposable);
-
-             systemEvents.SystemDarkMode
-                 .Subscribe(isDarkMode => IsDarkTheme = isDarkMode)
-                 .DisposeWith(disposable);
-         }
-
-         public bool IsDarkTheme
-         {
-             get { return isDarkTheme; }
-             private set
-             {
-                 isDarkTheme = value;
-
-                 UpdateTheme();
-             }
-         }
-
-         protected override bool ShowWithoutActivation => false;
-
-         public void Show(OsdData data)
-         {
-             const int SW_SHOWNOACTIVATE = 4;
-
-             this.data = data;
-
-             hideTimer?.Dispose();
-             hideTimer = null;
-
-             UpdatePositionAndSize();
-
-             Opacity = 1;
-             Invalidate();
-             ShowWindow(Handle, SW_SHOWNOACTIVATE);
-             BringWindowToTop(Handle);
-
-             hideTimer = Observable
-                 .Timer(DateTimeOffset.Now.AddMilliseconds(Parameters.Timeout), TimeSpan.FromMilliseconds(500 / 16))
-                 .ObserveOn(SynchronizationContext.Current!)
-                 .Subscribe(t =>
-                 {
-                     Opacity -= .1;
-                     Location = new Point(Location.X, Location.Y - 5);
-
-                     if (Opacity <= 0)
-                     {
-                         Visible = false;
-                     }
-                 });
-         }
-
-         protected override CreateParams CreateParams
-         {
-             get
-             {
-                 const int WS_EX_NOACTIVATE = 0x08000000;
-                 const int WS_EX_TOOLWINDOW = 0x00000080;
-
-                 var p = base.CreateParams;
-                 p.ExStyle |= (WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
-
-                 return p;
-             }
-         }
-     }*/
 
     private sealed class SystemOsd : IDisposable
     {
@@ -275,6 +176,11 @@ sealed partial class Osd : IOsd, IDisposable
 
         public void Hide()
         {
+            if (handle == IntPtr.Zero)
+            {
+                handle = GetSystemOsdHandle();
+            }
+
             User32.ShowWindow(handle, 0);
         }
 
@@ -304,7 +210,7 @@ sealed partial class Osd : IOsd, IDisposable
 
             if (handle == IntPtr.Zero && (eventType == EVENT_OBJECT_CREATE || eventType == EVENT_OBJECT_SHOW))
             {
-                if (GetWindowClassName(hWnd) == "NativeHWNDHost")
+                if (GetWindowClassName(hWnd) == (IsWindows11 ? "XamlExplorerHostIslandWindow" : "NativeHWNDHost"))
                 {
                     handle = GetSystemOsdHandle();
                 }

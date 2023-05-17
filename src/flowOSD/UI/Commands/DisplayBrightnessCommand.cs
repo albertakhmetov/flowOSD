@@ -33,8 +33,6 @@ sealed class DisplayBrightnessCommand : CommandBase
     public const string UP = "up";
     public const string DOWN = "down";
 
-    private static int WM_SHELLHOOK = RegisterWindowMessage("SHELLHOOK");
-
     private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
         new CommandParameterInfo(DOWN, "Down", Images.Instance.Hardware.BrightnessDown),
         new CommandParameterInfo(UP, "Up", Images.Instance.Hardware.BrightnessUp));
@@ -75,15 +73,9 @@ sealed class DisplayBrightnessCommand : CommandBase
             displayBrightness.LevelDown();
         }
 
-        var hostHandle = FindWindowEx(IntPtr.Zero, IntPtr.Zero, "Shell_TrayWnd", "");
-        if (hostHandle > 0 && (hostHandle = FindWindowEx(hostHandle, IntPtr.Zero, "ReBarWindow32", "")) > 0)
+        if (ShowScreenBrightnessOsd())
         {
-            var shellHandle = FindWindowEx(hostHandle, IntPtr.Zero, "MSTaskSwWClass", null);
-            if (shellHandle > 0)
-            {
-                SendMessage(shellHandle, WM_SHELLHOOK, 0x37, 0);
-                return;
-            }
+            return;
         }
 
         // fail back:

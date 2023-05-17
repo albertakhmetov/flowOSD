@@ -106,6 +106,7 @@ sealed class NotificationService : IDisposable
         if (hardwareFeatures.Charger)
         {
             atk.Charger
+                .Skip(1)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromSeconds(2))
                 .ObserveOn(SynchronizationContext.Current!)

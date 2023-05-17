@@ -22,7 +22,8 @@ using static flowOSD.Native.User32;
 
 static class Messages
 {
-    public readonly static int WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
+    public static readonly int WM_SHELLHOOK = RegisterWindowMessage("SHELLHOOK");
+    public static readonly int WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
 
     public const int HWND_BROADCAST = 0xFFFF;
 
