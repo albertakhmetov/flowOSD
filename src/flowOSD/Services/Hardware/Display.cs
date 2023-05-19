@@ -82,7 +82,7 @@ sealed partial class Display : IDisposable, IDisplay
 
         if (refreshRates.High != value && refreshRates.Low != value)
         {
-            throw new ApplicationException($"Selected refresh rate ({value}) isn't supported.");
+            throw new AppException($"Selected refresh rate ({value}) isn't supported.");
         }
 
         var mode = new DEVMODE();
@@ -97,13 +97,13 @@ sealed partial class Display : IDisposable, IDisplay
                 return true;
 
             case DISP_CHANGE_RESTART:
-                throw new ApplicationException($"Restart is required.");
+                throw new AppException($"Restart is required.", restartRequired: true);
 
             case DISP_CHANGE_BADMODE:
-                throw new ApplicationException($"Selected refresh rate ({value}) isn't supported.");
+                throw new AppException($"Selected refresh rate ({value}) isn't supported.");
 
             default:
-                throw new ApplicationException($"Can't change display refresh rate. Error code: {result}.");
+                throw new AppException($"Can't change display refresh rate. Error code: {result}.");
         }
     }
 

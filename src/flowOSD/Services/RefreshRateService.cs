@@ -79,6 +79,10 @@ internal sealed class RefreshRateService : IDisposable
                 display.SetRefreshRate(refreshRates?.High);
             }
         }
+        catch (AppException ex)
+        {
+            TraceException(ex, "RefreshRateService");
+        }
         catch (Win32Exception ex)
         {
             TraceException(ex, "RefreshRateService");

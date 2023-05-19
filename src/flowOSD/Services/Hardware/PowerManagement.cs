@@ -193,7 +193,7 @@ sealed partial class PowerManagement : IDisposable, IPowerManagement
         }
         try
         {
-            activeScheme = (Guid)Marshal.PtrToStructure(SchemeGuid, typeof(Guid));
+            activeScheme = Marshal.PtrToStructure<Guid>(SchemeGuid);
         }
         finally
         {

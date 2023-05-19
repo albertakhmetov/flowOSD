@@ -48,30 +48,9 @@ sealed class Keyboard : IDisposable, IKeyboard
         Activity = activitySubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
 
-        keyboardReader = Task.Factory.StartNew(async () =>
-        {
-            try
-            {
-                while (!cancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    var data = await this.device.ReadDataAsync(cancellationTokenSource.Token);
-
-                    if (data.Length > 1)
-                    {
-                        activitySubject.OnNext(GetTickCount());
-                    }
-
-                    if (data.Length > 1 && data[0] == FEATURE_KBD_REPORT_ID && Enum.IsDefined(typeof(AtkKey), data[1]))
-                    {
-                        keyPressedSubject.OnNext((AtkKey)data[1]);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                TraceException(ex, "Keyboard listener exception");
-            }
-        }, TaskCreationOptions.LongRunning);
+        keyboardReader = Task.Factory.StartNew(
+            async () => await ProcessKeyboardInput(cancellationTokenSource.Token),
+            TaskCreationOptions.LongRunning);
     }
 
     public IObservable<uint> Activity { get; }
@@ -83,6 +62,56 @@ sealed class Keyboard : IDisposable, IKeyboard
         if (cancellationTokenSource != null)
         {
             cancellationTokenSource.Cancel();
+        }
+    }
+
+    private async Task ProcessKeyboardInput(CancellationToken token)
+    {
+        const int MAX_ATTEPTS = 10;
+
+        try
+        {
+            var atteptNo = 0;
+
+            while (!token.IsCancellationRequested)
+            {
+                byte[] data;
+
+                try
+                {
+                    data = await this.device.ReadDataAsync(token);
+                }
+                catch (IOException)
+                {
+                    if (atteptNo < MAX_ATTEPTS)
+                    {
+                        await Task.Delay(500);
+
+                        atteptNo++;
+                        continue;
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                atteptNo = 0;
+
+                if (data.Length > 1)
+                {
+                    activitySubject.OnNext(GetTickCount());
+                }
+
+                if (data.Length > 1 && data[0] == FEATURE_KBD_REPORT_ID && Enum.IsDefined(typeof(AtkKey), data[1]))
+                {
+                    keyPressedSubject.OnNext((AtkKey)data[1]);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            TraceException(ex, "Keyboard listener exception");
         }
     }
 }
