@@ -32,6 +32,7 @@ using flowOSD.UI.Commands;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.AppLifecycle;
 using WinRT.Interop;
 
 public partial class App : Application
@@ -133,7 +134,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             Common.TraceException(ex, "An exception has occured during initialization");
-            Comctl32.Error("ERORR", "Unhandled application exception", ex.Message);
+            Comctl32.Error("ERROR", "Unhandled application exception", ex.Message);
 
             Exit();
         }

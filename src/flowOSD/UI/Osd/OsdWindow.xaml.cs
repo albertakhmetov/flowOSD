@@ -102,7 +102,7 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         if (AppWindow.IsVisible != true)
         {
-            AppWindow.Show();
+            AppWindow.Show(false);
         }
 
         hideTimer = Observable
