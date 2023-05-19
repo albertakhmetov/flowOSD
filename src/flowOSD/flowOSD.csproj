@@ -10,6 +10,7 @@
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
+		<WindowsAppSdkSelfContained>true</WindowsAppSdkSelfContained>
 	</PropertyGroup>
 	
 	<PropertyGroup>
