@@ -79,8 +79,14 @@ sealed class ConfigService : IConfig, IDisposable
             .Subscribe(x => Save())
             .DisposeWith(disposable);
 
-        Notifications = poco.Notifications ?? new NotificationsConfig();
+        Notifications = poco.Notifications ?? new EnumConfig<NotificationType>();
         Notifications.PropertyChanged
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Subscribe(x => Save())
+            .DisposeWith(disposable);
+
+        Warnings = poco.Warnings ?? new EnumConfig<WarningType>();
+        Warnings.PropertyChanged
             .Throttle(TimeSpan.FromMilliseconds(500))
             .Subscribe(x => Save())
             .DisposeWith(disposable);
@@ -107,7 +113,9 @@ sealed class ConfigService : IConfig, IDisposable
 
     public CommonConfig Common { get; }
 
-    public NotificationsConfig Notifications { get; }
+    public EnumConfig<NotificationType> Notifications { get; }
+
+    public EnumConfig<WarningType> Warnings { get; }
 
     public HotKeysConfig HotKeys { get; }
 
@@ -142,7 +150,8 @@ sealed class ConfigService : IConfig, IDisposable
             using var stream = configFile.OpenRead();
 
             var options = new JsonSerializerOptions { WriteIndented = true };
-            options.Converters.Add(new NotificationConfigConverter());
+            options.Converters.Add(new EnumConfigConverter<NotificationType>());
+            options.Converters.Add(new EnumConfigConverter<WarningType>());
             options.Converters.Add(new HotKeysConfigConverter());
 
             return JsonSerializer.Deserialize<POCO>(stream, options) ?? new POCO();
@@ -159,13 +168,15 @@ sealed class ConfigService : IConfig, IDisposable
         using (var stream = tempFile.Create())
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
-            options.Converters.Add(new NotificationConfigConverter());
+            options.Converters.Add(new EnumConfigConverter<NotificationType>());
+            options.Converters.Add(new EnumConfigConverter<WarningType>());
             options.Converters.Add(new HotKeysConfigConverter());
 
             var poco = new POCO
             {
                 Common = this.Common,
                 Notifications = this.Notifications,
+                Warnings = this.Warnings,
                 HotKeys = this.HotKeys,
                 Performance = new PerformancePOCO
                 {
@@ -232,7 +243,9 @@ sealed class ConfigService : IConfig, IDisposable
     {
         public CommonConfig? Common { get; set; }
 
-        public NotificationsConfig? Notifications { get; set; }
+        public EnumConfig<NotificationType>? Notifications { get; set; }
+
+        public EnumConfig<WarningType>? Warnings { get; set; }
 
         public HotKeysConfig? HotKeys { get; set; }
 
@@ -250,41 +263,41 @@ sealed class ConfigService : IConfig, IDisposable
         public PerformanceProfile[]? Profiles { get; set; }
     }
 
-    private class NotificationConfigConverter : JsonConverter<NotificationsConfig>
+    private class EnumConfigConverter<T> : JsonConverter<EnumConfig<T>> where T : struct, Enum
     {
-        public override NotificationsConfig? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override EnumConfig<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var config = new NotificationsConfig();
+            var config = new EnumConfig<T>();
 
             if (reader.TokenType != JsonTokenType.StartArray)
             {
-                throw new ApplicationException("Config file is corrupted");
+                throw new AppException("Config file is corrupted");
             }
 
             while (reader.Read() && reader.TokenType == JsonTokenType.String)
             {
                 var v = reader.GetString();
-                if (Enum.TryParse<NotificationType>(v, out var type))
+                if (Enum.TryParse<T>(v, out var type))
                 {
-                    config[type] = true;
+                    config[type] = false;
                 }
             }
 
             if (reader.TokenType != JsonTokenType.EndArray)
             {
-                throw new ApplicationException("Config file is corrupted");
+                throw new AppException("Config file is corrupted");
             }
 
             return config;
         }
 
-        public override void Write(Utf8JsonWriter writer, NotificationsConfig value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, EnumConfig<T> value, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
 
-            foreach (var i in Enum.GetValues<NotificationType>())
+            foreach (var i in Enum.GetValues<T>())
             {
-                if (value[i])
+                if (!value[i])
                 {
                     writer.WriteStringValue(Enum.GetName(i));
                 }

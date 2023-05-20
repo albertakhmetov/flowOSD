@@ -19,33 +19,7 @@
 
 namespace flowOSD.Core.Configs;
 
-using System.Diagnostics;
-
-public interface IConfig
+public enum WarningType
 {
-    CommonConfig Common { get; }
 
-    EnumConfig<NotificationType> Notifications { get; }
-
-    EnumConfig<WarningType> Warnings { get; }
-
-    HotKeysConfig HotKeys { get; }
-
-    PerformanceConfig Performance { get; }
-
-    FileInfo AppFile { get; }
-
-    FileVersionInfo AppFileInfo { get; }
-
-    DirectoryInfo DataDirectory { get; }
-
-    bool IsPreRelease { get; }
-
-    string ProductName { get; }
-
-    string ProductVersion { get; }
-
-    Version FileVersion { get; }
-
-    string ModelName { get; }
 }

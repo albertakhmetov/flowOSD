@@ -22,48 +22,48 @@ namespace flowOSD.Core.Configs;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-public sealed class NotificationsConfig : ConfigBase
+public sealed class EnumConfig<T> : ConfigBase where T : struct, Enum
 {
-    private HashSet<NotificationType> notifications;
-    private Subject<NotificationType> notificationChangedSubject;
+    private HashSet<T> values;
+    private Subject<T> valueChangedSubject;
 
-    public NotificationsConfig()
+    public EnumConfig()
     {
-        notifications = new HashSet<NotificationType>();
-        notificationChangedSubject = new Subject<NotificationType>();
+        values = new HashSet<T>();
+        valueChangedSubject = new Subject<T>();
 
-        NotificationChanged = notificationChangedSubject.AsObservable();
+        ValueChanged = valueChangedSubject.AsObservable();
     }
 
-    public bool this[NotificationType notificationType]
+    public bool this[T enumType]
     {
-        get => notifications.Contains(notificationType);
+        get => !values.Contains(enumType);
         set
         {
             if (value)
             {
-                notifications.Add(notificationType);
+                values.Remove(enumType);
             }
             else
             {
-                notifications.Remove(notificationType);
+                values.Add(enumType);
             }
 
-            notificationChangedSubject.OnNext(notificationType);
+            valueChangedSubject.OnNext(enumType);
             OnPropertyChanged();
         }
     }
 
-    public IObservable<NotificationType> NotificationChanged { get; }
+    public IObservable<T> ValueChanged { get; }
 
-    public void Clear()
+    public void Reset()
     {
-        var store = notifications.ToArray();
-        notifications.Clear();
+        var store = values.ToArray();
+        values.Clear();
 
         foreach (var s in store)
         {
-            notificationChangedSubject.OnNext(s);
+            valueChangedSubject.OnNext(s);
         }
 
         OnPropertyChanged(null);
