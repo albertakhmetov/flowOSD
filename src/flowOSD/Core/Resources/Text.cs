@@ -24,6 +24,10 @@ using flowOSD.Core.Hardware;
 
 public class Text
 {
+    public static CommandsSection Commands { get; } = new CommandsSection();
+
+    public static ErrorsSection Errors { get; } = new ErrorsSection();
+
     public readonly static Text Instance = new Text();
 
     private Text()
@@ -41,7 +45,12 @@ public class Text
         Performance = new PerformanceSection();
         Tablet = new TabletSection();
         About = new AboutSection();
+
+        Error = new ErrorsSection();
+        Warning = new WarningSection();
     }
+
+    public string ConfirmationTitle => "Confirmation";
 
     public PerformanceModeSection PerformanceMode { get; }
 
@@ -64,6 +73,10 @@ public class Text
     public BatterySection Battery { get; }
 
     public AboutSection About { get; }
+
+    public ErrorsSection Error { get; }
+
+    public WarningSection Warning { get; }
 
     public sealed class PerformanceModeSection
     {
@@ -319,5 +332,41 @@ public class Text
         public string Runtime => "Runtime";
 
         public string Device => "Device";
+    }
+
+    public sealed class ErrorsSection
+    {
+        public string Title = "Error";
+
+        public string CriticalTitle => "Critical Error";
+
+        public string Unhandled => "Unhandled application exception";
+
+        public string Initialization => "An exception has occured during initialization";
+
+        public string GpuToggleErrorUI => "Error is occurred while toggling GPU (UI).";
+    }
+
+    public sealed class WarningSection
+    {
+        public string Title = "Warning";
+    }
+
+    public sealed class CommandsSection
+    {
+        public GpuSection Gpu { get; } = new GpuSection();
+
+        public sealed class GpuSection
+        {
+            public string TurnOffConfirmation => "Do you want to turn off dGPU?";
+
+            public string TurnOnConfirmation => "Do you want to turn on dGPU?";
+
+            public string Disable => "Disable dGPU";
+
+            public string Enable => "Enable dGPU";
+
+            public string Description = "Toggle dGPU";
+        }
     }
 }

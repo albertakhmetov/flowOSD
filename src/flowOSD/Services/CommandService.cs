@@ -32,6 +32,7 @@ sealed class CommandService : ICommandService, IDisposable
     private IHardwareService hardwareService;
     private IKeysSender keysSender;
     private IUpdater updater;
+    private INotificationService notificationService;
 
     private Dictionary<string, Lazy<CommandBase>> instances = new Dictionary<string, Lazy<CommandBase>>();
 
@@ -41,12 +42,14 @@ sealed class CommandService : ICommandService, IDisposable
         IKeysSender keysSender,
         ISystemEvents systemEvents,
         IUpdater updater,
-        IOsd osd)
+        IOsd osd,
+        INotificationService notificationService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
         this.updater = updater ?? throw new ArgumentNullException(nameof(updater));
+        this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
         /*  Register(
               new SettingsCommand(config, this, systemEvents, hardwareService),
@@ -62,7 +65,7 @@ sealed class CommandService : ICommandService, IDisposable
             hardwareService.ResolveNotNull<IPowerManagement>(),
             hardwareService.ResolveNotNull<IPerformanceService>()));
         Register(() => new PowerModeCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
-        Register(() => new GpuCommand(hardwareService.ResolveNotNull<IAtk>(), config));
+        Register(() => new GpuCommand(hardwareService.ResolveNotNull<IAtk>(), config, notificationService));
         Register(() => new TouchPadCommand(hardwareService.ResolveNotNull<ITouchPad>()));
         Register(() => new MicrophoneCommand(config, osd, hardwareService.ResolveNotNull<IMicrophone>()));
         Register(() => new DisplayRefreshRateCommand(

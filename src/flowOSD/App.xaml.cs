@@ -24,6 +24,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using flowOSD.Core;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using flowOSD.Services;
@@ -85,25 +86,33 @@ public partial class App : Application
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
 
-            systemEvents.AppException
-                .Subscribe(ex =>
-                {
-                    if (ex != null)
-                    {
-                        Common.TraceException(ex, "Unhandled application exception");
-                        Comctl32.Error("ERROR", "Unhandled application exception", ex.Message);
-                    }
-                })
-                .DisposeWith(disposable);
-
             keysSender = new KeysSender();
             osd = new Osd(configService, systemEvents);
 
-            hardwareService = new HardwareService(configService, messageQueue, keysSender).DisposeWith(disposable);
-            commandService = new CommandService(configService, hardwareService, keysSender, systemEvents, updater, osd).DisposeWith(disposable);
-            hotKeyService = new HotKeysService(configService, commandService, hardwareService).DisposeWith(disposable);
+            hardwareService = new HardwareService(
+                configService, 
+                messageQueue, 
+                keysSender).DisposeWith(disposable);
 
-            notificationService = new NotificationService(configService, osd, hardwareService).DisposeWith(disposable);
+            notificationService = new NotificationService(
+                configService, 
+                osd, 
+                hardwareService).DisposeWith(disposable);
+
+            commandService = new CommandService(
+                configService,
+                hardwareService,
+                keysSender,
+                systemEvents,
+                updater,
+                osd,
+                notificationService).DisposeWith(disposable);
+
+            hotKeyService = new HotKeysService(
+                configService, 
+                commandService, 
+                hardwareService).DisposeWith(disposable);
+
             notifyIconService = new NotifyIconService(
                 configService,
                 messageQueue,
@@ -130,11 +139,15 @@ public partial class App : Application
 
             messageQueue.Subscribe(WM_HELLO_FLOWOSD, ProcessMessage).DisposeWith(disposable);
             messageQueue.Subscribe(Messages.WM_TASKBARCREATED, ProcessMessage).DisposeWith(disposable);
+
+            systemEvents.AppException
+                .Subscribe(OnError)
+                .DisposeWith(disposable);
         }
         catch (Exception ex)
         {
-            Common.TraceException(ex, "An exception has occured during initialization");
-            Comctl32.Error("ERROR", "Unhandled application exception", ex.Message);
+            Common.TraceException(ex, Text.Instance.Error.Initialization);
+            Comctl32.Error(Text.Instance.Error.CriticalTitle, Text.Instance.Error.Initialization, ex.Message);
 
             Exit();
         }
@@ -172,6 +185,18 @@ public partial class App : Application
         {
             osd.InitSystemOsd();
         }
+    }
+
+    private void OnError(Exception? ex)
+    {
+        if (ex == null)
+        {
+            return;
+        }
+
+        Common.TraceException(ex, Text.Instance.Error.Unhandled);
+
+        notificationService.ShowError(Text.Instance.Error.Unhandled, ex);
     }
 
     private void OnSuspend()

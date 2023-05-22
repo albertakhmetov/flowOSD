@@ -26,13 +26,14 @@ using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Core.Resources;
 using flowOSD.Extensions;
+using flowOSD.Native;
 using flowOSD.Services;
 using flowOSD.UI;
 using flowOSD.UI.Commands;
 using static flowOSD.Extensions.Common;
 using static flowOSD.Native.User32;
 
-sealed class NotificationService : IDisposable
+sealed class NotificationService : IDisposable, INotificationService
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -83,6 +84,26 @@ sealed class NotificationService : IDisposable
     {
         disposable?.Dispose();
         disposable = null;
+    }
+
+    public void ShowError(string message, Exception exception)
+    {
+        ShowError(message, exception?.Message);
+    }
+
+    public void ShowError(string message, string? details = null)
+    {
+        Comctl32.Error($"{config.ProductName}: {Text.Instance.Error.Title}", message, details ?? string.Empty);
+    }
+
+    public void ShowWarning(WarningType warningType, string message, string? details = null)
+    {
+        Comctl32.Warning($"{config.ProductName}: {Text.Instance.Warning.Title}", message, details ?? string.Empty);
+    }
+
+    public bool ShowConfirmation(string message, string? details = null)
+    {
+        return Comctl32.Confirm($"{config.ProductName}: {Text.Instance.ConfirmationTitle}", message, details ?? string.Empty);
     }
 
     private void Init(CompositeDisposable disposable)

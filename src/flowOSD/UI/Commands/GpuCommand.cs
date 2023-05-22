@@ -33,18 +33,20 @@ sealed class GpuCommand : CommandBase
 {
     private IAtk atk;
     private IConfig config;
+    private INotificationService notificationService;
 
-    public GpuCommand(IAtk atk, IConfig config)
+    public GpuCommand(IAtk atk, IConfig config, INotificationService notificationService)
     {
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
         this.atk.GpuMode
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle dGPU";
+        Description = Core.Resources.Text.Commands.Gpu.Description;
         Enabled = true;
     }
 
@@ -62,7 +64,7 @@ sealed class GpuCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, "Error is occurred while toggling GPU (UI).");
+            TraceException(ex, Core.Resources.Text.Errors.GpuToggleErrorUI);
         }
     }
 
@@ -76,16 +78,14 @@ sealed class GpuCommand : CommandBase
         }
         else
         {
-           return Native.Comctl32.Confirm(
-                "Discrete GPU",
-                isGpuEnabled ? "Do you want to turn off dGPU?" : "Do you want to turn on dGPU?",
-                "");
+            return notificationService.ShowConfirmation(
+                isGpuEnabled ? Core.Resources.Text.Commands.Gpu.TurnOffConfirmation : Core.Resources.Text.Commands.Gpu.TurnOnConfirmation);
         }
     }
 
     private void Update(GpuMode gpuMode)
     {
         IsChecked = gpuMode == GpuMode.dGpu;
-        Text = IsChecked ? "Disable dGPU" : "Enable dGPU";
+        Text = IsChecked ? Core.Resources.Text.Commands.Gpu.Disable : Core.Resources.Text.Commands.Gpu.Enable;
     }
 }

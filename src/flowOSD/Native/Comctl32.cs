@@ -91,6 +91,21 @@ static class Comctl32
         return r == 0 && buttonId == IDYES;
     }
 
+    public static bool Warning(string title, string message, string details)
+    {
+        var r = TaskDialog(
+             IntPtr.Zero,
+             IntPtr.Zero,
+             title,
+             message,
+             details,
+             TDCBF_OK_BUTTON,
+             IntPtr.Zero,
+             out var buttonId);
+
+        return r == 0 && buttonId == IDYES;
+    }
+
     public static void Error(string title, string message, string details)
     {
         var r = TaskDialog(
