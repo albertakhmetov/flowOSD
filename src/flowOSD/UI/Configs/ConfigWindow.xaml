@@ -176,6 +176,19 @@
                         x:Name="generalConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
 
+                        <InfoBar
+                            Margin="10, 5"
+                            IsOpen="{Binding IsOptimizationInfoVisible}"
+                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                            Severity="Informational"
+                            Title="{Binding TextResources.Config.General.OptimizationTitle}"
+                            Message="{Binding TextResources.Config.General.OptimizationMessage}" >
+                            <InfoBar.ActionButton>
+                                <HyperlinkButton NavigateUri="{Binding OptimizationPageUrl}" Content="{Binding TextResources.Config.General.OptimizationMore}"/>
+                            </InfoBar.ActionButton>
+                        </InfoBar>
+
                         <Border Style="{StaticResource CxConfigBorderStyle}">
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
@@ -445,7 +458,10 @@
                             </ToggleSwitch>
                         </Border>
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Visibility="{Binding IsCpuTemperatureVisible, Converter={StaticResource VisibilityConverter}}"
+                            Style="{StaticResource CxConfigBorderStyle}">
+                            
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding ShowCpuTemperature, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
@@ -554,13 +570,13 @@
                         </Grid>
 
                         <TextBlock 
-                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"
+                            Visibility="{Binding IsCpuPowerLimitVisible, Converter={StaticResource VisibilityConverter}}"
                             Text="Power Limits"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
                         <Border 
-                            Visibility="{Binding IsUserProfile, Converter={StaticResource VisibilityConverter}}"                            
+                            Visibility="{Binding IsCpuPowerLimitVisible, Converter={StaticResource VisibilityConverter}}"                            
                             Style="{StaticResource CxConfigBorderStyle}">
 
                             <Grid>
@@ -752,7 +768,10 @@
                             </Grid>
                         </Border>
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Visibility="{Binding IsBatteryChargeLimitVisible, Converter={StaticResource VisibilityConverter}}"
+                            Style="{StaticResource CxConfigBorderStyle}">
+                            
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch" 
                                 VerticalAlignment="Center"

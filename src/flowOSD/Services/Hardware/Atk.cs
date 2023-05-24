@@ -110,7 +110,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         TabletModeSupported = Get(DEVID_TABLET, out var tabletMode);
         ChargerSupported = Get(DEVID_CHARGER, out var charger);
         ChargeLimitSupported = Get(DEVID_BATTERY_LIMIT, out _);
-        CpuPowerLimitSupported = Get(PPT_APU, out _) && Get(PPT_CPU, out _);
+        CpuPowerLimitSupported = (Get(PPT_APU, out _) && Get(PPT_CPU, out _)) || Get(PPT_CPUB0, out _);
 
         performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Default);
         gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)gpuMode);
@@ -213,8 +213,16 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         var limit = Math.Max(MinPowerLimit, Math.Min(MaxPowerLimit, value));
 
         byte[] buffer;
-        return Set(PPT_CPU, limit, out buffer) && IsOk(buffer)
-            && Set(PPT_APU, limit, out buffer) && IsOk(buffer);
+
+        if (Get(PPT_CPUB0, out _))
+        {
+            return Set(PPT_CPUB0, limit, out buffer) && IsOk(buffer);
+        }
+        else
+        {
+            return Set(PPT_CPU, limit, out buffer) && IsOk(buffer)
+                && Set(PPT_APU, limit, out buffer) && IsOk(buffer);
+        }
     }
 
     public bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints)

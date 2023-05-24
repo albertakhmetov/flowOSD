@@ -22,6 +22,7 @@ namespace flowOSD.UI.Configs;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Resources;
 using flowOSD.Extensions;
@@ -30,12 +31,24 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 {
     private CompositeDisposable? disposable = null;
 
-    public GeneralViewModel(IConfig config)
+    private IHardwareFeatures hardwareFeatures;
+
+    public GeneralViewModel(IConfig config, IHardwareService hardwareService)
         : base(config, Text.Instance.Config.General.Title, Images.Instance.Common.Home)
     {
+        if (hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
     }
 
     public Text TextResources => Text.Instance;
+
+    public bool IsOptimizationInfoVisible => hardwareFeatures.OptimizationService;
+
+    public string OptimizationPageUrl => Urls.Instance.Optimization;
 
     public bool RunAtStartup
     {

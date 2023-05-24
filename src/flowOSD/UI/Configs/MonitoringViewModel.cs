@@ -22,6 +22,7 @@ namespace flowOSD.UI.Configs;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Resources;
 using flowOSD.Extensions;
@@ -30,14 +31,24 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 {
     private CompositeDisposable? disposable = null;
 
-    public MonitoringViewModel(IConfig config)
+    private IHardwareFeatures hardwareFeatures;
+
+    public MonitoringViewModel(IConfig config, IHardwareService hardwareService)
         : base(config, Text.Instance.Config.Monitoring.Title, Images.Instance.Common.Diagnostic)
     {
+        if(hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
     }
 
     public Text TextResources => Text.Instance;
 
     public Images ImageResources => Images.Instance;
+
+    public bool IsCpuTemperatureVisible => hardwareFeatures.CpuTemperature;
 
     public bool ShowBatteryChargeRate
     {

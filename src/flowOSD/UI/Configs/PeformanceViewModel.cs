@@ -41,6 +41,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private IAtk atk;
     private IPerformanceService performanceService;
+    private IHardwareFeatures hardwareFeatures;
 
     private BehaviorSubject<bool> isDirtySubject;
 
@@ -60,6 +61,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         atk = hardwareService.ResolveNotNull<IAtk>();
         performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
 
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+
         isDirtySubject = new BehaviorSubject<bool>(false);
 
         cpu = new FanCurveDataSource();
@@ -76,9 +79,9 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     public Text TextResources => Text.Instance;
 
-    private void FanCurveChanged(object? sender, EventArgs e)
+    public bool IsCpuPowerLimitVisible
     {
-        isDirtySubject.OnNext(true);
+        get => hardwareFeatures.CpuPowerLimit && IsUserProfile;
     }
 
     public IReadOnlyCollection<PerformanceProfile> Profiles
@@ -205,6 +208,11 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
         disposable?.Dispose();
         disposable = null;
+    }
+
+    private void FanCurveChanged(object? sender, EventArgs e)
+    {
+        isDirtySubject.OnNext(true);
     }
 
     private void UpdateProfiles(Guid changedProfileId)

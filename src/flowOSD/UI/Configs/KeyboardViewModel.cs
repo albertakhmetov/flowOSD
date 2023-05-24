@@ -34,7 +34,9 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 {
     private CompositeDisposable? disposable = null;
 
-    public KeyboardViewModel(IConfig config, ICommandService commandService, IHardwareFeatures hardwareFeatures)
+    private IHardwareFeatures hardwareFeatures;
+
+    public KeyboardViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
             : base(config, Text.Instance.Config.Keyboard.Title, Images.Instance.Common.KeyboardSettings)
     {
         if (config == null)
@@ -47,10 +49,12 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
             throw new ArgumentNullException(nameof(commandService));
         }
 
-        if (hardwareFeatures == null)
+        if (hardwareService == null)
         {
-            throw new ArgumentNullException(nameof(hardwareFeatures));
+            throw new ArgumentNullException(nameof(hardwareService));
         }
+
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
 
         BacklightControl = !hardwareFeatures.OptimizationService;
         Timeouts = new ReadOnlyCollection<int>(new int[] { 5, 15, 30, 60, 600, 0 });

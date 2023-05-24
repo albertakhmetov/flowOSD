@@ -33,6 +33,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
     private CompositeDisposable? disposable = null;
 
     private IBattery battery;
+    private IHardwareFeatures hardwareFeatures;
 
     private int percentage, rate;
     private uint capacity;
@@ -49,6 +50,8 @@ public sealed class BatteryViewModel : ConfigViewModelBase
 
         battery = hardwareService.ResolveNotNull<IBattery>();
 
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+
         statusImage = string.Empty;
         powerState = string.Empty;
         estimatedTime = string.Empty;
@@ -61,6 +64,8 @@ public sealed class BatteryViewModel : ConfigViewModelBase
         get => Config.Common.UseBatteryChargeLimit;
         set => Config.Common.UseBatteryChargeLimit = value;
     }
+
+    public bool IsBatteryChargeLimitVisible => hardwareFeatures.ChargeLimit;
 
     public uint BatteryChargeLimit
     {

@@ -22,7 +22,7 @@ namespace flowOSD.Core.Resources;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
-public class Images
+public sealed class Images
 {
     public static readonly Images Instance = new Images();
 

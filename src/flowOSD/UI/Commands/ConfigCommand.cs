@@ -63,10 +63,10 @@ sealed class ConfigCommand : CommandBase, IDisposable
         {
             var viewModels = new ConfigViewModelBase[]
             {
-                new GeneralViewModel(config),
+                new GeneralViewModel(config, hardwareService),
                 new NotificationsViewModel(config),
-                new KeyboardViewModel(config, commandService, hardwareService.ResolveNotNull<IHardwareFeatures>()),
-                new MonitoringViewModel(config),
+                new KeyboardViewModel(config, commandService, hardwareService),
+                new MonitoringViewModel(config, hardwareService),
                 new PerformanceViewModel(config, hardwareService),
                 new TabletViewModel(config, hardwareService),
                 new BatteryViewModel(config, hardwareService),

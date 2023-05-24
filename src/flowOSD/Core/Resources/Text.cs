@@ -22,7 +22,7 @@ namespace flowOSD.Core.Resources;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
-public class Text
+public sealed class Text
 {
     public readonly static Text Instance = new Text();
 
@@ -151,6 +151,12 @@ public class Text
         public sealed class GeneralSection
         {
             public string Title => "General";
+
+            public string OptimizationTitle => "Limited functionality";
+
+            public string OptimizationMessage => "ASUS Optimization service is running. Some functionality is disabled. Turn off ASUS Optimization service to enable it.";
+
+            public string OptimizationMore => "View details";
 
             public string RunAtStartup => "Run at logon";
 

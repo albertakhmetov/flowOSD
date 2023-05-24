@@ -57,7 +57,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     private KeyboardBacklightService? keyboardBacklightService;
     private RefreshRateService refreshRateService;
-    private BatteryChargeService batteryChargeService;
+    private BatteryChargeService? batteryChargeService;
 
     public HardwareService(IConfig config, IMessageQueue messageQueue, IKeysSender keysSender)
     {
@@ -156,9 +156,12 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
             display,
             powerManagement).DisposeWith(disposable);
 
-        batteryChargeService = new BatteryChargeService(
-            this.config,
-            atk).DisposeWith(disposable);
+        if (!OptimizationService && ChargeLimit)
+        {
+            batteryChargeService = new BatteryChargeService(
+                this.config,
+                atk).DisposeWith(disposable);
+        }
     }
 
     public bool OptimizationService { get; }
@@ -171,7 +174,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     public bool Charger => atk.ChargerSupported;
 
-    public bool ChargeLimit => atk.ChargeLimitSupported;
+    public bool ChargeLimit => !OptimizationService && atk.ChargeLimitSupported;
 
     public bool CpuPowerLimit => atk.CpuPowerLimitSupported;
 
@@ -234,7 +237,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
         refreshRateService.Update();
         performanceService.Update();
-        batteryChargeService.Update();
+        batteryChargeService?.Update();
     }
 
     private void InitHid()
@@ -245,9 +248,9 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         }
 
 #if !DEBUG
-      //  hidDevice.WriteFeatureData(0x5a, 0x89);
+        //  hidDevice.WriteFeatureData(0x5a, 0x89);
         hidDevice.WriteFeatureData(0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e);
-       // hidDevice.WriteFeatureData(0x5a, 0x05, 0x20, 0x31, 0x00, 0x08);
+        // hidDevice.WriteFeatureData(0x5a, 0x05, 0x20, 0x31, 0x00, 0x08);
 #endif
     }
 

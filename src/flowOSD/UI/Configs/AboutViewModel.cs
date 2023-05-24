@@ -47,7 +47,7 @@ public sealed class AboutViewModel : ConfigViewModelBase
         Runtime = $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}";
 
         HomePage = TextResources.Config.About.HomePage;
-        HomePageUrl = "https://github.com/albertakhmetov/flowOSD";
+        HomePageUrl = Urls.Instance.HomePage;
 
         ModelName = config.ModelName;
     }
