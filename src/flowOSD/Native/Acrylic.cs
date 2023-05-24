@@ -19,10 +19,13 @@
 namespace flowOSD.Native;
 
 using System.Runtime.InteropServices;
+using flowOSD.Extensions;
+using Microsoft.UI.Xaml;
+using Windows.UI;
 
 static class Acrylic
 {
-    public static void EnableAcrylic(IWin32Window window, Color blurColor)
+    public static void EnableAcrylic(Window window, Color blurColor)
     {
         if (window is null) throw new ArgumentNullException(nameof(window));
 
@@ -35,7 +38,7 @@ static class Acrylic
         unsafe
         {
             SetWindowCompositionAttribute(
-                new HandleRef(window, window.Handle),
+                new HandleRef(window, window.GetHandle()),
                 new WindowCompositionAttributeData
                 {
                     Attribute = WCA.ACCENT_POLICY,

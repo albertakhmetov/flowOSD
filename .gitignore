@@ -456,3 +456,4 @@ $RECYCLE.BIN/
 
 output/*
 !output/.gitkeep
+/redist/WindowsAppRuntimeInstall.exe

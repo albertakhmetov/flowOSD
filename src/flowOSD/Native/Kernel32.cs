@@ -156,4 +156,9 @@ static class Kernel32
         int nOutBufferSize,
         out uint lpBytesReturned,
         IntPtr lpOverlapped);
+
+    [DllImport(nameof(Kernel32), SetLastError = true)]
+    public static extern bool SetSystemPowerState(
+        bool fSuspend,
+        bool fForce);
 }

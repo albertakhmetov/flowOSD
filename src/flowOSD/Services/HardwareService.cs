@@ -22,15 +22,17 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
-using flowOSD.Api;
-using flowOSD.Api.Hardware;
 using flowOSD.Extensions;
-using flowOSD.Hardware;
-using flowOSD.Hardware.Hid;
+using flowOSD.Services.Hardware;
 using flowOSD.Native;
+using flowOSD.Services.Hardware.Hid;
 using Microsoft.Win32;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 
-sealed class HardwareService : IDisposable, IHardwareService
+sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -38,53 +40,63 @@ sealed class HardwareService : IDisposable, IHardwareService
     private IMessageQueue messageQueue;
     private IKeysSender keysSender;
 
-    private HidDevice hidDevice;
+    private HidDevice? hidDevice;
 
-    private IAtk atk;
-    private IAtkWmi atkWmi;
-    private ICpu cpu;
+    private Atk atk;
     private IKeyboard keyboard;
     private IKeyboardBacklight keyboardBacklight;
     private ITouchPad touchPad;
-    private IDisplay display;
-    private IDisplayBrightness displayBrightness;
+    private Display display;
+    private DisplayBrightness displayBrightness;
     private Battery battery;
-    private IPowerManagement powerManagement;
-    private IMicrophone microphone;
+    private PowerManagement powerManagement;
+    private Microphone microphone;
+    private PerformanceService performanceService;
 
     private Dictionary<Type, object> devices = new Dictionary<Type, object>();
 
     private KeyboardBacklightService? keyboardBacklightService;
     private RefreshRateService refreshRateService;
+    private BatteryChargeService? batteryChargeService;
 
     public HardwareService(IConfig config, IMessageQueue messageQueue, IKeysSender keysSender)
     {
+        try
+        {
+            var service = new System.ServiceProcess.ServiceController("ASUSOptimization");
+            OptimizationService = service.Status != System.ServiceProcess.ServiceControllerStatus.Stopped;
+        }
+        catch
+        {
+            OptimizationService = false;
+        }
+
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
 
-        hidDevice = HidDevice.Devices
-            .Where(i => i.VendorId == 0xB05 && i.ReadFeatureData(out byte[] data, Keyboard.FEATURE_KBD_REPORT_ID))
-            .FirstOrDefault() ?? throw new ApplicationException("Can't connect to HID");
+        atk = new Atk(PerformanceMode.Default);
 
-        InitHid();
-
-        atk = new Atk(config.UserConfig.PerformanceModeOverrideEnabled ? config.UserConfig.PerformanceModeOverride : null);
-        atkWmi = new AtkWmi(atk);
-        cpu = new Cpu(atk);
-
-        if (config.UseOptimizationMode)
+        if (OptimizationService)
         {
-            keyboard = (atkWmi as IKeyboard)!;
+            hidDevice = null;
+
+            keyboard = (atk as IKeyboard)!;
             keyboardBacklight = new Hardware.Optimization.KeyboardBacklight();
             touchPad = new Hardware.Optimization.TouchPad(this.messageQueue, this.keysSender);
         }
         else
         {
+            hidDevice = HidDevice.Devices
+                .Where(i => i.VendorId == 0xB05 && i.ReadFeatureData(out byte[] data, Keyboard.FEATURE_KBD_REPORT_ID))
+                .FirstOrDefault() ?? throw new AppException(Text.Instance.Errors.CanNotConnectToHid);
+
+            InitHid();
+
             keyboard = new Hardware.Hid.Keyboard(hidDevice);
-            keyboardBacklight = new Hardware.Hid.KeyboardBacklight(hidDevice, config.UserConfig.KeyboardBacklightLevel);
+            keyboardBacklight = new Hardware.Hid.KeyboardBacklight(hidDevice, config.Common.KeyboardBacklightLevel);
             keyboardBacklight.Level
-                .Subscribe(x => config.UserConfig.KeyboardBacklightLevel = x)
+                .Subscribe(x => config.Common.KeyboardBacklightLevel = x)
                 .DisposeWith(disposable);
             touchPad = new Hardware.Hid.TouchPad(hidDevice);
         }
@@ -97,17 +109,25 @@ sealed class HardwareService : IDisposable, IHardwareService
 
         microphone = new Microphone();
 
+        performanceService = new PerformanceService(config, atk, powerManagement);
+
         Register<IAtk>(atk);
-        Register<IAtkWmi>(atkWmi);
-        Register<ICpu>(cpu);
         Register<IKeyboard>(keyboard);
         Register<IKeyboardBacklight>(keyboardBacklight);
+
+        if (keyboardBacklight is IKeyboardBacklightControl keyboardBacklightControl)
+        {
+            Register<IKeyboardBacklightControl>(keyboardBacklightControl);
+        }
+
         Register<ITouchPad>(touchPad);
         Register<IDisplay>(display);
         Register<IDisplayBrightness>(displayBrightness);
         Register<IBattery>(battery);
         Register<IPowerManagement>(powerManagement);
         Register<IMicrophone>(microphone);
+        Register<IPerformanceService>(performanceService);
+        Register<IHardwareFeatures>(this);
 
         powerManagement.PowerEvent
            .Where(x => x == PowerEvent.Suspend)
@@ -123,70 +143,40 @@ sealed class HardwareService : IDisposable, IHardwareService
            .Subscribe(_ => OnResume())
            .DisposeWith(disposable);
 
-        atkWmi.TabletMode
+        atk.TabletMode
             .Throttle(TimeSpan.FromMicroseconds(2000))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateTouchPad)
             .DisposeWith(disposable);
 
-        if (!config.UseOptimizationMode)
-        {
-            keyboard.KeyPressed
-                .Throttle(TimeSpan.FromMilliseconds(50))
-                .Where(x => x == AtkKey.BacklightDown)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(_ => keyboardBacklight.LevelDown())
-                .DisposeWith(disposable);
-
-            keyboard.KeyPressed
-                .Throttle(TimeSpan.FromMilliseconds(50))
-                .Where(x => x == AtkKey.BacklightUp)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(_ => keyboardBacklight.LevelUp())
-                .DisposeWith(disposable);
-
-            keyboard.KeyPressed
-                .Where(x => x == AtkKey.BrightnessDown)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(x => displayBrightness.LevelDown())
-                .DisposeWith(disposable);
-
-            keyboard.KeyPressed
-                .Where(x => x == AtkKey.BrightnessUp)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(x => displayBrightness.LevelUp())
-                .DisposeWith(disposable);
-
-            keyboard.KeyPressed
-                .Where(x => x == AtkKey.Mic)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(x => microphone.Toggle())
-                .DisposeWith(disposable);
-
-            keyboard.KeyPressed
-                .Where(x => x == AtkKey.TouchPad)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(x => touchPad.Toggle())
-                .DisposeWith(disposable);
-
-            keyboard.KeyPressed
-                .Where(x => x == AtkKey.Sleep)
-                .ObserveOn(SynchronizationContext.Current!)
-                .Subscribe(x => Powrprof.SetSuspendState(true, true, true))
-                .DisposeWith(disposable);
-        }
-
-        keyboardBacklightService = config.UseOptimizationMode ? null : new KeyboardBacklightService(
-            config, 
-            keyboardBacklight,
-            keyboard,
-            powerManagement).DisposeWith(disposable);
+        keyboardBacklightService = OptimizationService ? null : new KeyboardBacklightService(config, this).DisposeWith(disposable);
 
         refreshRateService = new RefreshRateService(
             this.config,
             display,
             powerManagement).DisposeWith(disposable);
+
+        if (!OptimizationService && ChargeLimit)
+        {
+            batteryChargeService = new BatteryChargeService(
+                this.config,
+                atk).DisposeWith(disposable);
+        }
     }
+
+    public bool OptimizationService { get; }
+
+    public bool CpuTemperature => atk.CpuTemperatureSupported;
+
+    public bool PerformanceSwitch => atk.PerformanceSwitchSupported;
+
+    public bool GpuSwitch => atk.GpuSwitchSupported;
+
+    public bool Charger => atk.ChargerSupported;
+
+    public bool ChargeLimit => !OptimizationService && atk.ChargeLimitSupported;
+
+    public bool CpuPowerLimit => atk.CpuPowerLimitSupported;
 
     public void Dispose()
     {
@@ -211,7 +201,7 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     public T ResolveNotNull<T>() where T : class
     {
-        return Resolve<T>() ?? throw new InvalidOperationException($"Can't resolve {typeof(T).Name}");
+        return Resolve<T>() ?? throw new InvalidOperationException(string.Format(Text.Instance.Errors.CanNotResolve, typeof(T).Name));
     }
 
     private void Register<T>(T instance) where T : class
@@ -228,9 +218,9 @@ sealed class HardwareService : IDisposable, IHardwareService
 
     private void OnSuspend()
     {
-        if (!config.UseOptimizationMode)
+        if (!OptimizationService)
         {
-            keyboardBacklight.SetState(DeviceState.Disabled, force: true);
+            keyboardBacklightService?.Disable();
         }
     }
 
@@ -238,33 +228,35 @@ sealed class HardwareService : IDisposable, IHardwareService
     {
         battery.Reconnect();
 
-        if (config.UserConfig.PerformanceModeOverrideEnabled)
-        {
-            atk.SetPerformanceMode(config.UserConfig.PerformanceModeOverride);
-        }
-
-        if (!config.UseOptimizationMode)
+        if (!OptimizationService)
         {
             InitHid();
             keyboardBacklightService?.ResetTimer();
-            keyboardBacklight.SetState(DeviceState.Enabled, force: true);
+            keyboardBacklightService?.Enable();
         }
 
         refreshRateService.Update();
+        performanceService.Update();
+        batteryChargeService?.Update();
     }
 
     private void InitHid()
     {
+        if (hidDevice == null)
+        {
+            return;
+        }
+
 #if !DEBUG
-      //  hidDevice.WriteFeatureData(0x5a, 0x89);
+        //  hidDevice.WriteFeatureData(0x5a, 0x89);
         hidDevice.WriteFeatureData(0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e);
-       // hidDevice.WriteFeatureData(0x5a, 0x05, 0x20, 0x31, 0x00, 0x08);
+        // hidDevice.WriteFeatureData(0x5a, 0x05, 0x20, 0x31, 0x00, 0x08);
 #endif
     }
 
     private async void UpdateTouchPad(TabletMode tabletMode)
     {
-        if (!config.UserConfig.DisableTouchPadInTabletMode)
+        if (!config.Common.DisableTouchPadInTabletMode)
         {
             return;
         }

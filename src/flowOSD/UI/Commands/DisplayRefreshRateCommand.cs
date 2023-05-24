@@ -22,8 +22,9 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 using static flowOSD.Extensions.Common;
 
@@ -31,9 +32,9 @@ sealed class DisplayRefreshRateCommand : CommandBase
 {
     private IPowerManagement powerManagement;
     private IDisplay display;
-    private UserConfig userConfig;
+    private CommonConfig userConfig;
 
-    public DisplayRefreshRateCommand(IPowerManagement powerManagement, IDisplay display, UserConfig userConfig)
+    public DisplayRefreshRateCommand(IPowerManagement powerManagement, IDisplay display, CommonConfig userConfig)
     {
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
         this.display = display ?? throw new ArgumentNullException(nameof(display));
@@ -52,11 +53,9 @@ sealed class DisplayRefreshRateCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle High Refresh Rate";
+        Description = TextResources.Commands.DisplayRefreshRate.Description;
         Enabled = true;
     }
-
-    public override string Name => nameof(DisplayRefreshRateCommand);
 
     public override async void Execute(object? parameter = null)
     {
@@ -84,14 +83,13 @@ sealed class DisplayRefreshRateCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, "Error is occurred while toggling display refresh rate (UI).");
-            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            TraceException(ex, TextResources.Errors.DisplayRefreshRateToggleUI);
         }
     }
 
     private void Update(uint refreshRate)
     {
         IsChecked = DisplayRefreshRates.IsHigh(refreshRate);
-        Text = IsChecked ? "Disable High Refresh Rate" : "Enable High Refresh Rate";
+        Text = IsChecked ? TextResources.Commands.DisplayRefreshRate.Disable : TextResources.Commands.DisplayRefreshRate.Enable;
     }
 }

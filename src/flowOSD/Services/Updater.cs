@@ -24,7 +24,8 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
-using flowOSD.Api;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
 using static flowOSD.Extensions.Common;
 
 sealed class Updater : IUpdater
@@ -59,7 +60,6 @@ sealed class Updater : IUpdater
         catch (Exception ex)
         {
             TraceException(ex, "Error due checking update");
-
         }
 
         return null;
@@ -121,7 +121,7 @@ sealed class Updater : IUpdater
 
         if (i != null && !i.HasExited)
         {
-            Application.Exit();
+            App.Current.Exit();
         }
     }
 

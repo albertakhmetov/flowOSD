@@ -43,6 +43,32 @@ static partial class Forms
         return obj;
     }
 
+    public static bool FindChild<T>(this Control control, out T? childControl) where T : Control
+    {
+        childControl = null;
+
+        if (control == null)
+        {
+            return false;
+        }
+
+        foreach (var child in control.Controls)
+        {
+            if (child is T)
+            {
+                childControl = child as T;
+                return true;
+            }
+
+            if (child is Control c && FindChild(c, out childControl))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static T Add<T>(this Panel control, Action<T> initializator) where T : Control
     {
         var obj = Activator.CreateInstance<T>();

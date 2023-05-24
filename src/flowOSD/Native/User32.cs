@@ -17,8 +17,12 @@
  *
  */
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using flowOSD.Extensions;
+using Microsoft.UI.Xaml;
+using Windows.Foundation;
 
 namespace flowOSD.Native;
 
@@ -34,6 +38,15 @@ static class User32
 
     public const int CDS_UPDATEREGISTRY = 0x1;
 
+    public const int SM_CONVERTIBLESLATEMODE = 0x2003;
+
+    public const int SM_CXSCREEN = 0;
+    public const int SM_CYSCREEN = 1;
+    public const int SSM_CXFULLSCREEN = 16;
+    public const int SSM_CYFULLSCREEN = 17;
+
+    public const int SPI_GETWORKAREA = 0x0030;
+
     public delegate void WINEVENTPROC(
         IntPtr hWinEventHook,
         uint eventType,
@@ -42,6 +55,49 @@ static class User32
         int idChild,
         uint dwEventThread,
         uint dwmsEventTime);
+
+    public delegate IntPtr WNDPROC(
+        IntPtr hWnd,
+        int msg,
+        IntPtr wParam,
+        IntPtr lParam);
+
+    public struct ICONDIR
+    {
+        public ushort idReserved;   // Reserved (must be 0)
+        public ushort idType;       // Resource Type (1 for icons)
+        public ushort idCount;      // How many images?
+        public ICONDIRENTRY[] idEntries;   // An entry for each image (idCount of 'em)
+    };
+
+    public struct ICONDIRENTRY
+    {
+        public byte bWidth;          // Width, in pixels, of the image
+        public byte bHeight;         // Height, in pixels, of the image
+        public byte bColorCount;     // Number of colors in image (0 if >=8bpp)
+        public byte bReserved;       // Reserved ( must be 0)
+        public ushort wPlanes;       // Color Planes
+        public ushort wBitCount;     // Bits per pixel
+        public uint dwBytesInRes;    // How many bytes in this resource?
+        public uint dwImageOffset;   // Where in the file is this image?
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WNDCLASSEX
+    {
+        public int cbSize;
+        public uint style;
+        public WNDPROC lpfnWndProc;
+        public int cbClsExtra;
+        public int cbWndExtra;
+        public IntPtr hInstance;
+        public IntPtr hIcon;
+        public IntPtr hCursor;
+        public IntPtr hbrBackground;
+        public string lpszMenuName;
+        public string lpszClassName;
+        public IntPtr hIconSm;
+    };
 
     [StructLayout(LayoutKind.Sequential)]
     public struct KEYBDINPUT
@@ -118,10 +174,35 @@ static class User32
     }
 
     [DllImport(nameof(User32), SetLastError = true)]
+    public static extern bool SystemParametersInfo(
+        uint uiAction,
+        uint uiParam,
+        IntPtr pvParam,
+        uint fWinIni);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern int GetSystemMetrics(
+        int nIndex);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern IntPtr CreateIconFromResourceEx(
+        byte[] presbits,
+        int dwResSize,
+        bool fIcon,
+        uint dwVer,
+        int cxDesired,
+        int cyDesired,
+        uint Flags);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern bool DestroyIcon(
+        IntPtr hIcon);
+
+    [DllImport(nameof(User32), SetLastError = true)]
     public static extern uint SendInput(
         uint nInputs,
-
-        INPUT[] pInputs, int cbSize);
+        INPUT[] pInputs,
+        int cbSize);
 
     [DllImport(nameof(User32), SetLastError = true)]
     public static extern bool GetLastInputInfo(
@@ -173,6 +254,11 @@ static class User32
         IntPtr hWnd,
         IntPtr lpdwProcessId);
 
+    [DllImport(nameof(User32), CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern IntPtr GetWindowThreadProcessId(
+        IntPtr hWnd,
+        out int lpdwProcessId);
+
     [DllImport(nameof(User32), SetLastError = true)]
     public static extern bool ShowWindow(
         IntPtr hWnd,
@@ -207,10 +293,6 @@ static class User32
         bool fAttach);
 
     [DllImport(nameof(User32), SetLastError = true)]
-    public static extern int GetSystemMetrics(
-        int nIndex);
-
-    [DllImport(nameof(User32), SetLastError = true)]
     public static extern IntPtr GetCurrentThreadId();
 
     [DllImport(nameof(User32), SetLastError = true)]
@@ -238,6 +320,90 @@ static class User32
     public static extern bool UnhookWinEvent(
         IntPtr hWinEventHook);
 
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern IntPtr SetWindowLongPtr(
+        IntPtr hWnd,
+        int nIndex,
+        IntPtr dwNewLong);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern IntPtr GetWindowLongPtr(
+        IntPtr hWnd,
+        int nIndex);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern short RegisterClassEx(
+        ref WNDCLASSEX lpwcx);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern bool UnregisterClass(
+        string lpClassName,
+        IntPtr hInstance);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern IntPtr CreateWindowEx(
+        ushort dwExStyle,
+        string lpClassName,
+        string lpWindowName,
+        ushort dwStyle,
+        int X,
+        int Y,
+        int nWidth,
+        int nHeight,
+        IntPtr hWndParent,
+        IntPtr hMenu,
+        IntPtr hInstance,
+        IntPtr lpParam
+        );
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern bool DestroyWindow(
+        IntPtr hwnd);
+
+    [DllImport(nameof(User32), SetLastError = true)]
+    public static extern IntPtr DefWindowProc(
+        IntPtr hWnd,
+        int msg,
+        IntPtr wParam,
+        IntPtr lParam);
+
+    [DllImport("user32.dll", SetLastError = false)]
+    public static extern IntPtr GetShellWindow();
+
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int GetClassName(
+        IntPtr hWnd,
+        StringBuilder lpClassName,
+        int nMaxCount);
+
+    public static IntPtr AddStyle(IntPtr handle, int style)
+    {
+        var current = GetWindowLongPtr(handle, Styles.GWL_STYLE);
+
+        return SetWindowLongPtr(handle, Styles.GWL_STYLE, current | style);
+    }
+
+    public static IntPtr RemoveStyle(IntPtr handle, int style)
+    {
+        var current = GetWindowLongPtr(handle, Styles.GWL_STYLE);
+
+        return SetWindowLongPtr(handle, Styles.GWL_STYLE, current & ~style);
+    }
+
+    public static IntPtr AddExStyle(IntPtr handle, int style)
+    {
+        var current = GetWindowLongPtr(handle, Styles.GWL_EXSTYLE);
+
+        return SetWindowLongPtr(handle, Styles.GWL_EXSTYLE, current | style);
+    }
+
+    public static IntPtr RemoveExStyle(IntPtr handle, int style)
+    {
+        var current = GetWindowLongPtr(handle, Styles.GWL_EXSTYLE);
+
+        return SetWindowLongPtr(handle, Styles.GWL_EXSTYLE, current & ~style);
+    }
+
     public static Point GetCursorPos()
     {
         GetCursorPos(out POINT p);
@@ -245,9 +411,11 @@ static class User32
         return new Point(p.x, p.y);
     }
 
-    public static void ShowAndActivate(IntPtr handle)
+    public static void ShowAndActivate(Window window)
     {
         const int SW_SHOW = 1;
+
+        var handle = window.GetHandle();
 
         var currentlyFocusedWindowProcessId = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
         var appThread = GetWindowThreadProcessId(handle, IntPtr.Zero);
@@ -256,13 +424,60 @@ static class User32
         {
             AttachThreadInput(currentlyFocusedWindowProcessId, appThread, true);
             BringWindowToTop(handle);
-            ShowWindow(handle, SW_SHOW);
+            window.AppWindow.Show();
             AttachThreadInput(currentlyFocusedWindowProcessId, appThread, false);
         }
         else
         {
             BringWindowToTop(handle);
-            ShowWindow(handle, SW_SHOW);
+            window.AppWindow.Show();
         }
+    }
+
+    public static string GetWindowClassName(IntPtr hWnd)
+    {
+        var className = new StringBuilder(256);
+
+        return GetClassName(hWnd, className, className.Capacity) != 0 ? className.ToString() : string.Empty;
+    }
+
+    public static int GetShellProcessId()
+    {
+        var hWndShell = GetShellWindow();
+        GetWindowThreadProcessId(hWndShell, out int pid);
+
+        return Process.GetProcessesByName("explorer").FirstOrDefault(p => p.Id == pid)?.Id ?? 0;
+    }
+
+    public static Rect GetPrimaryWorkArea()
+    {
+        IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<Rect>());
+        try
+        {
+            SystemParametersInfo(SPI_GETWORKAREA, 0, ptr, 0);
+
+            var rect = Marshal.PtrToStructure<RECT>(ptr);
+            return new Rect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+    }
+
+    public static bool ShowScreenBrightnessOsd()
+    {
+        var hostHandle = FindWindowEx(IntPtr.Zero, IntPtr.Zero, "Shell_TrayWnd", "");
+        if (hostHandle > 0 && (hostHandle = FindWindowEx(hostHandle, IntPtr.Zero, "ReBarWindow32", "")) > 0)
+        {
+            var shellHandle = FindWindowEx(hostHandle, IntPtr.Zero, "MSTaskSwWClass", null);
+            if (shellHandle > 0)
+            {
+                SendMessage(shellHandle, Messages.WM_SHELLHOOK, 0x37, 0);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

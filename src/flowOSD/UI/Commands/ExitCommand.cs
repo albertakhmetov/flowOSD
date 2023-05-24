@@ -21,22 +21,22 @@ namespace flowOSD.UI.Commands;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
 
 sealed class ExitCommand : CommandBase
 {
     public ExitCommand()
     {
-        Text = "Exit";
+        Text = TextResources.Commands.Exit.Description;
         Enabled = true;
     }
-
-    public override string Name => nameof(ExitCommand);
 
     public override bool CanExecuteWithHotKey => false;
 
     public override void Execute(object? parameter = null)
     {
-        Application.Exit();
+        if (Microsoft.UI.Xaml.Application.Current is App app)
+        {
+            app.ShutDown();
+        }
     }
 }

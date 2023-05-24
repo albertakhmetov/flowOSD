@@ -16,17 +16,18 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
-using System.ComponentModel;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using flowOSD.Api;
-using flowOSD.Api.Hardware;
-using flowOSD.Extensions;
-using static flowOSD.Extensions.Common;
 
 namespace flowOSD.Services;
 
-internal class RefreshRateService : IDisposable
+using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Extensions;
+using static flowOSD.Extensions.Common;
+
+internal sealed class RefreshRateService : IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
@@ -60,7 +61,7 @@ internal class RefreshRateService : IDisposable
 
     private async void Update(PowerSource powerSource, DeviceState displayState)
     {
-        if (!config.UserConfig.ControlDisplayRefreshRate || displayState == DeviceState.Disabled)
+        if (!config.Common.ControlDisplayRefreshRate || displayState == DeviceState.Disabled)
         {
             return;
         }
@@ -77,6 +78,10 @@ internal class RefreshRateService : IDisposable
             {
                 display.SetRefreshRate(refreshRates?.High);
             }
+        }
+        catch (AppException ex)
+        {
+            TraceException(ex, "RefreshRateService");
         }
         catch (Win32Exception ex)
         {

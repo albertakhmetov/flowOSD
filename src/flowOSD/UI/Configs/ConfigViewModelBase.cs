@@ -1,0 +1,77 @@
+﻿/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
+ *
+ *  This file is part of flowOSD.
+ *
+ *  flowOSD is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  flowOSD is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
+ *
+ */
+
+namespace flowOSD.UI.Configs;
+
+using System;
+using System.Collections.ObjectModel;
+using flowOSD.Core.Configs;
+
+public abstract class ConfigViewModelBase : ViewModelBase
+{
+    private bool isSelected;
+
+    protected ConfigViewModelBase(IConfig config, string title, string? icon, bool isFooterItem = false)
+    {
+        Config = config ?? throw new ArgumentNullException(nameof(config));
+
+        IsFooterItem = isFooterItem;
+        Title = title ?? string.Empty;
+        Icon = icon ?? string.Empty;
+    }
+
+    public bool IsSelected
+    {
+        get => isSelected;
+        set
+        {
+            if (isSelected == value)
+            {
+                return;
+            }
+
+            if (isSelected)
+            {
+                OnDeactivated();
+            }
+
+            isSelected = value;
+            OnPropertyChanged();
+
+            if (isSelected)
+            {
+                OnActivated();
+            }
+        }
+    }
+
+    public bool IsFooterItem { get; }
+
+    public string Title { get; }
+
+    public string Icon { get; }
+
+    protected IConfig Config { get; }
+
+    protected virtual void OnActivated()
+    { }
+
+    protected virtual void OnDeactivated()
+    { }
+}

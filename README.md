@@ -1,6 +1,6 @@
 # flowOSD 2
 
-[Download the latest version here](https://github.com/albertakhmetov/flowOSD/releases/download/v2.0.2/flowOSD-2.0.2.exe)
+[Download the latest version here](https://github.com/albertakhmetov/flowOSD/releases/download/v2.1.1/flowOSD-2.1.1.exe)
 
 *This version supports only Windows 11 22H2. Please, for Windows 10 and the previous release of Windows 11 use flowOSD 1.x*
 

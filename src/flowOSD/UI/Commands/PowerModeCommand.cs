@@ -22,8 +22,8 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Api;
-using flowOSD.Api.Hardware;
+using flowOSD.Core;
+using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 
 sealed class PowerModeCommand : CommandBase
@@ -39,11 +39,9 @@ sealed class PowerModeCommand : CommandBase
             .Subscribe(isBatterySaver => Enabled = !isBatterySaver)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle Power Mode";
+        Description = TextResources.Commands.PowerMode.Description;
         Enabled = true;
     }
-
-    public override string Name => nameof(PowerModeCommand);
 
     public override bool CanExecuteWithHotKey => true;
 

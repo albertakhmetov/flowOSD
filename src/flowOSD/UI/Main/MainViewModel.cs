@@ -1,0 +1,259 @@
+﻿/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
+ *
+ *  This file is part of flowOSD.
+ *
+ *  flowOSD is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  flowOSD is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
+ *
+ */
+
+namespace flowOSD.UI.Main;
+
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Text;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
+using flowOSD.Extensions;
+using flowOSD.UI.Commands;
+
+public class MainViewModel : ViewModelBase, IDisposable
+{
+    private CompositeDisposable? disposable = new CompositeDisposable();
+
+    private IConfig config;
+    private IPowerManagement powerManagement;
+    private IPerformanceService performanceService;
+    private IBattery battery;
+    private IAtk atk;
+    private IHardwareFeatures hardwareFeatures;
+
+    private string performanceProfileText, performanceProfileImage;
+
+    private string powerModeText, powerModeImage;
+    private bool isBatterySaver;
+
+    private bool hasRate;
+    private string batteryImage;
+    private int rate, cpuTemperature;
+
+    public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
+    {
+        if (commandService == null)
+        {
+            throw new ArgumentNullException(nameof(commandService));
+        }
+
+        if (hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
+
+        powerModeText = string.Empty;
+        powerModeImage = string.Empty;
+
+        powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
+        performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
+        battery = hardwareService.ResolveNotNull<IBattery>();
+        atk = hardwareService.ResolveNotNull<IAtk>();
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+
+        BoostCommand = commandService.ResolveNotNull<ToggleBoostCommand>();
+        PerformanceCommand = commandService.ResolveNotNull<PerformanceCommand>();
+        PowerModeCommand = commandService.ResolveNotNull<PowerModeCommand>();
+        DisplayRefreshRateCommand = commandService.ResolveNotNull<DisplayRefreshRateCommand>();
+        GpuCommand = commandService.ResolveNotNull<GpuCommand>();
+        TouchPadCommand = commandService.ResolveNotNull<TouchPadCommand>();
+
+        ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
+    }
+
+    public Text TextResources => Text.Instance;
+
+    public Images ImageResources => Images.Instance;
+
+    public CommandBase BoostCommand { get; }
+
+    public CommandBase PerformanceCommand { get; }
+
+    public string PerformanceProfileText
+    {
+        get => performanceProfileText;
+        private set => SetProperty(ref performanceProfileText, value);
+    }
+
+    public string PerformanceProfileImage
+    {
+        get => performanceProfileImage;
+        private set => SetProperty(ref performanceProfileImage, value);
+    }
+
+    public CommandBase PowerModeCommand { get; }
+
+    public bool IsBatterySaver
+    {
+        get => isBatterySaver;
+        set => SetProperty(ref isBatterySaver, value);
+    }
+
+    public string PowerModeText
+    {
+        get => powerModeText;
+        set => SetProperty(ref powerModeText, value);
+    }
+
+    public string PowerModeImage
+    {
+        get => powerModeImage;
+        set => SetProperty(ref powerModeImage, value);
+    }
+
+    public bool ShowBatteryChargeRate
+    {
+        get => config.Common.ShowBatteryChargeRate;
+        set => config.Common.ShowBatteryChargeRate = value;
+    }
+
+    public bool ShowCpuTemperature
+    {
+        get => config.Common.ShowCpuTemperature && hardwareFeatures.CpuTemperature;
+        set => config.Common.ShowCpuTemperature = value;
+    }
+
+    public bool HasRate
+    {
+        get => hasRate;
+        set => SetProperty(ref hasRate, value);
+    }
+
+    public string BatteryImage
+    {
+        get => batteryImage;
+        set => SetProperty(ref batteryImage, value);
+    }
+
+    public int Rate
+    {
+        get => rate;
+        set => SetProperty(ref rate, value);
+    }
+
+    public int CpuTemperature
+    {
+        get => cpuTemperature;
+        set => SetProperty(ref cpuTemperature, value);
+    }
+
+    public CommandBase DisplayRefreshRateCommand { get; }
+
+    public CommandBase GpuCommand { get; }
+
+    public CommandBase TouchPadCommand { get; }
+
+    public CommandBase ConfigCommand { get; }
+
+    public void Activate()
+    {
+        disposable?.Dispose();
+        disposable = new CompositeDisposable();
+
+        performanceService.ActiveProfile
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(profile =>
+            {
+                PerformanceProfileText = profile.Name;
+
+                if (profile.Id == PerformanceProfile.Default.Id)
+                {
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.Performance;
+                }
+                else if (profile.Id == PerformanceProfile.Turbo.Id)
+                {
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.Turbo;
+                }
+                else if (profile.Id == PerformanceProfile.Silent.Id)
+                {
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.Silent;
+                }
+                else
+                {
+                    PerformanceProfileImage = Images.Instance.PerformanceMode.User;
+                }
+            })
+            .DisposeWith(disposable);
+
+        powerManagement.PowerMode
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(powerMode =>
+            {
+                PowerModeText = Text.Instance.PowerMode.From(powerMode);
+                PowerModeImage = Images.Instance.PowerMode.From(powerMode);
+            })
+            .DisposeWith(disposable);
+
+        powerManagement.IsBatterySaver
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(isBatterySaver => IsBatterySaver = isBatterySaver)
+            .DisposeWith(disposable);
+
+        config.Common.PropertyChanged
+            .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature))
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(OnPropertyChanged)
+            .DisposeWith(disposable);
+
+        if (config.Common.ShowBatteryChargeRate)
+        {
+            battery.Rate.DistinctUntilChanged()
+                .CombineLatest(
+                    battery.Capacity.DistinctUntilChanged(),
+                    battery.PowerState.DistinctUntilChanged(),
+                    battery.EstimatedTime.DistinctUntilChanged(),
+                    (rate, capacity, powerState, estimatedTime) => new { rate, capacity, powerState, estimatedTime })
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(x => UpdateBattery(x.rate, x.capacity, x.powerState, x.estimatedTime))
+                .DisposeWith(disposable);
+        }
+
+        if (config.Common.ShowCpuTemperature && hardwareFeatures.CpuTemperature)
+        {
+            atk.CpuTemperature
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(value => CpuTemperature = value)
+                .DisposeWith(disposable);
+        }
+    }
+
+    public void Deactivate()
+    {
+        disposable?.Dispose();
+        disposable = null;
+    }
+
+    public void Dispose()
+    {
+        Deactivate();
+    }
+
+    private void UpdateBattery(int rate, uint capacity, BatteryPowerState powerState, uint estimatedTime)
+    {
+        HasRate = Math.Abs(rate) > 500;
+        Rate = HasRate ? Convert.ToInt32(Math.Round(rate / 1000f)) : 0;
+
+        BatteryImage = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
+    }
+}

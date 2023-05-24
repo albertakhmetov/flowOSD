@@ -22,7 +22,10 @@ using static flowOSD.Native.User32;
 
 static class Messages
 {
-    public readonly static int WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
+    public static readonly int WM_SHELLHOOK = RegisterWindowMessage("SHELLHOOK");
+    public static readonly int WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
+
+    public const int HWND_BROADCAST = 0xFFFF;
 
     public const int WM_WININICHANGE = 0x001A;
     public const int WM_DISPLAYCHANGE = 0x7E;
@@ -48,6 +51,8 @@ static class Messages
     public const int WM_MOUSEMOVE = 0x0200;
 
     public const int WM_CONTEXTMENU = 0x007B;
+
+    public const int WM_ACTIVATE = 0x0006;
 
     public static int HiWord(IntPtr ptr)
     {
