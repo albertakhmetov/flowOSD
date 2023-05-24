@@ -39,7 +39,7 @@ sealed class PowerModeCommand : CommandBase
             .Subscribe(isBatterySaver => Enabled = !isBatterySaver)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle Power Mode";
+        Description = TextResources.Commands.PowerMode.Description;
         Enabled = true;
     }
 

@@ -49,7 +49,7 @@ sealed class NotifyMenuCommand : CommandBase
 
         CreateWindow();
 
-        Text = $"Show {this.config.ProductName}";
+        Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
         Description = Text;
         Enabled = true;
     }

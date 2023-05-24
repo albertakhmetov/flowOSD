@@ -40,7 +40,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
     private string? estimatedTime;
 
     public BatteryViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.Battery, Images.Instance.Hardware.Battery)
+        : base(config, Text.Instance.Config.Battery.Title, Images.Instance.Hardware.Battery)
     {
         if (hardwareService == null)
         {
@@ -178,7 +178,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
 
         if ((powerState & BatteryPowerState.PowerOnLine) == BatteryPowerState.PowerOnLine)
         {
-            text.Append(TextResources.Battery.PluggedIn);
+            text.Append(TextResources.Config.Battery.PluggedIn);
         }
 
         if ((powerState & BatteryPowerState.Critical) == BatteryPowerState.Critical)
@@ -188,7 +188,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
                 text.Append(", ");
             }
 
-            text.Append(TextResources.Battery.Critical);
+            text.Append(TextResources.Config.Battery.Critical);
         }
 
         if ((powerState & BatteryPowerState.Charging) == BatteryPowerState.Charging && Math.Abs(Rate) > 100)
@@ -198,7 +198,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
                 text.Append(", ");
             }
 
-            text.Append(TextResources.Battery.Charging);
+            text.Append(TextResources.Config.Battery.Charging);
         }
 
         if ((powerState & BatteryPowerState.Discharging) == BatteryPowerState.Discharging && Math.Abs(Rate) > 100)
@@ -208,7 +208,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
                 text.Append(", ");
             }
 
-            text.Append(TextResources.Battery.Discharging);
+            text.Append(TextResources.Config.Battery.Discharging);
         }
 
         PowerState = text.ToString();

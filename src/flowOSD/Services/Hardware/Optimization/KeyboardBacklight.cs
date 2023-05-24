@@ -21,6 +21,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using Microsoft.Win32;
 
 namespace flowOSD.Services.Hardware.Optimization;
@@ -81,12 +82,12 @@ sealed class KeyboardBacklight : IKeyboardBacklight, IDisposable
         {
             if (key == null)
             {
-                throw new ApplicationException("Registry Key for ASUS Optimization was not found.");
+                throw new AppException(Text.Instance.Errors.CanNotFoundAsusOptimizationKey);
             }
 
             if (key == null || !int.TryParse(key.GetValue(BACKLIGHT_VALUE)?.ToString(), out int value))
             {
-                throw new ApplicationException("Can't read the keyboard backlight value from Registry.");
+                throw new AppException(Text.Instance.Errors.CanNotReadAsusOptimizationBacklight);
             }
 
             stateSubject.OnNext(value == 1 ? DeviceState.Disabled : DeviceState.Enabled);

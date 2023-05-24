@@ -31,6 +31,7 @@ using flowOSD.Native;
 using flowOSD.Extensions;
 using flowOSD.Core;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 
 sealed partial class Display : IDisposable, IDisplay
 {
@@ -82,7 +83,7 @@ sealed partial class Display : IDisposable, IDisplay
 
         if (refreshRates.High != value && refreshRates.Low != value)
         {
-            throw new AppException($"Selected refresh rate ({value}) isn't supported.");
+            throw new AppException(string.Format(Text.Instance.Errors.DisplayRefreshRateIsNotSupported, value));
         }
 
         var mode = new DEVMODE();
@@ -97,13 +98,13 @@ sealed partial class Display : IDisposable, IDisplay
                 return true;
 
             case DISP_CHANGE_RESTART:
-                throw new AppException($"Restart is required.", restartRequired: true);
+                throw new AppException(Text.Instance.Errors.RestartIsRequired, restartRequired: true);
 
             case DISP_CHANGE_BADMODE:
-                throw new AppException($"Selected refresh rate ({value}) isn't supported.");
+                throw new AppException(string.Format(Text.Instance.Errors.DisplayRefreshRateIsNotSupported, value));
 
             default:
-                throw new AppException($"Can't change display refresh rate. Error code: {result}.");
+                throw new AppException(string.Format(Text.Instance.Errors.CanNotChangeDisplayRefreshRate, value));
         }
     }
 

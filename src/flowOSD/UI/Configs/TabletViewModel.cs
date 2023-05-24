@@ -38,7 +38,7 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
     private IReadOnlyCollection<PerformanceProfile>? profiles;
 
     public TabletViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.Tablet, Images.Instance.Hardware.Tablet)
+        : base(config, Text.Instance.Config.Tablet.Title, Images.Instance.Hardware.Tablet)
     {
         if (hardwareService == null)
         {

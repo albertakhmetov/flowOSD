@@ -26,6 +26,7 @@ using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using flowOSD;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using Microsoft.Win32.SafeHandles;
 using static flowOSD.Native.Kernel32;
@@ -169,7 +170,7 @@ sealed partial class Battery : IDisposable, IBattery
 
         if (batteryHandle.IsInvalid)
         {
-            throw new Win32Exception("Can't connect to battery device.");
+            throw new AppException(Text.Instance.Errors.CanNotConnectToBattery);
         }
     }
 
@@ -178,7 +179,7 @@ sealed partial class Battery : IDisposable, IBattery
         var disHandle = SetupDiGetClassDevs(ref GUID_DEVICE_BATTERY, IntPtr.Zero, IntPtr.Zero, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
         if (disHandle == -1)
         {
-            throw new ApplicationException("Can't connect to the battery.");
+            throw new AppException(Text.Instance.Errors.CanNotConnectToBattery);
         }
 
         try
@@ -234,7 +235,7 @@ sealed partial class Battery : IDisposable, IBattery
             SetupDiDestroyDeviceInfoList(disHandle);
         }
 
-        throw new ApplicationException("Can't connect to the battery.");
+        throw new AppException(Text.Instance.Errors.CanNotConnectToBattery);
     }
 
     private SP_DEVICE_INTERFACE_DATA? GetDeviceInterfaceData(IntPtr hdev, uint index)

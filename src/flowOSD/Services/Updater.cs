@@ -60,7 +60,6 @@ sealed class Updater : IUpdater
         catch (Exception ex)
         {
             TraceException(ex, "Error due checking update");
-
         }
 
         return null;
@@ -122,7 +121,7 @@ sealed class Updater : IUpdater
 
         if (i != null && !i.HasExited)
         {
-            //Application.Exit();
+            App.Current.Exit();
         }
     }
 

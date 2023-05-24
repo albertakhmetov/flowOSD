@@ -31,7 +31,7 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     public GeneralViewModel(IConfig config)
-        : base(config, Text.Instance.Config.General, Images.Instance.Common.Home)
+        : base(config, Text.Instance.Config.General.Title, Images.Instance.Common.Home)
     {
     }
 

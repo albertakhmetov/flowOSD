@@ -72,8 +72,8 @@ public sealed partial class ConfigWindow : Window, IDisposable
         AppWindow.SetPresenter(presenter);
 
         Title = Text.Instance.Config.Title;
-        cpuCurveTuner.Title = Text.Instance.Performance.CpuFanCurve;
-        gpuCurveTuner.Title = Text.Instance.Performance.GpuFanCurve;
+        cpuCurveTuner.Title = Text.Instance.Config.Performance.CpuFanCurve;
+        gpuCurveTuner.Title = Text.Instance.Config.Performance.GpuFanCurve;
 
         AddExStyle(this.GetHandle(), WS_EX_DLGMODALFRAME);
 

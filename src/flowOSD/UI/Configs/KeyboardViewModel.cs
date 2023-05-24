@@ -35,7 +35,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     public KeyboardViewModel(IConfig config, ICommandService commandService, IHardwareFeatures hardwareFeatures)
-            : base(config, Text.Instance.Config.Keyboard, Images.Instance.Common.KeyboardSettings)
+            : base(config, Text.Instance.Config.Keyboard.Title, Images.Instance.Common.KeyboardSettings)
     {
         if (config == null)
         {

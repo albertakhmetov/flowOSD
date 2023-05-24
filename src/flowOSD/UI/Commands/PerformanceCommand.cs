@@ -50,7 +50,7 @@ public class PerformanceCommand : CommandBase
             .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.Default.Id)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle Performance Mode";
+        Description = TextResources.Commands.Performance.Description;
         Enabled = true;
     }
 

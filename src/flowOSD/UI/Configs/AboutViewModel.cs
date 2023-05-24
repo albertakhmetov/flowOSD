@@ -31,7 +31,7 @@ using flowOSD.UI.Commands;
 public sealed class AboutViewModel : ConfigViewModelBase
 {
     public AboutViewModel(IConfig config, ICommandService commandService)
-        : base(config, Text.Instance.Config.About, Images.Instance.Common.Info, isFooterItem: true)
+        : base(config, Text.Instance.Config.About.Title, Images.Instance.Common.Info, isFooterItem: true)
     {
         if (commandService == null)
         {
@@ -46,7 +46,7 @@ public sealed class AboutViewModel : ConfigViewModelBase
         Comments = config.AppFileInfo.Comments ?? string.Empty;
         Runtime = $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}";
 
-        HomePage = TextResources.About.HomePage;
+        HomePage = TextResources.Config.About.HomePage;
         HomePageUrl = "https://github.com/albertakhmetov/flowOSD";
 
         ModelName = config.ModelName;

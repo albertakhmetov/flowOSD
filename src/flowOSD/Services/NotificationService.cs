@@ -58,7 +58,7 @@ sealed class NotificationService : IDisposable, INotificationService
 
         if (hardwareService == null)
         {
-            throw new ArgumentNullException("hardwareService");
+            throw new ArgumentNullException(nameof(hardwareService));
         }
 
         atk = hardwareService.ResolveNotNull<IAtk>();
@@ -93,17 +93,17 @@ sealed class NotificationService : IDisposable, INotificationService
 
     public void ShowError(string message, string? details = null)
     {
-        Comctl32.Error($"{config.ProductName}: {Text.Instance.Error.Title}", message, details ?? string.Empty);
+        Comctl32.Error($"{config.ProductName}: {Text.Instance.Errors.Title}", message, details ?? string.Empty);
     }
 
     public void ShowWarning(WarningType warningType, string message, string? details = null)
     {
-        Comctl32.Warning($"{config.ProductName}: {Text.Instance.Warning.Title}", message, details ?? string.Empty);
+        Comctl32.Warning($"{config.ProductName}: {Text.Instance.Warnings.Title}", message, details ?? string.Empty);
     }
 
     public bool ShowConfirmation(string message, string? details = null)
     {
-        return Comctl32.Confirm($"{config.ProductName}: {Text.Instance.ConfirmationTitle}", message, details ?? string.Empty);
+        return Comctl32.Confirm($"{config.ProductName}: {Text.Instance.Confirmations.Title}", message, details ?? string.Empty);
     }
 
     private void Init(CompositeDisposable disposable)
@@ -201,7 +201,7 @@ sealed class NotificationService : IDisposable, INotificationService
     {
         var isMuted = microphone.IsMicMuted();
         osd.Show(new OsdMessage(
-            isMuted ? Core.Resources.Text.Instance.Main.MicOff : Core.Resources.Text.Instance.Main.MicOn,
+            isMuted ? Text.Instance.Notifications.MicOff : Text.Instance.Notifications.MicOn,
             isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
     }
 

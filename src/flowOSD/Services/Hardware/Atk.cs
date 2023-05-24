@@ -26,6 +26,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using Microsoft.Win32.SafeHandles;
 using static flowOSD.Native.Kernel32;
@@ -100,7 +101,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
         if (handle.IsInvalid)
         {
-            throw new ApplicationException("Can't connect to ACPI.");
+            throw new AppException(Text.Instance.Errors.CanNotConnectToAcpi);
         }
 
         GpuSwitchSupported = Get(DEVID_GPU_ECO_MODE, out var gpuMode);

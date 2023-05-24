@@ -27,6 +27,7 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using Microsoft.Win32;
 
@@ -42,8 +43,8 @@ sealed class ConfigService : IConfig, IDisposable
         AppFile = new FileInfo(typeof(ConfigService).Assembly.Location);
         AppFileInfo = FileVersionInfo.GetVersionInfo(AppFile.FullName);
 
-        ProductName = AppFileInfo.ProductName ?? throw new ApplicationException("Product Name isn't set");
-        ProductVersion = AppFileInfo.ProductVersion ?? throw new ApplicationException("Product Version isn't set");
+        ProductName = AppFileInfo.ProductName ?? throw new AppException(Text.Instance.Errors.ProductNameIsNotSet);
+        ProductVersion = AppFileInfo.ProductVersion ?? throw new AppException(Text.Instance.Errors.ProductVersionIsNotSet);
         FileVersion = new Version(
             AppFileInfo.FileMajorPart,
             AppFileInfo.FileMinorPart,
@@ -205,13 +206,13 @@ sealed class ConfigService : IConfig, IDisposable
         using var key = Registry.CurrentUser.OpenSubKey(RUN_KEY, true);
         if (key == null)
         {
-            throw new ApplicationException("Can't write to Windows registry");
+            throw new AppException(Text.Instance.Errors.CanNotWriteStartupKey);
         }
 
         var exe = Process.GetCurrentProcess().MainModule?.FileName;
         if (string.IsNullOrEmpty(exe) || !exe.EndsWith(".exe"))
         {
-            throw new ApplicationException("Can't retrive app exe path");
+            throw new AppException(Text.Instance.Errors.CanNotRetriveAppPath);
         }
 
         if (runAtStartup)
@@ -271,7 +272,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.StartArray)
             {
-                throw new AppException("Config file is corrupted");
+                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
             }
 
             while (reader.Read() && reader.TokenType == JsonTokenType.String)
@@ -285,7 +286,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.EndArray)
             {
-                throw new AppException("Config file is corrupted");
+                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
             }
 
             return config;
@@ -317,7 +318,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.StartArray)
             {
-                throw new ApplicationException("Config file is corrupted");
+                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
             }
 
             var item = new Dictionary<string, string>();
@@ -338,7 +339,7 @@ sealed class ConfigService : IConfig, IDisposable
                     }
                     else
                     {
-                        throw new ApplicationException("Config file is corrupted");
+                        throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
                     }
                 }
 
@@ -353,7 +354,7 @@ sealed class ConfigService : IConfig, IDisposable
                     }
                     else
                     {
-                        throw new ApplicationException("Config file is corrupted");
+                        throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
                     }
 
                     item = new Dictionary<string, string>();
@@ -362,7 +363,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.EndArray)
             {
-                throw new ApplicationException("Config file is corrupted");
+                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
             }
 
             return config;

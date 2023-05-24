@@ -146,8 +146,8 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Common.TraceException(ex, Text.Instance.Error.Initialization);
-            Comctl32.Error(Text.Instance.Error.CriticalTitle, Text.Instance.Error.Initialization, ex.Message);
+            Common.TraceException(ex, Text.Instance.Errors.Initialization);
+            Comctl32.Error(Text.Instance.Errors.CriticalTitle, Text.Instance.Errors.Initialization, ex.Message);
 
             Exit();
         }
@@ -194,9 +194,9 @@ public partial class App : Application
             return;
         }
 
-        Common.TraceException(ex, Text.Instance.Error.Unhandled);
+        Common.TraceException(ex, Text.Instance.Errors.Unhandled);
 
-        notificationService.ShowError(Text.Instance.Error.Unhandled, ex);
+        notificationService.ShowError(Text.Instance.Errors.Unhandled, ex);
     }
 
     private void OnSuspend()

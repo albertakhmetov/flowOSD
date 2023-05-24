@@ -30,6 +30,7 @@ using Microsoft.Win32;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 
 sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 {
@@ -88,7 +89,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         {
             hidDevice = HidDevice.Devices
                 .Where(i => i.VendorId == 0xB05 && i.ReadFeatureData(out byte[] data, Keyboard.FEATURE_KBD_REPORT_ID))
-                .FirstOrDefault() ?? throw new ApplicationException("Can't connect to HID");
+                .FirstOrDefault() ?? throw new AppException(Text.Instance.Errors.CanNotConnectToHid);
 
             InitHid();
 
@@ -197,7 +198,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     public T ResolveNotNull<T>() where T : class
     {
-        return Resolve<T>() ?? throw new InvalidOperationException($"Can't resolve {typeof(T).Name}");
+        return Resolve<T>() ?? throw new InvalidOperationException(string.Format(Text.Instance.Errors.CanNotResolve, typeof(T).Name));
     }
 
     private void Register<T>(T instance) where T : class

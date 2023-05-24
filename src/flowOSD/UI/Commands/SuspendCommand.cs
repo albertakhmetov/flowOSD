@@ -31,12 +31,12 @@ sealed class SuspendCommand : CommandBase
     public const string SLEEP = "sleep";
 
     private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(HIBERNATE, "Hibernate"),
-        new CommandParameterInfo(SLEEP, "Sleep"));
+        new CommandParameterInfo(HIBERNATE, Core.Resources.Text.Instance.Commands.Suspend.Hibernate),
+        new CommandParameterInfo(SLEEP, Core.Resources.Text.Instance.Commands.Suspend.Sleep));
 
     public SuspendCommand()
     {
-        Text = "Suspend";
+        Text = TextResources.Commands.Suspend.Description;
         Description = Text;
         Enabled = true;
     }

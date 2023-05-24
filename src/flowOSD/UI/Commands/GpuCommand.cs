@@ -46,7 +46,7 @@ sealed class GpuCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = Core.Resources.Text.Commands.Gpu.Description;
+        Description = TextResources.Commands.Gpu.Description;
         Enabled = true;
     }
 
@@ -64,7 +64,7 @@ sealed class GpuCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, Core.Resources.Text.Errors.GpuToggleErrorUI);
+            TraceException(ex, TextResources.Errors.GpuToggleUI);
         }
     }
 
@@ -79,13 +79,13 @@ sealed class GpuCommand : CommandBase
         else
         {
             return notificationService.ShowConfirmation(
-                isGpuEnabled ? Core.Resources.Text.Commands.Gpu.TurnOffConfirmation : Core.Resources.Text.Commands.Gpu.TurnOnConfirmation);
+                isGpuEnabled ? TextResources.Commands.Gpu.TurnOffConfirmation : TextResources.Commands.Gpu.TurnOnConfirmation);
         }
     }
 
     private void Update(GpuMode gpuMode)
     {
         IsChecked = gpuMode == GpuMode.dGpu;
-        Text = IsChecked ? Core.Resources.Text.Commands.Gpu.Disable : Core.Resources.Text.Commands.Gpu.Enable;
+        Text = IsChecked ? TextResources.Commands.Gpu.Disable : TextResources.Commands.Gpu.Enable;
     }
 }

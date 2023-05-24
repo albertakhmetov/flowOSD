@@ -31,7 +31,7 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     public MonitoringViewModel(IConfig config)
-        : base(config, Text.Instance.Config.Monitoring, Images.Instance.Common.Diagnostic)
+        : base(config, Text.Instance.Config.Monitoring.Title, Images.Instance.Common.Diagnostic)
     {
     }
 

@@ -24,59 +24,31 @@ using flowOSD.Core.Hardware;
 
 public class Text
 {
-    public static CommandsSection Commands { get; } = new CommandsSection();
-
-    public static ErrorsSection Errors { get; } = new ErrorsSection();
-
     public readonly static Text Instance = new Text();
 
     private Text()
     {
-        PerformanceMode = new PerformanceModeSection();
-        PowerMode = new PowerModeSection();
-        Charger = new ChargerSection();
-        
-        Main = new MainSection();
-        Config = new ConfigSection();
-
-        Common = new CommonSection();
-        Battery = new BatterySection();
-        Notification = new NotificationSection();
-        Performance = new PerformanceSection();
-        Tablet = new TabletSection();
-        About = new AboutSection();
-
-        Error = new ErrorsSection();
-        Warning = new WarningSection();
     }
 
-    public string ConfirmationTitle => "Confirmation";
+    public MainSection Main { get; } = new MainSection();
 
-    public PerformanceModeSection PerformanceMode { get; }
+    public ConfigSection Config { get; } = new ConfigSection();
 
-    public PowerModeSection PowerMode { get; }
+    public CommandsSection Commands { get; } = new CommandsSection();
 
-    public ChargerSection Charger { get; }
+    public ErrorsSection Errors { get; } = new ErrorsSection();
 
-    public MainSection Main { get; }
+    public WarningsSection Warnings { get; } = new WarningsSection();
 
-    public ConfigSection Config { get; }
+    public ConfirmationsSection Confirmations { get; } = new ConfirmationsSection();
 
-    public CommonSection Common { get; }
+    public NotificationsSection Notifications { get; } = new NotificationsSection();
 
-    public NotificationSection Notification { get; }
+    public PerformanceModeSection PerformanceMode { get; } = new PerformanceModeSection();
 
-    public PerformanceSection Performance { get; }
+    public PowerModeSection PowerMode { get; } = new PowerModeSection();
 
-    public TabletSection Tablet { get; }
-
-    public BatterySection Battery { get; }
-
-    public AboutSection About { get; }
-
-    public ErrorsSection Error { get; }
-
-    public WarningSection Warning { get; }
+    public ChargerSection Charger { get; } = new ChargerSection();
 
     public sealed class PerformanceModeSection
     {
@@ -145,6 +117,270 @@ public class Text
 
     public sealed class MainSection
     {
+        public string CpuBoost => "CPU Boost";
+
+        public string HighRefreshRate => "High Refesh Rate";
+
+        public string Gpu => "dGPU";
+
+        public string TouchPad => "Touchpad";
+
+        public string ShowApp => "Show {0}";
+    }
+
+    public sealed class ConfigSection
+    {
+        public string Title => "Settings";
+
+        public GeneralSection General { get; } = new GeneralSection();
+
+        public NotificationsSection Notifications { get; } = new NotificationsSection();
+
+        public KeyboardSection Keyboard { get; } = new KeyboardSection();
+
+        public MonitoringSection Monitoring { get; } = new MonitoringSection();
+
+        public PerformanceSection Performance { get; } = new PerformanceSection();
+
+        public TabletSection Tablet { get; } = new TabletSection();
+
+        public BatterySection Battery { get; } = new BatterySection();
+
+        public AboutSection About { get; } = new AboutSection();
+
+        public sealed class GeneralSection
+        {
+            public string Title => "General";
+
+            public string RunAtStartup => "Run at logon";
+
+            public string ControlDisplayRefreshRate => "Control display refresh rate";
+
+            public string ConfirmGpuModeChange => "Confirm GPU change";
+
+            public string CheckForUpdates => "Check for updates at startup";
+        }
+
+        public sealed class NotificationsSection
+        {
+            public string Title => "Notifications";
+
+            public string PerformanceMode => "Performance mode notifications";
+
+            public string PowerMode => "Power mode notifications";
+
+            public string PowerSource => "Power source notifications";
+
+            public string Boost => "CPU boost mode notifications";
+
+            public string TouchPad => "TouchPad state notifications";
+
+            public string DisplayRefreshRate => "Display refresh rate notifications";
+
+            public string Mic => "Microphone status notifications";
+
+            public string Gpu => "dGPU notifications";
+
+            public string From(NotificationType notificationType)
+            {
+                switch (notificationType)
+                {
+                    case NotificationType.PerformanceMode:
+                        return PerformanceMode;
+
+                    case NotificationType.PowerMode:
+                        return PowerMode;
+
+                    case NotificationType.PowerSource:
+                        return PowerSource;
+
+                    case NotificationType.Boost:
+                        return Boost;
+
+                    case NotificationType.TouchPad:
+                        return TouchPad;
+
+                    case NotificationType.DisplayRefreshRate:
+                        return DisplayRefreshRate;
+
+                    case NotificationType.Mic:
+                        return Mic;
+
+                    case NotificationType.Gpu:
+                        return Gpu;
+
+                    default:
+                        return "";
+                }
+            }
+        }
+
+        public sealed class KeyboardSection
+        {
+            public string Title => "Keyboard";
+
+            public string BacklightTimeout => "Backlight timeout";
+
+            public string BacklightWithDisplay => "Turn off backlight if laptop display is off";
+
+            public string HotKeys => "HotKeys";
+
+            public string HotKeyAction => "Action";
+        }
+
+        public sealed class MonitoringSection
+        {
+            public string Title => "Monitoring";
+
+            public string ShowBatteryChargeRate => "Show battery charge rate";
+
+            public string ShowCpuTemperature => "Show CPU temperature";
+        }
+
+        public sealed class PerformanceSection
+        {
+            public string Title => "Performance";
+
+            public string UserProfileName => "User Profile";
+
+            public string NewProfileToolTip => "Create a new profile";
+
+            public string RenameProfileToolTip => "Rename profile";
+
+            public string RemoveProfileToolTip => "Remove profile";
+
+            public string NewProfileNamePlaceholder => "Enter a new profile name";
+
+            public string RemoveProfileConfirmation => "Remove the current profile?";
+
+            public string CreateProfile => "Create Profile";
+
+            public string RenameProfile => "Rename Profile";
+
+            public string RemoveProfile => "Remove Profile";
+
+            public string Cpu => "Cpu";
+
+            public string CpuFanCurve => "CPU Fan Curve";
+
+            public string GpuFanCurve => "GPU Fan Curve";
+        }
+
+        public sealed class TabletSection
+        {
+            public string Title = "Tablet";
+
+            public string DisableTouchPadInTabletMode => "Disable TouchPad in tablet mode";
+
+            public string Profile => "Performance profile in tablet mode";
+        }
+
+        public sealed class BatterySection
+        {
+            public string Title = "Battery";
+
+            public string PluggedIn => "Plugged-in";
+
+            public string Critical => "Critical";
+
+            public string Charging => "Charging";
+
+            public string Discharging => "Discharging";
+
+            public string Name => "Name";
+
+            public string ManufactureName => "Manufacture Name";
+
+            public string Capacity => "Capacity";
+
+            public string DesignedCapacity => "Designed Capacity";
+
+            public string FullChargedCapacity => "Full Charged Capacity";
+
+            public string WearPercentage => "Wear Percentage";
+
+            public string EstimatedTime => "Estimated Time";
+
+            public string BatteryChargeLimit => "Use Battery Charge Limit";
+
+            public string BatteryChargeLimitDescription => "The battery charge will be limited by";
+        }
+
+        public sealed class AboutSection
+        {
+            public string Title => "About";
+
+            public string HomePage => "Home page";
+
+            public string Version => "Version";
+
+            public string Runtime => "Runtime";
+
+            public string Device => "Device";
+        }
+    }
+
+    public sealed class ErrorsSection
+    {
+        public string Title = "Error";
+
+        public string CriticalTitle => "Critical Error";
+
+        public string Unhandled => "Unhandled application exception";
+
+        public string Initialization => "An exception has occured during initialization";
+
+        public string GpuToggleUI => "Error is occurred while toggling GPU (UI).";
+
+        public string TouchPadToggleUI => "Error is occurred while toggling TouchPad state (UI).";
+
+        public string BoostToggleUI => "Error is occurred while toggling CPU boost mode (UI).";
+
+        public string DisplayRefreshRateToggleUI => "Error is occurred while toggling display refresh rate (UI).";
+
+        public string MicToggle => "Error is occurred while toggling microphone state.";
+
+        public string DisplayRefreshRateIsNotSupported = "Selected refresh rate ({0}) isn't supported.";
+
+        public string RestartIsRequired = "Restart is required.";
+
+        public string CanNotChangeDisplayRefreshRate = "Can't change display refresh rate. Error code: {0}.";
+
+        public string CanNotConnectToBattery = "Can't connect to battery device.";
+
+        public string CanNotConnectToAcpi = "Can't connect to ACPI.";
+
+        public string CanNotFoundAsusOptimizationKey = "Registry Key for ASUS Optimization was not found.";
+
+        public string CanNotReadAsusOptimizationBacklight = "Can't read the keyboard backlight value from Registry.";
+
+        public string ConfigIsCorrupted = "Config file is corrupted";
+
+        public string CanNotWriteStartupKey = "Can't write to Windows registry";
+
+        public string CanNotRetriveAppPath = "Can't retrive app exe path";
+
+        public string ProductNameIsNotSet = "Product Name isn't set";
+
+        public string ProductVersionIsNotSet = "Product Version isn't set";
+
+        public string CanNotConnectToHid = "Can't connect to HID";
+
+        public string CanNotResolve = "Can't resolve {0}";
+    }
+
+    public sealed class WarningsSection
+    {
+        public string Title = "Warning";
+    }
+
+    public sealed class ConfirmationsSection
+    {
+        public string Title = "Confirmation";
+    }
+
+    public sealed class NotificationsSection
+    {
         public string MicOn => "On air";
 
         public string MicOff => "Muted";
@@ -158,203 +394,31 @@ public class Text
         public string TouchPad => "Touchpad";
     }
 
-    public sealed class ConfigSection
-    {
-        public string Title => "Settings";
-
-        public string General => "General";
-
-        public string Notifications => "Notifications";
-
-        public string Keyboard => "Keyboard";
-
-        public string HotKeys => "HotKeys";
-
-        public string Monitoring => "Monitoring";
-
-        public string Performance => "Performance";
-
-        public string Tablet = "Tablet";
-
-        public string Battery = "Battery";
-
-        public string About => "About";
-
-
-
-
-
-
-
-        public string KeyboardBacklightTimeout => "Backlight timeout";
-
-        public string KeyboardBacklightWithDisplay => "Turn off backlight if laptop display is off";
-
-        public string HotKeyAction => "Action";
-
-        public string ShowBatteryChargeRate => "Show battery charge rate";
-
-        public string ShowCpuTemperature => "Show CPU temperature";
-
-        public string UserProfileName => "User Profile";
-    }
-
-    public sealed class CommonSection
-    {
-        public string RunAtStartup => "Run at logon";
-
-        public string ControlDisplayRefreshRate => "Control display refresh rate";
-
-        public string ConfirmGpuModeChange => "Confirm GPU change";
-
-        public string CheckForUpdates => "Check for updates at startup";
-    }
-
-    public sealed class NotificationSection
-    {
-        public string PerformanceMode => "Performance mode notifications";
-
-        public string PowerMode => "Power mode notifications";
-
-        public string PowerSource => "Power source notifications";
-
-        public string Boost => "CPU boost mode notifications";
-
-        public string TouchPad => "TouchPad state notifications";
-
-        public string DisplayRefreshRate => "Display refresh rate notifications";
-
-        public string Mic => "Microphone status notifications";
-
-        public string Gpu => "dGPU notifications";
-
-        public string From(NotificationType notificationType)
-        {
-            switch (notificationType)
-            {
-                case NotificationType.PerformanceMode:
-                    return PerformanceMode;
-
-                case NotificationType.PowerMode:
-                    return PowerMode;
-
-                case NotificationType.PowerSource:
-                    return PowerSource;
-
-                case NotificationType.Boost:
-                    return Boost;
-
-                case NotificationType.TouchPad:
-                    return TouchPad;
-
-                case NotificationType.DisplayRefreshRate:
-                    return DisplayRefreshRate;
-
-                case NotificationType.Mic:
-                    return Mic;
-
-                case NotificationType.Gpu:
-                    return Gpu;
-
-                default:
-                    return "";
-            }
-        }
-    }
-
-    public sealed class PerformanceSection
-    {
-        public string NewProfileToolTip => "Create a new profile";
-
-        public string RenameProfileToolTip => "Rename profile";
-
-        public string RemoveProfileToolTip => "Remove profile";
-
-        public string NewProfileNamePlaceholder => "Enter a new profile name";
-
-        public string RemoveProfileConfirmation => "Remove the current profile?";
-
-        public string CreateProfile => "Create Profile";
-
-        public string RenameProfile => "Rename Profile";
-
-        public string RemoveProfile => "Remove Profile";
-
-        public string Cpu => "Cpu";
-
-        public string CpuFanCurve => "CPU Fan Curve";
-
-        public string GpuFanCurve => "GPU Fan Curve";
-    }
-
-    public sealed class TabletSection
-    {
-        public string DisableTouchPadInTabletMode => "Disable TouchPad in tablet mode";
-
-        public string Profile => "Performance profile in tablet mode";
-    }
-
-    public sealed class BatterySection
-    {
-        public string PluggedIn => "Plugged-in";
-
-        public string Critical => "Critical";
-
-        public string Charging => "Charging";
-
-        public string Discharging => "Discharging";
-
-        public string Name => "Name";
-
-        public string ManufactureName => "Manufacture Name";
-
-        public string Capacity => "Capacity";
-
-        public string DesignedCapacity => "Designed Capacity";
-
-        public string FullChargedCapacity => "Full Charged Capacity";
-
-        public string WearPercentage => "Wear Percentage";
-
-        public string EstimatedTime => "Estimated Time";
-
-        public string BatteryChargeLimit => "Use Battery Charge Limit";
-
-        public string BatteryChargeLimitDescription => "The battery charge will be limited by";
-    }
-
-    public sealed class AboutSection
-    {
-        public string HomePage => "Home page";
-
-        public string Version => "Version";
-
-        public string Runtime => "Runtime";
-
-        public string Device => "Device";
-    }
-
-    public sealed class ErrorsSection
-    {
-        public string Title = "Error";
-
-        public string CriticalTitle => "Critical Error";
-
-        public string Unhandled => "Unhandled application exception";
-
-        public string Initialization => "An exception has occured during initialization";
-
-        public string GpuToggleErrorUI => "Error is occurred while toggling GPU (UI).";
-    }
-
-    public sealed class WarningSection
-    {
-        public string Title = "Warning";
-    }
-
     public sealed class CommandsSection
     {
         public GpuSection Gpu { get; } = new GpuSection();
+
+        public TouchPadSection TouchPad { get; } = new TouchPadSection();
+
+        public BoostSection Boost { get; } = new BoostSection();
+
+        public SuspendSection Suspend { get; } = new SuspendSection();
+
+        public PowerModeSection PowerMode { get; } = new PowerModeSection();
+
+        public PerformanceModeSection Performance { get; } = new PerformanceModeSection();
+
+        public ConfigSection Config { get; } = new ConfigSection();
+
+        public DisplayBrightnessSection DisplayBrightness { get; } = new DisplayBrightnessSection();
+
+        public DisplayRefreshRateSection DisplayRefreshRate { get; } = new DisplayRefreshRateSection();
+
+        public ExitSection Exit { get; } = new ExitSection();
+
+        public KeyboardBacklightSection KeyboardBacklight { get; } = new KeyboardBacklightSection();
+
+        public MicrophoneSection Microphone { get; } = new MicrophoneSection();
 
         public sealed class GpuSection
         {
@@ -366,7 +430,86 @@ public class Text
 
             public string Enable => "Enable dGPU";
 
-            public string Description = "Toggle dGPU";
+            public string Description => "Toggle dGPU";
+        }
+
+        public sealed class TouchPadSection
+        {
+            public string Disable => "Disable TouchPad";
+
+            public string Enable => "Enable TouchPad";
+
+            public string Description => "Toggle TouchPad";
+        }
+
+        public sealed class BoostSection
+        {
+            public string Disable => "Disable Boost";
+
+            public string Enable => "Enable Boost";
+
+            public string Description => "Toggle CPU Boost Mode";
+        }
+
+        public sealed class SuspendSection
+        {
+            public string Hibernate => "Hibernate";
+
+            public string Sleep => "Sleep";
+
+            public string Description => "Suspend";
+        }
+
+        public sealed class PowerModeSection
+        {
+            public string Description => "Toggle Power Mode";
+        }
+
+        public sealed class PerformanceModeSection
+        {
+            public string Description => "Toggle Performance Mode";
+        }
+
+        public sealed class ConfigSection
+        {
+            public string Description => "Settings...";
+        }
+
+        public sealed class DisplayBrightnessSection
+        {
+            public string Description => "Display Brightness";
+
+            public string Up => "Up";
+
+            public string Down => "Down";
+        }
+
+        public sealed class DisplayRefreshRateSection
+        {
+            public string Description => "Toggle High Refresh Rate";
+
+            public string Disable => "Disable High Refresh Rate";
+
+            public string Enable => "Enable High Refresh Rate";
+        }
+
+        public sealed class ExitSection
+        {
+            public string Description => "Exit";
+        }
+
+        public sealed class KeyboardBacklightSection
+        {
+            public string Description => "Keyboard Backlight";
+
+            public string Up => "Up";
+
+            public string Down => "Down";
+        }
+
+        public sealed class MicrophoneSection
+        {
+            public string Description => "Toggle Microphone";
         }
     }
 }

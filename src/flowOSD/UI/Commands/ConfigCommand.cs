@@ -51,7 +51,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
 
-        Text = "Settings...";
+        Text = TextResources.Commands.Config.Description;
         Enabled = true;
     }
 

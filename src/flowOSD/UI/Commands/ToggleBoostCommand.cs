@@ -40,7 +40,7 @@ sealed class ToggleBoostCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle CPU Boost Mode";
+        Description = TextResources.Commands.Boost.Description;
         Enabled = true;
     }
 
@@ -52,13 +52,13 @@ sealed class ToggleBoostCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, "Error is occurred while toggling CPU boost mode (UI).");
+            TraceException(ex, TextResources.Errors.BoostToggleUI);
         }
     }
 
     private void Update(bool isEnabled)
     {
         IsChecked = isEnabled;
-        Text = IsChecked ? "Disable Boost" : "Enable Boost";
+        Text = IsChecked ? TextResources.Commands.Boost.Disable : TextResources.Commands.Boost.Enable;
     }
 }

@@ -26,7 +26,7 @@ sealed class ExitCommand : CommandBase
 {
     public ExitCommand()
     {
-        Text = "Exit";
+        Text = TextResources.Commands.Exit.Description;
         Enabled = true;
     }
 

@@ -39,7 +39,7 @@ sealed class MicrophoneCommand : CommandBase
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
         this.microphone = microphone ?? throw new ArgumentNullException(nameof(microphone));
 
-        Text = "Toggle Microphone";
+        Text = TextResources.Commands.Microphone.Description;
         Description = Text;
         Enabled = true;
     }
@@ -61,12 +61,12 @@ sealed class MicrophoneCommand : CommandBase
 
             var isMuted = microphone.IsMicMuted();
             osd.Show(new OsdMessage(
-                isMuted ? Core.Resources.Text.Instance.Main.MicOff : Core.Resources.Text.Instance.Main.MicOn,
+                isMuted ? Core.Resources.Text.Instance.Notifications.MicOff : Core.Resources.Text.Instance.Notifications.MicOn,
                 isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
         }
         catch (Exception ex)
         {
-            TraceException(ex, "Error is occurred while toggling microphone state.");
+            TraceException(ex, TextResources.Errors.MicToggle);
         }
     }
 }

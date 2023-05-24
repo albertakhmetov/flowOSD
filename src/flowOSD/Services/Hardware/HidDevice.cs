@@ -304,40 +304,4 @@ sealed class HidDevice
             }
         }
     }
-
-    /* private sealed class DeviceHandle : SafeHandle
-     {
-         public DeviceHandle(
-             string devicePath,
-             uint deviceAccess = GENERIC_READ | GENERIC_WRITE,
-             uint shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE,
-             bool isOverlapped = false)
-             : base(INVALID_HANDLE_VALUE, true)
-         {
-             IsOverlapped = isOverlapped;
-
-             var security = new SECURITY_ATTRIBUTES();
-             security.lpSecurityDescriptor = IntPtr.Zero;
-             security.bInheritHandle = true;
-             security.nLength = Marshal.SizeOf(security);
-
-             handle = CreateFile(
-                 devicePath,
-                 deviceAccess,
-                 shareMode,
-                 ref security,
-                 OPEN_EXISTING,
-                 isOverlapped ? FILE_FLAG_OVERLAPPED : 0,
-                 IntPtr.Zero);
-         }
-
-         public bool IsOverlapped { get; }
-
-         public override bool IsInvalid => handle == IntPtr.Zero || handle == INVALID_HANDLE_VALUE;
-
-         protected override bool ReleaseHandle()
-         {
-             return CancelIoEx(handle, IntPtr.Zero) && CloseHandle(handle);
-         }
-     }*/
 }

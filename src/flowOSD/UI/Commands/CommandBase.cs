@@ -89,6 +89,8 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
 
     protected CompositeDisposable? Disposable { get; private set; } = new CompositeDisposable();
 
+    protected Core.Resources.Text TextResources => Core.Resources.Text.Instance;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler? CanExecuteChanged;

@@ -53,7 +53,7 @@ sealed class DisplayRefreshRateCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle High Refresh Rate";
+        Description = TextResources.Commands.DisplayRefreshRate.Description;
         Enabled = true;
     }
 
@@ -83,13 +83,13 @@ sealed class DisplayRefreshRateCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, "Error is occurred while toggling display refresh rate (UI).");
+            TraceException(ex, TextResources.Errors.DisplayRefreshRateToggleUI);
         }
     }
 
     private void Update(uint refreshRate)
     {
         IsChecked = DisplayRefreshRates.IsHigh(refreshRate);
-        Text = IsChecked ? "Disable High Refresh Rate" : "Enable High Refresh Rate";
+        Text = IsChecked ? TextResources.Commands.DisplayRefreshRate.Disable : TextResources.Commands.DisplayRefreshRate.Enable;
     }
 }

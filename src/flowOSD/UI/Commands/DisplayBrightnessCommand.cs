@@ -34,8 +34,8 @@ sealed class DisplayBrightnessCommand : CommandBase
     public const string DOWN = "down";
 
     private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(DOWN, "Down", Images.Instance.Hardware.BrightnessDown),
-        new CommandParameterInfo(UP, "Up", Images.Instance.Hardware.BrightnessUp));
+        new CommandParameterInfo(DOWN, Core.Resources.Text.Instance.Commands.DisplayBrightness.Down, Images.Instance.Hardware.BrightnessDown),
+        new CommandParameterInfo(UP, Core.Resources.Text.Instance.Commands.DisplayBrightness.Up, Images.Instance.Hardware.BrightnessUp));
 
     private IConfig config;
     private IOsd osd;
@@ -47,7 +47,7 @@ sealed class DisplayBrightnessCommand : CommandBase
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
         this.displayBrightness = displayBrightness ?? throw new ArgumentNullException(nameof(displayBrightness));
 
-        Text = "Display Brightness";
+        Text = TextResources.Commands.DisplayBrightness.Description;
         Description = Text;
         Enabled = true;
     }

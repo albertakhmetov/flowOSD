@@ -49,7 +49,7 @@ sealed class MainUICommand : CommandBase
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
 
-        Text = $"Show {this.config.ProductName}";
+        Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
         Description = Text;
         Enabled = true;
     }

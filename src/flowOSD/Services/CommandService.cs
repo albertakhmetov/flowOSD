@@ -51,13 +51,6 @@ sealed class CommandService : ICommandService, IDisposable
         this.updater = updater ?? throw new ArgumentNullException(nameof(updater));
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
-        /*  Register(
-              new SettingsCommand(config, this, systemEvents, hardwareService),
-              new ExitCommand(),
-              new PrintScreenCommand(keysSender),
-              new ClipboardCopyPlainTextCommand(keysSender),
-              new ClipboardPastePlainTextCommand(keysSender));*/
-
         Register(() => new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new PerformanceCommand(
             config,

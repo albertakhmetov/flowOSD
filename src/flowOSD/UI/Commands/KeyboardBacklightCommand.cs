@@ -35,8 +35,8 @@ sealed class KeyboardBacklightCommand : CommandBase
     public const string DOWN = "down";
 
     private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(DOWN, "Down"),
-        new CommandParameterInfo(UP, "Up"));
+        new CommandParameterInfo(DOWN, Core.Resources.Text.Instance.Commands.KeyboardBacklight.Down),
+        new CommandParameterInfo(UP, Core.Resources.Text.Instance.Commands.KeyboardBacklight.Up));
 
     private IConfig config;
     private IOsd osd;
@@ -45,7 +45,7 @@ sealed class KeyboardBacklightCommand : CommandBase
 
     public KeyboardBacklightCommand(IConfig config, IOsd osd, IHardwareService hardwareService)
     {
-        if(hardwareService == null)
+        if (hardwareService == null)
         {
             throw new ArgumentNullException(nameof(hardwareService));
         }
@@ -56,7 +56,7 @@ sealed class KeyboardBacklightCommand : CommandBase
         keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
         keyboardBacklightControl = hardwareService.Resolve<IKeyboardBacklightControl>();
 
-        Text = "Keyboard Backlight";
+        Text = TextResources.Commands.KeyboardBacklight.Description;
         Description = Text;
         Enabled = true;
     }

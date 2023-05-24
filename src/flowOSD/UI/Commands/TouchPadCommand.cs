@@ -40,7 +40,7 @@ sealed class TouchPadCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = "Toggle TouchPad";
+        Description = TextResources.Commands.TouchPad.Description;
         Enabled = true;
     }
 
@@ -52,13 +52,13 @@ sealed class TouchPadCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, "Error is occurred while toggling TouchPad state (UI).");
+            TraceException(ex, TextResources.Errors.TouchPadToggleUI);
         }
     }
 
     private void Update(DeviceState state)
     {
         IsChecked = state == DeviceState.Enabled;
-        Text = IsChecked ? "Disable TouchPad" : "Enable TouchPad";
+        Text = IsChecked ? TextResources.Commands.TouchPad.Disable : TextResources.Commands.TouchPad.Enable;
     }
 }
