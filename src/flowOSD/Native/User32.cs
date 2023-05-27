@@ -30,9 +30,14 @@ static class User32
 {
     public const int ENUM_CURRENT_SETTINGS = -1;
 
-    public const int DISP_CHANGE_SUCCESSFUL = 0;
-    public const int DISP_CHANGE_BADMODE = -2;
-    public const int DISP_CHANGE_RESTART = 1;
+    public const uint DISP_CHANGE_SUCCESSFUL = 0x00000000;
+    public const uint DISP_CHANGE_RESTART = 0x00000001;
+    public const uint DISP_CHANGE_FAILED = 0x80000001;
+    public const uint DISP_CHANGE_BADMODE = 0x80000002;
+    public const uint DISP_CHANGE_NOTUPDATED = 0x80000003;
+    public const uint DISP_CHANGE_BADFLAGS = 0x80000004;
+    public const uint DISP_CHANGE_BADPARAM = 0x80000005;
+    public const uint DISP_CHANGE_BADDUALVIEW = 0x80000006;
 
     public const int DM_DISPLAYFREQUENCY = 0x400000;
 
@@ -222,7 +227,7 @@ static class User32
         ref DEVMODE lpDevMode);
 
     [DllImport(nameof(User32), CharSet = CharSet.Unicode, SetLastError = true)]
-    public static extern int ChangeDisplaySettingsEx(
+    public static extern uint ChangeDisplaySettingsEx(
         string lpszDeviceName,
         ref DEVMODE lpDevMode,
         IntPtr hwnd,

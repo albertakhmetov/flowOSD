@@ -97,6 +97,9 @@ sealed partial class Display : IDisposable, IDisplay
             case DISP_CHANGE_SUCCESSFUL:
                 return true;
 
+            case DISP_CHANGE_FAILED:
+                return false;
+
             case DISP_CHANGE_RESTART:
                 throw new AppException(Text.Instance.Errors.RestartIsRequired, restartRequired: true);
 
@@ -104,7 +107,7 @@ sealed partial class Display : IDisposable, IDisplay
                 throw new AppException(string.Format(Text.Instance.Errors.DisplayRefreshRateIsNotSupported, value));
 
             default:
-                throw new AppException(string.Format(Text.Instance.Errors.CanNotChangeDisplayRefreshRate, value));
+                throw new AppException(string.Format(Text.Instance.Errors.CanNotChangeDisplayRefreshRate, result));
         }
     }
 

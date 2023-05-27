@@ -161,4 +161,9 @@ public sealed partial class ConfigWindow : Window, IDisposable
 
         (performanceConfig.DataContext as PerformanceViewModel)?.RemoveProfile();
     }
+
+    private void renameProfileFlyout_Opened(object sender, object e)
+    {
+        renameProfileName.Text = (performanceConfig.DataContext as PerformanceViewModel)?.CurrentProfile?.Name;
+    }
 }

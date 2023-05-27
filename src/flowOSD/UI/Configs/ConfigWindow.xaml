@@ -529,11 +529,10 @@
 
                                 <FontIcon FontSize="18" Glyph="&#xE8AC;" Margin="0"/>
                                 <Button.Flyout>
-                                    <Flyout x:Name="renameProfileFlyout">
+                                    <Flyout x:Name="renameProfileFlyout" Opened="renameProfileFlyout_Opened">
                                         <StackPanel MinWidth="250">
                                             <TextBox
                                                 x:Name="renameProfileName"
-                                                Text="{Binding Name, Mode=OneWay}"
                                                 PlaceholderText="{Binding TextResources.Config.Performance.NewProfileNamePlaceholder}"/>
                                             <Button 
                                                 IsEnabled="{Binding ElementName=renameProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"

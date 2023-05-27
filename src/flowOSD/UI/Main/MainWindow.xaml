@@ -97,8 +97,7 @@
             <DropDownButton 
                 Style="{StaticResource ButtonStyle}" 
                 Grid.Row="0" 
-                Grid.Column="1"
-                Command="{Binding TogglePerformanceProfileCommand, Mode=OneTime}">
+                Grid.Column="1">
                 
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 

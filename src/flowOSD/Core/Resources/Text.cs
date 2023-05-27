@@ -350,7 +350,7 @@ public sealed class Text
 
         public string RestartIsRequired = "Restart is required.";
 
-        public string CanNotChangeDisplayRefreshRate = "Can't change display refresh rate. Error code: {0}.";
+        public string CanNotChangeDisplayRefreshRate = "Can't change display refresh rate. Error code: {0:X}.";
 
         public string CanNotConnectToBattery = "Can't connect to battery device.";
 
