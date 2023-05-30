@@ -172,7 +172,7 @@
 
                 <Grid>
                     <!-- General -->
-                    <StackPanel 
+                    <StackPanel
                         x:Name="generalConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
 
@@ -326,7 +326,7 @@
                         <Border 
                             Style="{StaticResource CxConfigBorderStyle}"
                             Visibility="{Binding BacklightControl, Converter={StaticResource VisibilityConverter}}">
-                            
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -353,7 +353,7 @@
                         <Border
                             Style="{StaticResource CxConfigBorderStyle}"
                             Visibility="{Binding BacklightControl, Converter={StaticResource VisibilityConverter}}">
-                            
+
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
                                 Header="{Binding TextResources.Config.Keyboard.BacklightWithDisplay}"
@@ -461,7 +461,7 @@
                         <Border 
                             Visibility="{Binding IsCpuTemperatureVisible, Converter={StaticResource VisibilityConverter}}"
                             Style="{StaticResource CxConfigBorderStyle}">
-                            
+
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding ShowCpuTemperature, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <StackPanel Orientation="Horizontal">
@@ -481,7 +481,11 @@
                         x:Name="performanceConfig"
                         Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}}">
 
-                        <Grid Margin="10,5" HorizontalAlignment="Right">
+                        <Grid 
+                            Margin="10,5"
+                            HorizontalAlignment="Right"
+                            Visibility="{Binding Profiles.Count, Converter={StaticResource VisibilityConverter}}">
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -525,7 +529,7 @@
                                 Grid.Column="2"
                                 Margin="5,0,0,0"
                                 VerticalAlignment="Center"
-                                ToolTipService.ToolTip="{Binding TextResources.Config.Performance.RenameProfileToolTip}">                                
+                                ToolTipService.ToolTip="{Binding TextResources.Config.Performance.RenameProfileToolTip}">
 
                                 <FontIcon FontSize="18" Glyph="&#xE8AC;" Margin="0"/>
                                 <Button.Flyout>
@@ -556,17 +560,54 @@
                                 <Button.Flyout>
                                     <Flyout x:Name="removeProfileFlyout">
                                         <StackPanel MinWidth="250">
-                                            <TextBlock Text="{Binding TextResources.Config.Performance.RemoveProfileConfirmation}"/>
+                                            <TextBlock 
+                                                FontWeight="SemiBold"
+                                                Text="{Binding TextResources.Config.Performance.RemoveProfileConfirmation}"/>
                                             <Button 
                                                 Style="{StaticResource AccentButtonStyle}"
                                                 HorizontalAlignment="Right" 
                                                 Click="RemoveProfile"
-                                                Content="{Binding TextResources.Performance.RemoveProfile}" Margin="0,10,0,0"/>
+                                                Content="{Binding TextResources.Config.Performance.RemoveProfile}" Margin="0,10,0,0"/>
                                         </StackPanel>
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
                         </Grid>
+
+                        <Border 
+                            Visibility="{Binding Profiles.Count, Converter={StaticResource VisibilityConverter}, ConverterParameter='!'}"                            
+                            Style="{StaticResource CxConfigBorderStyle}">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock
+                                    Text="{Binding TextResources.Config.Performance.NoProfileTitle}"
+                                    FontWeight="SemiBold"/>
+
+                                <TextBlock
+                                    Text="{Binding TextResources.Config.Performance.NoProfileMessage}"
+                                    FontWeight="Normal"
+                                    Margin="0,10,0,0"/>
+
+                                <StackPanel 
+                                    Orientation="Horizontal"
+                                    Margin="0,20,0,0">
+                                    
+                                    <TextBox
+                                        x:Name="newProfileName"
+                                        Width="250"
+                                        VerticalAlignment="Center"
+                                        PlaceholderText="{Binding TextResources.Config.Performance.NewProfileNamePlaceholder}"/>
+                                    <Button 
+                                        IsEnabled="{Binding ElementName=newProfileName, Path=Text, Converter={StaticResource BooleanConverter}, ConverterParameter='!'}"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        HorizontalAlignment="Right" 
+                                        VerticalAlignment="Center"
+                                        Command="{Binding CreateProfileCommand}"
+                                        CommandParameter="{Binding ElementName=newProfileName, Path=Text}"
+                                        Content="{Binding TextResources.Config.Performance.CreateProfile}" Margin="10,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </Border>
 
                         <TextBlock 
                             Visibility="{Binding IsCpuPowerLimitVisible, Converter={StaticResource VisibilityConverter}}"
@@ -599,11 +640,13 @@
                         </Border>
 
                         <TextBlock 
+                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
                             Text="Fan Curves"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
                         <Border 
+                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
                             Style="{StaticResource CxConfigBorderStyle}">
 
                             <controls:FanCurveTuner
@@ -613,7 +656,9 @@
                                 Height="200"/>
                         </Border>
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
+                            Style="{StaticResource CxConfigBorderStyle}">
 
                             <controls:FanCurveTuner 
                                 x:Name="gpuCurveTuner"
@@ -770,7 +815,7 @@
                         <Border 
                             Visibility="{Binding IsBatteryChargeLimitVisible, Converter={StaticResource VisibilityConverter}}"
                             Style="{StaticResource CxConfigBorderStyle}">
-                            
+
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch" 
                                 VerticalAlignment="Center"

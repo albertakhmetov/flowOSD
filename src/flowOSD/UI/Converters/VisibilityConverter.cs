@@ -49,7 +49,7 @@ public sealed class VisibilityConverter : IValueConverter
                 : (string.IsNullOrEmpty(s) ? Visibility.Collapsed : Visibility.Visible);
         }
 
-        if (targetType == typeof(Visibility) && value is object)
+        if (targetType == typeof(Visibility) && value is ValueType == false)
         {
             return parameter as string == "!"
                 ? (value != null ? Visibility.Collapsed : Visibility.Visible)

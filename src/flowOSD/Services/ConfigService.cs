@@ -64,7 +64,11 @@ sealed class ConfigService : IConfig, IDisposable
 
         ModelName = GetModelName() ?? string.Empty;
 
+#if DEBUG
+        configFile = new FileInfo(Path.Combine(DataDirectory.FullName, "config-debug.json"));
+#else
         configFile = new FileInfo(Path.Combine(DataDirectory.FullName, "config.json"));
+#endif
 
         var poco = Load();
 
@@ -191,7 +195,10 @@ sealed class ConfigService : IConfig, IDisposable
             JsonSerializer.Serialize<POCO>(stream, poco, options);
         }
 
-        tempFile.Replace(configFile.FullName, configFile.FullName + ".backup");
+        if (configFile.Exists)
+        {
+            tempFile.Replace(configFile.FullName, configFile.FullName + ".backup");
+        }
     }
 
     private bool GetStartupOption()

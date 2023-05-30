@@ -247,6 +247,10 @@ public sealed class Text
         {
             public string Title => "Performance";
 
+            public string NoProfileTitle => "Performance profiles";
+
+            public string NoProfileMessage => "Create a custom profile to configure CPU power limit and fan curves.";
+
             public string UserProfileName => "User Profile";
 
             public string NewProfileToolTip => "Create a new profile";

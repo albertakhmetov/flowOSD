@@ -46,7 +46,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private BehaviorSubject<bool> isDirtySubject;
 
     private IReadOnlyCollection<PerformanceProfile> profiles;
-    private PerformanceProfile currentProfile;
+    private PerformanceProfile? currentProfile;
 
     private uint cpuLimit;
 
@@ -75,6 +75,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
         MinPowerLimit = atk.MinPowerLimit;
         MaxPowerLimit = atk.MaxPowerLimit;
+
+        CreateProfileCommand = new RelayCommand(x => CreateProfile(x as string));
     }
 
     public Text TextResources => Text.Instance;
@@ -90,7 +92,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         set => SetProperty(ref profiles, value);
     }
 
-    public PerformanceProfile CurrentProfile
+    public PerformanceProfile? CurrentProfile
     {
         get => currentProfile;
         set
@@ -98,6 +100,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             currentProfile = value;
             if (currentProfile == null)
             {
+                OnPropertyChanged(null);
                 return;
             }
 
@@ -105,29 +108,10 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
             OnPropertyChanged(null);
 
-            if (CurrentProfile!.IsUserProfile)
+            if (CurrentProfile?.IsUserProfile == true)
             {
                 Cpu.Set(CurrentProfile.CpuFanCurve, true);
                 Gpu.Set(CurrentProfile.GpuFanCurve, true);
-            }
-            else
-            {
-                PerformanceMode mode;
-                if (CurrentProfile.Id == PerformanceProfile.Turbo.Id)
-                {
-                    mode = PerformanceMode.Turbo;
-                }
-                else if (CurrentProfile.Id == PerformanceProfile.Silent.Id)
-                {
-                    mode = PerformanceMode.Silent;
-                }
-                else
-                {
-                    mode = PerformanceMode.Default;
-                }
-
-                Cpu.Set(atk.GetFanCurve(FanType.Cpu, mode), false);
-                Gpu.Set(atk.GetFanCurve(FanType.Gpu, mode), false);
             }
 
             isDirtySubject.OnNext(false);
@@ -154,13 +138,20 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     public FanCurveDataSource Gpu => gpu;
 
+    public ICommand CreateProfileCommand { get; }
+
     public void Dispose()
     {
         OnDeactivated();
     }
 
-    public void CreateProfile(string profileName)
+    public bool CreateProfile(string? profileName)
     {
+        if (string.IsNullOrEmpty(profileName))
+        {
+            return false;
+        }
+
         var profile = new PerformanceProfile(
             Guid.NewGuid(),
             profileName,
@@ -169,6 +160,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             FanDataPoint.CreateDefaultCurve());
 
         Config.Performance[profile.Id] = profile;
+
+        return true;
     }
 
     public void RenameProfile(string profileName)
@@ -217,13 +210,10 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private void UpdateProfiles(Guid changedProfileId)
     {
-        Profiles = new ReadOnlyCollection<PerformanceProfile>(new PerformanceProfile[] {
-            PerformanceProfile.Default,
-            PerformanceProfile.Turbo,
-            PerformanceProfile.Silent,
-        }.Union(Config.Performance.GetProfiles()).ToArray());
+        Profiles = new ReadOnlyCollection<PerformanceProfile>(Config.Performance.GetProfiles());
 
         var profile = performanceService.GetProfile(changedProfileId);
+
         if (profile.IsUserProfile)
         {
             CurrentProfile = profile;
@@ -234,7 +224,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         }
         else
         {
-            CurrentProfile = PerformanceProfile.Default;
+            CurrentProfile = null;
         }
     }
 
