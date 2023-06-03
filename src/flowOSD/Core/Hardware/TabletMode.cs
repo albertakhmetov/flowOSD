@@ -22,7 +22,7 @@ namespace flowOSD.Core.Hardware;
 public enum TabletMode
 {
     Notebook = 0,
-    Tablet = 1,
-    Tent = 2,
+    Tent = 1,
+    Tablet = 2,
     Rotated = 3,
 }
