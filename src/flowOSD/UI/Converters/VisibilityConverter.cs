@@ -28,6 +28,11 @@ public sealed class VisibilityConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, string language)
     {
+        if (targetType == typeof(Visibility) && parameter is string stringParameter && stringParameter != "!")
+        {
+            return System.Convert.ToString(value) == stringParameter ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         if (targetType == typeof(Visibility) && value is bool b)
         {
             return parameter as string == "!"

@@ -30,6 +30,7 @@ using flowOSD.Native;
 using flowOSD.Services;
 using flowOSD.UI;
 using flowOSD.UI.Commands;
+using flowOSD.UI.Configs;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -45,7 +46,7 @@ public partial class App : Application
     private CompositeDisposable? disposable;
     private IDisposable? helloMessageSubsciption;
 
-    private IUpdater updater;
+    private IUpdateService updateService;
 
     private ConfigService configService;
     private MessageQueue messageQueue;
@@ -82,7 +83,7 @@ public partial class App : Application
             disposable = new CompositeDisposable();
 
             configService = new ConfigService().DisposeWith(disposable);
-            updater = new Updater(configService);
+            updateService = new UpdateService(configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
 
@@ -90,13 +91,13 @@ public partial class App : Application
             osd = new Osd(configService, systemEvents);
 
             hardwareService = new HardwareService(
-                configService, 
-                messageQueue, 
+                configService,
+                messageQueue,
                 keysSender).DisposeWith(disposable);
 
             notificationService = new NotificationService(
-                configService, 
-                osd, 
+                configService,
+                osd,
                 hardwareService).DisposeWith(disposable);
 
             commandService = new CommandService(
@@ -104,13 +105,13 @@ public partial class App : Application
                 hardwareService,
                 keysSender,
                 systemEvents,
-                updater,
+                updateService,
                 osd,
                 notificationService).DisposeWith(disposable);
 
             hotKeyService = new HotKeysService(
-                configService, 
-                commandService, 
+                configService,
+                commandService,
                 hardwareService).DisposeWith(disposable);
 
             notifyIconService = new NotifyIconService(
@@ -143,6 +144,32 @@ public partial class App : Application
             systemEvents.AppException
                 .Subscribe(OnError)
                 .DisposeWith(disposable);
+
+            updateService.State
+               .Where(x => x == UpdateServiceState.ReadyToDownload)
+               .ObserveOn(SynchronizationContext.Current!)
+               .Subscribe(x =>
+               {
+                   if (commandService.ResolveNotNull<ConfigCommand>().IsWindowActive)
+                   {
+                       return;
+                   }
+
+                   var showUpdate = notificationService.ShowConfirmation(
+                       Text.Instance.Config.About.Update,
+                       Text.Instance.Confirmations.NewVersion);
+
+                   if (showUpdate)
+                   {
+                       commandService.ResolveNotNull<ConfigCommand>().Execute(nameof(AboutViewModel));
+                   }
+               })
+               .DisposeWith(disposable);
+
+            if (configService.Common.CheckForUpdates)
+            {
+                updateService.CheckUpdate();
+            }
         }
         catch (Exception ex)
         {

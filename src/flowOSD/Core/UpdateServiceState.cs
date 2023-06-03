@@ -19,15 +19,12 @@
 
 namespace flowOSD.Core;
 
-public interface IUpdater
+public enum UpdateServiceState
 {
-    string ReleaseNotesLink { get; }
-
-    Task<Version?> CheckUpdate();
-
-    Task<bool> Download(Version version, IProgress<int> progress, CancellationToken cancellationToken = default);
-
-    void Install(Version version);
-
-    bool IsUpdate(Version version);
+    None,
+    Updated,
+    Checking,
+    ReadyToDownload,
+    Downloading,
+    ReadyToInstall,
 }

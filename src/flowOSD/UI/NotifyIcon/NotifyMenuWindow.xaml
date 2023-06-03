@@ -32,13 +32,15 @@
             Grid.Row="1" 
             IsTabStop="False"/>
         <MenuFlyoutItem 
-            Grid.Row="2" Text="{Binding ConfigCommand.Text, Mode=OneWay}" 
+            Grid.Row="2" 
+            Text="{Binding ConfigCommand.Text, Mode=OneWay}" 
             Command="{Binding ConfigCommand, Mode=OneTime}" 
             Click="OnMenuFlyoutItemClick"/>
         <MenuFlyoutItem
             Grid.Row="3"
-            Text="Check for updates"
-            IsEnabled="false"
+            Text="{Binding TextResources.Commands.Update.CheckForUpdate}"
+            Command="{Binding ConfigCommand, Mode=OneTime}"
+            CommandParameter="AboutViewModel"
             Click="OnMenuFlyoutItemClick"/>
         <MenuFlyoutSeparator Grid.Row="4" IsTabStop="False"/>
         <MenuFlyoutItem 

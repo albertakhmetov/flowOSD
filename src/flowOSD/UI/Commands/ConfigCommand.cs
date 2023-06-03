@@ -37,6 +37,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
     private ISystemEvents systemEvents;
     private ICommandService commandService;
     private IHardwareService hardwareService;
+    private IUpdateService updateService;
 
     private ConfigWindow? window;
 
@@ -44,18 +45,22 @@ sealed class ConfigCommand : CommandBase, IDisposable
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
-        IHardwareService hardwareService)
+        IHardwareService hardwareService,
+        IUpdateService updateService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
+        this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
         Text = TextResources.Commands.Config.Description;
         Enabled = true;
     }
 
     public override bool CanExecuteWithHotKey => false;
+
+    public bool IsWindowActive => window?.Visible == true;
 
     public override void Execute(object? parameter = null)
     {
@@ -70,7 +75,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
                 new PerformanceViewModel(config, hardwareService),
                 new TabletViewModel(config, hardwareService),
                 new BatteryViewModel(config, hardwareService),
-                new AboutViewModel(config, commandService)
+                new AboutViewModel(config, commandService, updateService)
             };
 
             window = new ConfigWindow(systemEvents, viewModels);
@@ -80,10 +85,15 @@ sealed class ConfigCommand : CommandBase, IDisposable
 
             window.AppWindow.Resize(new Windows.Graphics.SizeInt32(
                 (int)(800 * scale),
-                (int)(500 * scale)));
+                (int)(600 * scale)));
         }
 
         window.Activate();
+
+        if (parameter is string viewModelName)
+        {
+            window.SelectedViewModel = window.ConfigViewModels.FirstOrDefault(i => i.GetType().Name == viewModelName);
+        }
     }
 
     public override void Dispose()

@@ -20,19 +20,32 @@
 namespace flowOSD.UI.Configs;
 
 using System;
+using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Windows.Input;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Core.Resources;
+using flowOSD.Extensions;
 using flowOSD.UI.Commands;
 
 public sealed class AboutViewModel : ConfigViewModelBase
 {
-    public AboutViewModel(IConfig config, ICommandService commandService)
+    private CompositeDisposable? disposable = null;
+    private IDisposable? updateSubscription;
+
+    private IUpdateService updateService;
+
+    public AboutViewModel(IConfig config, ICommandService commandService, IUpdateService updateService)
         : base(config, Text.Instance.Config.About.Title, Images.Instance.Common.Info, isFooterItem: true)
     {
+        this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
+
         if (commandService == null)
         {
             throw new ArgumentNullException(nameof(commandService));
@@ -50,9 +63,15 @@ public sealed class AboutViewModel : ConfigViewModelBase
         HomePageUrl = Urls.Instance.HomePage;
 
         ModelName = config.ModelName;
+
+        updateSubscription = updateService.State
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(state => InfoCount = state == UpdateServiceState.ReadyToDownload ? 1 : 0);
     }
 
     public Text TextResources => Text.Instance;
+
+    public Images ImageResources => Images.Instance;
 
     public string ProductName { get; }
 
@@ -70,5 +89,42 @@ public sealed class AboutViewModel : ConfigViewModelBase
 
     public string ModelName { get; }
 
-    public CommandBase UpdateCommand { get; }
+    public UpdateCommand UpdateCommand { get; }
+
+    public bool CheckForUpdates
+    {
+        get => Config.Common.CheckForUpdates;
+        set => Config.Common.CheckForUpdates = value;
+    }
+
+    public void Dispose()
+    {
+        updateSubscription?.Dispose();
+        updateSubscription = null;
+
+        OnDeactivated();
+    }
+
+    protected async override void OnActivated()
+    {
+        var state = await updateService.State.FirstAsync();
+
+        if (state == UpdateServiceState.None || state == UpdateServiceState.Updated)
+        {
+            await updateService.CheckUpdate();
+        }
+
+        disposable = new CompositeDisposable();
+
+        Config.Common.PropertyChanged
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(OnPropertyChanged)
+            .DisposeWith(disposable);
+    }
+
+    protected override void OnDeactivated()
+    {
+        disposable?.Dispose();
+        disposable = null;
+    }
 }

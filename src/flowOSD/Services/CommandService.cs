@@ -31,7 +31,7 @@ sealed class CommandService : ICommandService, IDisposable
     private IConfig config;
     private IHardwareService hardwareService;
     private IKeysSender keysSender;
-    private IUpdater updater;
+    private IUpdateService updateService;
     private INotificationService notificationService;
 
     private Dictionary<string, Lazy<CommandBase>> instances = new Dictionary<string, Lazy<CommandBase>>();
@@ -41,14 +41,14 @@ sealed class CommandService : ICommandService, IDisposable
         IHardwareService hardwareService,
         IKeysSender keysSender,
         ISystemEvents systemEvents,
-        IUpdater updater,
+        IUpdateService updateService,
         IOsd osd,
         INotificationService notificationService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
-        this.updater = updater ?? throw new ArgumentNullException(nameof(updater));
+        this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
         Register(() => new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
@@ -69,10 +69,10 @@ sealed class CommandService : ICommandService, IDisposable
         Register(() => new ExitCommand());
         Register(() => new SuspendCommand());
 
-        Register(() => new ConfigCommand(config, systemEvents, this, hardwareService));
+        Register(() => new ConfigCommand(config, systemEvents, this, hardwareService, updateService));
         Register(() => new MainUICommand(this.config, systemEvents, this, hardwareService));
         Register(() => new NotifyMenuCommand(this.config, systemEvents, this));
-        Register(() => new UpdateCommand(this.updater));
+        Register(() => new UpdateCommand(this.updateService));
 
         Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(config, osd, hardwareService));

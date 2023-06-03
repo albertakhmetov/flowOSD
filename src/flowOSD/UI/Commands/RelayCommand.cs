@@ -40,7 +40,7 @@ public sealed class RelayCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return canExecute == null? true:canExecute(parameter);
+        return canExecute == null ? true : canExecute(parameter);
     }
 
     public void Execute(object? parameter)

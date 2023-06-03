@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using flowOSD.Core;
+using flowOSD.Core.Resources;
 using flowOSD.UI.Commands;
 
 namespace flowOSD.UI.NotifyIcon;
@@ -12,7 +13,7 @@ public sealed class NotifyMenuViewModel : ViewModelBase
 {
     public NotifyMenuViewModel(ICommandService commandService)
     {
-        if(commandService == null)
+        if (commandService == null)
         {
             throw new ArgumentNullException(nameof(commandService));
         }
@@ -21,6 +22,8 @@ public sealed class NotifyMenuViewModel : ViewModelBase
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
         ExitCommand = commandService.ResolveNotNull<ExitCommand>();
     }
+
+    public Text TextResources => Text.Instance;
 
     public CommandBase MainUICommand { get; }
 

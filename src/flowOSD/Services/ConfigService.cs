@@ -199,6 +199,10 @@ sealed class ConfigService : IConfig, IDisposable
         {
             tempFile.Replace(configFile.FullName, configFile.FullName + ".backup");
         }
+        else
+        {
+            tempFile.MoveTo(configFile.FullName);
+        }
     }
 
     private bool GetStartupOption()

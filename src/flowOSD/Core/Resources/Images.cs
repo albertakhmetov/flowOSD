@@ -47,6 +47,8 @@ public sealed class Images
 
     public sealed class CommonSection
     {
+        public string Shield => "\uEA18";
+
         public string Info => "\uE946";
 
         public string Diagnostic => "\uE9D9";

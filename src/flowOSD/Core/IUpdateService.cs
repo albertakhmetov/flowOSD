@@ -17,15 +17,19 @@
  *
  */
 
-namespace flowOSD.Core.Resources;
+namespace flowOSD.Core;
 
-public sealed class Urls
+using System.Reactive.Subjects;
+
+public interface IUpdateService
 {
-    public static readonly Urls Instance = new Urls();
+    IObservable<UpdateServiceState> State { get; }
 
-    public string HomePage => "https://github.com/albertakhmetov/flowOSD";
+    IObservable<Version> LatestVersion { get; }
 
-    public string Optimization => "https://github.com/albertakhmetov/flowOSD/wiki/ASUS-Optimization";
+    Task<bool> CheckUpdate(bool force = false);
 
-    public string GitLatest => "https://github.com/albertakhmetov/flowOSD/releases/latest";
+    Task<bool> Download(ISubject<int> progress, CancellationToken cancellationToken = default);
+
+    bool Install();
 }

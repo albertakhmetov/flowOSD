@@ -21,48 +21,119 @@ namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using flowOSD.Core;
+using flowOSD.Core.Resources;
+using flowOSD.Extensions;
 
-sealed class UpdateCommand : CommandBase
+public sealed class UpdateCommand : CommandBase
 {
-    private IUpdater updater;
-   // private UpdaterUI updaterUI;
+    private IUpdateService updateService;
 
-    public UpdateCommand(IUpdater updater)
+    private int progress;
+    private string updateState;
+
+    private Subject<int>? progressSubject;
+    private CancellationTokenSource? cts;
+    private CompositeDisposable? disposable;
+
+    public UpdateCommand(IUpdateService updateService)
     {
-        this.updater = updater ?? throw new ArgumentNullException(nameof(updater));
-     //   this.updaterUI = updaterUI ?? throw new ArgumentNullException(nameof(updaterUI));
+        this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
-        Text = "Check for updates";
-        Enabled = true;
+        Text = string.Empty;
+        UpdateState = string.Empty;
+
+        updateService.State
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(OnUpdateServiceStateUpdated)
+            .DisposeWith(Disposable!);
     }
 
-    public override bool CanExecuteWithHotKey => false;
-
-    public override async void Execute(object? parameter = null)
+    public int Progress
     {
-        Text = "Checking for updates...";
-        Enabled = false;
-        try
+        get => progress;
+        set => SetProperty(ref progress, value);
+    }
+
+    public string UpdateState
+    {
+        get => updateState;
+        set => SetProperty(ref updateState, value);
+    }
+
+    public string ReleaseNotesUrl => Urls.Instance.GitLatest;
+
+    public override void Dispose()
+    {
+        disposable?.Dispose();
+        disposable = null;
+
+        base.Dispose();
+    }
+
+    public async override void Execute(object? parameter)
+    {
+        var state = await updateService.State.FirstAsync();
+
+        switch (state)
         {
-            //var version = await updater.CheckUpdate();
-            //if (version == null)
-            //{
-            //    return;
-            //}
+            case UpdateServiceState.None:
+            case UpdateServiceState.Updated:
+                await updateService.CheckUpdate(true);
+                break;
 
-            //if (updater.IsUpdate(version) || parameter is bool showNoUpdate == false || showNoUpdate)
-            //{
-            //    updaterUI.Show(version, updater.IsUpdate(version));
-            //}
+            case UpdateServiceState.ReadyToDownload:
+                disposable?.Dispose();
+                cts?.Cancel();
 
-            await Task.Delay(5000);
+                progressSubject = new Subject<int>();
+                disposable = new CompositeDisposable(
+                    progressSubject,
+                    progressSubject.DistinctUntilChanged().ObserveOn(SynchronizationContext.Current!).Subscribe(x => Progress = x));
+
+                cts = new CancellationTokenSource();
+
+                await updateService.Download(progressSubject, cts.Token);
+                break;
+
+            case UpdateServiceState.Downloading:
+                cts?.Cancel();
+                break;
+
+            case UpdateServiceState.ReadyToInstall:
+                updateService.Install();
+                break;
         }
-        finally
+    }
+
+    private void OnUpdateServiceStateUpdated(UpdateServiceState state)
+    {
+        UpdateState = state.ToString();
+
+        Enabled = state != UpdateServiceState.Checking;
+
+        switch (state)
         {
-            Text = "Check for updates";
-            Enabled = true;
+            case UpdateServiceState.None:
+            case UpdateServiceState.Updated:
+            case UpdateServiceState.Checking:
+                Text = Core.Resources.Text.Instance.Commands.Update.CheckForUpdate;
+                break;
+
+            case UpdateServiceState.ReadyToDownload:
+                Text = Core.Resources.Text.Instance.Commands.Update.DownloadUpdate;
+                break;
+
+            case UpdateServiceState.Downloading:
+                Text = Core.Resources.Text.Instance.Commands.Update.CancelDownload;
+                break;
+
+            case UpdateServiceState.ReadyToInstall:
+                Text = Core.Resources.Text.Instance.Commands.Update.Install;
+                break;
         }
     }
 }

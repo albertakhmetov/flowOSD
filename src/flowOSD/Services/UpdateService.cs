@@ -26,55 +26,99 @@ using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Resources;
 using static flowOSD.Extensions.Common;
 
-sealed class Updater : IUpdater
+sealed class UpdateService : IUpdateService
 {
-    private const string URL = "https://github.com/albertakhmetov/flowOSD/releases/latest";
-
     private IConfig config;
 
-    public Updater(IConfig config)
+    private DateTime? lastCheckTime;
+
+    private BehaviorSubject<Version> latestVersionSubject;
+    private BehaviorSubject<UpdateServiceState> stateSubject;
+
+    public UpdateService(IConfig config)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
+
+        latestVersionSubject = new BehaviorSubject<Version>(config.FileVersion);
+        stateSubject = new BehaviorSubject<UpdateServiceState>(UpdateServiceState.None);
+
+        State = stateSubject.AsObservable();
+        LatestVersion = latestVersionSubject.AsObservable();
     }
 
-    public string ReleaseNotesLink => URL;
+    public IObservable<UpdateServiceState> State { get; }
 
-    public async Task<Version?> CheckUpdate()
+    public IObservable<Version> LatestVersion { get; }
+
+    public async Task<bool> CheckUpdate(bool force = false)
     {
+        if (lastCheckTime != null && (DateTime.Now - lastCheckTime).Value.TotalMinutes < 5 && !force)
+        {
+            return false;
+        }
+
+        var state = stateSubject.Value;
+
         try
         {
+            stateSubject.OnNext(UpdateServiceState.Checking);
+
             using var client = new HttpClient();
 
-            var i = await client.GetAsync(URL);
+            var i = await client.GetAsync(Urls.Instance.GitLatest);
             if (i.IsSuccessStatusCode)
             {
                 var v = i.RequestMessage?.RequestUri?.Segments.LastOrDefault();
-                if (!string.IsNullOrEmpty(v) && Regex.IsMatch(v, "v[0-9]+.[0-9]+.[0-9]+"))
+                if (v != null && Regex.IsMatch(v, "v[0-9]+.[0-9]+.[0-9]+") && Version.TryParse(v.Substring(1), out var latestVersion))
                 {
-                    return Version.Parse(v.Substring(1));
+                    latestVersionSubject.OnNext(latestVersion);
+
+                    if (config.FileVersion < latestVersion)
+                    {
+                        stateSubject.OnNext(UpdateServiceState.ReadyToDownload);
+                    }
+                    else
+                    {
+                        stateSubject.OnNext(UpdateServiceState.Updated);
+                    }
+
+                    lastCheckTime = DateTime.Now;
+
+                    return true;
                 }
             }
         }
         catch (Exception ex)
         {
+            stateSubject.OnNext(state);
+
             TraceException(ex, "Error due checking update");
         }
 
-        return null;
+        return false;
     }
 
-    public async Task<bool> Download(Version version, IProgress<int> progress, CancellationToken cancellationToken = default)
+    public async Task<bool> Download(ISubject<int> progress, CancellationToken cancellationToken = default)
     {
+        var version = latestVersionSubject.Value;
+        if (version == config.FileVersion || stateSubject.Value != UpdateServiceState.ReadyToDownload)
+        {
+            return false;
+        }
+
         var installerFileName = $"{config.ProductName}-{version.Major}.{version.Minor}.{version.Build}.exe";
 
         try
         {
+            stateSubject.OnNext(UpdateServiceState.Downloading);
+
             using var client = new HttpClient();
 
             var response = await client.GetAsync(
-                URL + $"/download/{installerFileName}",
+                Urls.Instance.GitLatest + $"/download/{installerFileName}",
                 HttpCompletionOption.ResponseHeadersRead);
 
             if (!response.IsSuccessStatusCode || response.Content.Headers.ContentLength == null)
@@ -95,37 +139,45 @@ sealed class Updater : IUpdater
             const uint bufferSize = 81920;
 
             var relativeProgress = new Progress<long>(
-                totalBytes => progress.Report((int)Math.Round(100f * totalBytes / response.Content.Headers.ContentLength.Value)));
+                totalBytes => progress.OnNext((int)Math.Round(100f * totalBytes / response.Content.Headers.ContentLength.Value)));
 
             await download.CopyToAsync(file, bufferSize, relativeProgress, cancellationToken);
-            progress.Report(100);
+            progress.OnNext(100);
+            progress.OnCompleted();
+
+            stateSubject.OnNext(UpdateServiceState.ReadyToInstall);
 
             return true;
         }
         catch (Exception ex)
         {
             TraceException(ex, "Error due downloading update");
+            stateSubject.OnNext(UpdateServiceState.ReadyToDownload);
+
             return false;
         }
     }
 
-    public void Install(Version version)
+    public bool Install()
     {
+        var version = latestVersionSubject.Value;
+
+        if (version == config.FileVersion || stateSubject.Value != UpdateServiceState.ReadyToInstall)
+        {
+            return false;
+        }
+
         var installerFileName = $"{config.ProductName}-{version.Major}.{version.Minor}.{version.Build}.exe";
 
         var info = new ProcessStartInfo();
         info.FileName = Path.Combine(Path.GetTempPath(), installerFileName);
-        info.Arguments = "/SILENT";
+        if (!File.Exists(info.FileName))
+        {
+            return false;
+        }
 
         var i = Process.Start(info);
 
-        if (i != null && !i.HasExited)
-        {
-            App.Current.Exit();
-        }
+        return true;
     }
-
-    public bool IsUpdate(Version version) => version > config.FileVersion;
-
-    public string GetReleaseNotesLink() => URL;
 }

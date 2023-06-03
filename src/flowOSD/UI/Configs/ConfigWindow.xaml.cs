@@ -90,6 +90,12 @@ public sealed partial class ConfigWindow : Window, IDisposable
 
     public AboutViewModel AboutViewModel { get; }
 
+    public ConfigViewModelBase? SelectedViewModel
+    {
+        get => navigationView.SelectedItem as ConfigViewModelBase;
+        set => navigationView.SelectedItem = value;
+    }
+
     public void Dispose()
     {
         disposable?.Dispose();

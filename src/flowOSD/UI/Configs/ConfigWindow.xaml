@@ -157,6 +157,11 @@
                                 FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                                 Glyph="{Binding Icon}"/>
                         </NavigationViewItem.Icon>
+                        <NavigationViewItem.InfoBadge>
+                            <InfoBadge 
+                                Value="{Binding InfoCount}"
+                                Visibility="{Binding InfoCount, Converter={StaticResource VisibilityConverter}}"/>
+                        </NavigationViewItem.InfoBadge>
                     </NavigationViewItem>
                 </DataTemplate>
             </NavigationView.MenuItemTemplate>
@@ -206,12 +211,6 @@
                                 HorizontalAlignment="Stretch"
                                 Header="{Binding TextResources.Config.General.ConfirmGpuModeChange}"
                                 IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
-                        </Border>
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
-                            <ToggleSwitch 
-                                HorizontalAlignment="Stretch"
-                                Header="{Binding TextResources.Config.General.CheckForUpdates}"
-                                IsOn="{Binding CheckForUpdates, Mode=TwoWay}" />
                         </Border>
                     </StackPanel>
 
@@ -590,7 +589,7 @@
                                 <StackPanel 
                                     Orientation="Horizontal"
                                     Margin="0,20,0,0">
-                                    
+
                                     <TextBox
                                         x:Name="newProfileName"
                                         Width="250"
@@ -611,7 +610,7 @@
 
                         <TextBlock 
                             Visibility="{Binding IsCpuPowerLimitVisible, Converter={StaticResource VisibilityConverter}}"
-                            Text="Power Limits"
+                            Text="{Binding TextResources.Config.Performance.PowerLimits}"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
@@ -893,17 +892,122 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Runtime}" Style="{StaticResource Value}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ModelName}" Style="{StaticResource Value}"/>
 
-                                <StackPanel 
-                                    Orientation="Horizontal" 
-                                    Grid.Row="5" 
-                                    Grid.ColumnSpan="2" 
-                                    HorizontalAlignment="Right"
-                                    Margin="0,10,0,0">
-
-                                    <HyperlinkButton NavigateUri="{Binding HomePageUrl}" Content="{Binding HomePage}"/>
-                                    <HyperlinkButton Command="{Binding UpdateCommand}" Content="{Binding UpdateCommand.Text}"/>
-                                </StackPanel>
+                                <HyperlinkButton
+                                    Grid.Row="5"
+                                    Margin="-13,0,0,0"
+                                    NavigateUri="{Binding HomePageUrl}" Content="{Binding HomePage}"/>
                             </Grid>
+                        </Border>
+
+                        <TextBlock 
+                            Visibility="{Binding IsCpuPowerLimitVisible, Converter={StaticResource VisibilityConverter}}"
+                            Text="{Binding TextResources.Config.About.Update}"
+                            FontWeight="SemiBold"
+                            Margin="10,30,0,5"/>
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid VerticalAlignment="Top" Margin="0,5,0,0">
+                                    <FontIcon 
+                                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                        Margin="0,0,0,0"                                    
+                                        Glyph="{Binding ImageResources.Common.Updater}"/>
+
+                                    <FontIcon 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Updated', Converter={StaticResource VisibilityConverter}}"
+                                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                        Margin="0,0,-5,-5"
+                                        Foreground="Green"
+                                        Glyph="&#xF83F;"/>
+
+                                    <FontIcon 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Updated', Converter={StaticResource VisibilityConverter}}"                                       
+                                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                        Margin="0,0,-5,-5"
+                                        Foreground="White" 
+                                        Glyph="&#xF1D8;"/>
+                                </Grid>
+
+                                <StackPanel 
+                                    Grid.Column="1"
+                                    Margin="25,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Orientation="Vertical">
+
+                                    <TextBlock 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='None', Converter={StaticResource VisibilityConverter}}"                                                                                
+                                        Text="{Binding TextResources.Update.CheckForUpdate}"/>
+
+                                    <TextBlock 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Checking', Converter={StaticResource VisibilityConverter}}"                                                                                
+                                        Text="{Binding TextResources.Update.CheckingForUpdate}"/>
+
+                                    <TextBlock 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Updated', Converter={StaticResource VisibilityConverter}}"
+                                        Text="{Binding TextResources.Update.Updated}"/>
+
+                                    <TextBlock 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='ReadyToDownload', Converter={StaticResource VisibilityConverter}}"
+                                        Text="{Binding TextResources.Update.NewVersion}"/>
+
+                                    <TextBlock 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Downloading', Converter={StaticResource VisibilityConverter}}"                                                                                
+                                        Text="{Binding TextResources.Update.Downloading}"/>
+
+                                    <TextBlock 
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='ReadyToInstall', Converter={StaticResource VisibilityConverter}}"                                                                                
+                                        Text="{Binding TextResources.Update.ReadyToInstall}"/>
+
+                                    <HyperlinkButton
+                                        Margin="-11,5,0,0"
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='ReadyToDownload', Converter={StaticResource VisibilityConverter}}"                                        
+                                        NavigateUri="{Binding UpdateCommand.ReleaseNotesUrl}"
+                                        Content="{Binding TextResources.Update.ViewReleaseNotes}"/>
+
+                                    <ProgressBar
+                                        Margin="0,10"
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Checking', Converter={StaticResource VisibilityConverter}}"                                                                                
+                                        IsIndeterminate="True"/>
+
+                                    <ProgressBar
+                                        Margin="0,10"
+                                        Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Downloading', Converter={StaticResource VisibilityConverter}}"                                                                                
+                                        Value="{Binding UpdateCommand.Progress}"                                    
+                                        IsIndeterminate="False"/>
+
+                                </StackPanel>
+
+                                <Button
+                                    Grid.Column="2"
+                                    Margin="20,0,0,0"
+                                    VerticalAlignment="Top"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="{Binding UpdateCommand.Enabled}"
+                                    Command="{Binding UpdateCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <FontIcon 
+                                            Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='ReadyToInstall', Converter={StaticResource VisibilityConverter}}"                                       
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Margin="0,0,10,0"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" 
+                                            Glyph="{Binding ImageResources.Common.Shield}"/>
+                                        <TextBlock Text="{Binding UpdateCommand.Text}"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{Binding TextResources.Config.About.CheckForUpdates}"
+                                IsOn="{Binding CheckForUpdates, Mode=TwoWay}" />
                         </Border>
 
                         <TextBlock 

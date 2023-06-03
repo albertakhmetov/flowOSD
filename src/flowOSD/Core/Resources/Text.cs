@@ -50,6 +50,8 @@ public sealed class Text
 
     public ChargerSection Charger { get; } = new ChargerSection();
 
+    public UpdateSection Update { get; } = new UpdateSection();
+
     public sealed class PerformanceModeSection
     {
         public string Performance => "Performance";
@@ -163,8 +165,6 @@ public sealed class Text
             public string ControlDisplayRefreshRate => "Control display refresh rate";
 
             public string ConfirmGpuModeChange => "Confirm GPU change";
-
-            public string CheckForUpdates => "Check for updates at startup";
         }
 
         public sealed class NotificationsSection
@@ -247,6 +247,8 @@ public sealed class Text
         {
             public string Title => "Performance";
 
+            public string PowerLimits => "Power Limits";
+
             public string NoProfileTitle => "Performance profiles";
 
             public string NoProfileMessage => "Create a custom profile to configure CPU power limit and fan curves.";
@@ -327,6 +329,10 @@ public sealed class Text
             public string Runtime => "Runtime";
 
             public string Device => "Device";
+
+            public string Update => "Update";
+
+            public string CheckForUpdates => "Check for updates at startup";
         }
     }
 
@@ -387,6 +393,8 @@ public sealed class Text
     public sealed class ConfirmationsSection
     {
         public string Title = "Confirmation";
+
+        public string NewVersion => "New version is available. Show details?";
     }
 
     public sealed class NotificationsSection
@@ -402,6 +410,23 @@ public sealed class Text
         public string Gpu => "dGPU";
 
         public string TouchPad => "Touchpad";
+    }
+
+    public sealed class UpdateSection
+    {
+        public string CheckForUpdate => "Check for update by clicking 'Check for update'";
+
+        public string CheckingForUpdate => "Checking for update...";
+
+        public string Updated => "The latest version is installed";
+
+        public string NewVersion => "New version is available";
+
+        public string Downloading => "Update is downloading...";
+
+        public string ReadyToInstall => "Update is downloaded and ready to install";
+
+        public string ViewReleaseNotes => "View Release Notes";
     }
 
     public sealed class CommandsSection
@@ -429,6 +454,8 @@ public sealed class Text
         public KeyboardBacklightSection KeyboardBacklight { get; } = new KeyboardBacklightSection();
 
         public MicrophoneSection Microphone { get; } = new MicrophoneSection();
+
+        public UpdateSection Update { get; } = new UpdateSection();
 
         public sealed class GpuSection
         {
@@ -520,6 +547,17 @@ public sealed class Text
         public sealed class MicrophoneSection
         {
             public string Description => "Toggle Microphone";
+        }
+
+        public sealed class UpdateSection
+        {
+            public string CheckForUpdate => "Check for update";
+
+            public string DownloadUpdate => "Download update";
+
+            public string CancelDownload => "Cancel";
+
+            public string Install => "Install update";
         }
     }
 }

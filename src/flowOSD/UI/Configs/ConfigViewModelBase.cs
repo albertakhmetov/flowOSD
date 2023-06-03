@@ -26,6 +26,7 @@ using flowOSD.Core.Configs;
 public abstract class ConfigViewModelBase : ViewModelBase
 {
     private bool isSelected;
+    private int infoCount;
 
     protected ConfigViewModelBase(IConfig config, string title, string? icon, bool isFooterItem = false)
     {
@@ -34,6 +35,13 @@ public abstract class ConfigViewModelBase : ViewModelBase
         IsFooterItem = isFooterItem;
         Title = title ?? string.Empty;
         Icon = icon ?? string.Empty;
+        InfoCount = 0;
+    }
+
+    public int InfoCount
+    {
+        get => infoCount;
+        set => SetProperty(ref infoCount, value);
     }
 
     public bool IsSelected

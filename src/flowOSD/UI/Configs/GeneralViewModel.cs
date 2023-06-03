@@ -68,12 +68,6 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         set => Config.Common.ConfirmGpuModeChange = value;
     }
 
-    public bool CheckForUpdates
-    {
-        get => Config.Common.CheckForUpdates;
-        set => Config.Common.CheckForUpdates = value;
-    }
-
     public void Dispose()
     {
         OnDeactivated();
