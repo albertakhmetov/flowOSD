@@ -47,7 +47,7 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     private bool hasRate;
     private string batteryImage;
-    private int rate, cpuTemperature;
+    private int rate, cpuTemperature, cpuFanSpeed, gpuFanSpeed;
 
     public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
     {
@@ -131,7 +131,18 @@ public class MainViewModel : ViewModelBase, IDisposable
     public bool ShowCpuTemperature
     {
         get => config.Common.ShowCpuTemperature && hardwareFeatures.CpuTemperature;
-        set => config.Common.ShowCpuTemperature = value;
+    }
+
+    public bool ShowFanSpeed => ShowCpuFanSpeed || ShowGpuFanSpeed;
+
+    public bool ShowCpuFanSpeed
+    {
+        get => config.Common.ShowFanSpeed && hardwareFeatures.CpuFanSpeed;
+    }
+
+    public bool ShowGpuFanSpeed
+    {
+        get => config.Common.ShowFanSpeed && hardwareFeatures.GpuFanSpeed;
     }
 
     public bool HasRate
@@ -156,6 +167,18 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         get => cpuTemperature;
         set => SetProperty(ref cpuTemperature, value);
+    }
+
+    public int CpuFanSpeed
+    {
+        get => cpuFanSpeed;
+        set => SetProperty(ref cpuFanSpeed, value);
+    }
+
+    public int GpuFanSpeed
+    {
+        get => gpuFanSpeed;
+        set => SetProperty(ref gpuFanSpeed, value);
     }
 
     public CommandBase DisplayRefreshRateCommand { get; }
@@ -216,6 +239,17 @@ public class MainViewModel : ViewModelBase, IDisposable
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 
+        config.Common.PropertyChanged
+            .Where(propertyName => propertyName == nameof(config.Common.ShowFanSpeed))
+            .SubscribeOn(SynchronizationContext.Current!)
+            .Subscribe(_ =>
+            {
+                OnPropertyChanged(nameof(ShowFanSpeed));
+                OnPropertyChanged(nameof(ShowCpuFanSpeed));
+                OnPropertyChanged(nameof(ShowGpuFanSpeed));
+            })
+            .DisposeWith(disposable);
+
         if (config.Common.ShowBatteryChargeRate)
         {
             battery.Rate.DistinctUntilChanged()
@@ -229,13 +263,31 @@ public class MainViewModel : ViewModelBase, IDisposable
                 .DisposeWith(disposable);
         }
 
-        if (config.Common.ShowCpuTemperature && hardwareFeatures.CpuTemperature)
+        if (ShowCpuTemperature)
         {
             atk.CpuTemperature
                 .ObserveOn(SynchronizationContext.Current!)
                 .Subscribe(value => CpuTemperature = value)
                 .DisposeWith(disposable);
         }
+
+        if (ShowCpuFanSpeed)
+        {
+            atk.CpuFanSpeed
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(value => CpuFanSpeed = value)
+                .DisposeWith(disposable);
+        }
+
+        if (ShowGpuFanSpeed)
+        {
+            atk.GpuFanSpeed
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(value => GpuFanSpeed = value)
+                .DisposeWith(disposable);
+        }
+
+        OnPropertyChanged(null);
     }
 
     public void Deactivate()

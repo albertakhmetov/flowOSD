@@ -168,6 +168,10 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     public bool CpuTemperature => atk.CpuTemperatureSupported;
 
+    public bool CpuFanSpeed => atk.CpuFanSpeedSupported;
+
+    public bool GpuFanSpeed => atk.GpuFanSpeedSupported;
+
     public bool PerformanceSwitch => atk.PerformanceSwitchSupported;
 
     public bool GpuSwitch => atk.GpuSwitchSupported;

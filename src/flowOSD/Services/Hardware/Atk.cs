@@ -76,6 +76,9 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     private readonly BehaviorSubject<PerformanceMode> performanceModeSubject;
     private readonly BehaviorSubject<GpuMode> gpuModeSubject;
     private readonly CountableSubject<int> cpuTemperatureSubject;
+    private readonly CountableSubject<int> cpuFanSpeedSubject;
+    private readonly CountableSubject<int> gpuFanSpeedSubject;
+
     private readonly BehaviorSubject<TabletMode> tabletModeSubject;
     private readonly BehaviorSubject<ChargerTypes> chargerSubject;
     private Subject<AtkKey> keyPressedSubject;
@@ -106,6 +109,10 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
         GpuSwitchSupported = Get(DEVID_GPU_ECO_MODE, out var gpuMode);
         CpuTemperatureSupported = Get(CPU_TEMPERATURE, out var cpuTemperature);
+
+        CpuFanSpeedSupported = Get(CPU_FAN_SPEED, out var cpuFanSpeed);
+        GpuFanSpeedSupported = Get(GPU_FAN_SPEED, out var gpuFanSpeed);
+
         PerformanceSwitchSupported = Get(DEVID_THROTTLE_THERMAL_POLICY, out _);
         TabletModeSupported = Get(DEVID_TABLET, out var tabletMode);
         ChargerSupported = Get(DEVID_CHARGER, out var charger);
@@ -115,6 +122,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Default);
         gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)gpuMode);
         cpuTemperatureSubject = new CountableSubject<int>(cpuTemperature);
+        cpuFanSpeedSubject = new CountableSubject<int>(cpuFanSpeed);
+        gpuFanSpeedSubject = new CountableSubject<int>(gpuFanSpeed);
         tabletModeSubject = new BehaviorSubject<TabletMode>((TabletMode)tabletMode);
         chargerSubject = new BehaviorSubject<ChargerTypes>(GetChargerTypes(charger));
         keyPressedSubject = new Subject<AtkKey>();
@@ -122,6 +131,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         PerformanceMode = performanceModeSubject.AsObservable();
         GpuMode = gpuModeSubject.AsObservable();
         CpuTemperature = cpuTemperatureSubject.AsObservable();
+        CpuFanSpeed = cpuFanSpeedSubject.AsObservable();
+        GpuFanSpeed = gpuFanSpeedSubject.AsObservable();
         TabletMode = tabletModeSubject.AsObservable();
         Charger = chargerSubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
@@ -129,6 +140,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Default);
 
         cpuTemperatureSubject.Count
+            .CombineLatest(cpuFanSpeedSubject, gpuFanSpeedSubject, (cpuT, cpuF, gpuF) => cpuT + cpuF + gpuF)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .Subscribe(sum =>
             {
@@ -145,7 +157,19 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
                             {
                                 if (Get(CPU_TEMPERATURE, out var temperature))
                                 {
-                                    cpuTemperatureSubject?.OnNext(temperature);
+                                    cpuTemperatureSubject.OnNext(temperature);
+                                }
+
+                                int fanSpeed;
+
+                                if (Get(CPU_FAN_SPEED, out fanSpeed))
+                                {
+                                    cpuFanSpeedSubject.OnNext(fanSpeed);
+                                }
+
+                                if (Get(GPU_FAN_SPEED, out fanSpeed))
+                                {
+                                    gpuFanSpeedSubject.OnNext(fanSpeed);
                                 }
                             });
                 }
@@ -166,6 +190,10 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public bool CpuTemperatureSupported { get; }
 
+    public bool CpuFanSpeedSupported { get; }
+
+    public bool GpuFanSpeedSupported { get; }
+
     public bool PerformanceSwitchSupported { get; }
 
     public bool GpuSwitchSupported { get; }
@@ -183,6 +211,10 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     public IObservable<GpuMode> GpuMode { get; }
 
     public IObservable<int> CpuTemperature { get; }
+
+    public IObservable<int> CpuFanSpeed { get; }
+
+    public IObservable<int> GpuFanSpeed { get; }
 
     public IObservable<TabletMode> TabletMode { get; }
 

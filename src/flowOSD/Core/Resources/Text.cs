@@ -128,6 +128,10 @@ public sealed class Text
         public string TouchPad => "Touchpad";
 
         public string ShowApp => "Show {0}";
+
+        public string CpuFanSpeed => "Cpu";
+
+        public string GpuFanSpeed => "Gpu";
     }
 
     public sealed class ConfigSection
@@ -241,6 +245,8 @@ public sealed class Text
             public string ShowBatteryChargeRate => "Show battery charge rate";
 
             public string ShowCpuTemperature => "Show CPU temperature";
+
+            public string ShowFanSpeed => "Show Fan Speeds";
         }
 
         public sealed class PerformanceSection

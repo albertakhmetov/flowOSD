@@ -40,6 +40,7 @@ public sealed class CommonConfig : ConfigBase
 
     private bool showBatteryChargeRate;
     private bool showCpuTemperature;
+    private bool showFanSpeed;
 
     private bool useBatteryChargeLimit;
     private uint batteryChargeLimit;
@@ -59,6 +60,7 @@ public sealed class CommonConfig : ConfigBase
 
         showBatteryChargeRate = true;
         showCpuTemperature = true;
+        showFanSpeed = true;
 
         useBatteryChargeLimit = false;
         batteryChargeLimit = 80;
@@ -123,6 +125,12 @@ public sealed class CommonConfig : ConfigBase
     {
         get => showCpuTemperature;
         set => SetProperty(ref showCpuTemperature, value);
+    }
+
+    public bool ShowFanSpeed
+    {
+        get => showFanSpeed;
+        set => SetProperty(ref showFanSpeed, value);
     }
 
     public bool UseBatteryChargeLimit

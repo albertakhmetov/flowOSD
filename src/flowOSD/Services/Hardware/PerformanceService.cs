@@ -176,10 +176,33 @@ sealed class PerformanceService : IDisposable, IPerformanceService
         }
         else
         {
-            atk.SetFanCurve(FanType.Cpu, profile.CpuFanCurve);
-            atk.SetFanCurve(FanType.Gpu, profile.GpuFanCurve);
-
-            atk.SetCpuLimit(profile.CpuLimit);
+            if (!SetCustomProfile(profile))
+            {
+                ApplyProfile(PerformanceProfile.Default);
+            }
         }
+    }
+
+    private bool SetCustomProfile(PerformanceProfile profile)
+    {
+        if (!atk.SetFanCurve(FanType.Cpu, profile.CpuFanCurve))
+        {
+            Common.TraceWarning("Can't set CPU Fan Curve");
+            return false;
+        }
+
+        if (!atk.SetFanCurve(FanType.Gpu, profile.GpuFanCurve))
+        {
+            Common.TraceWarning("Can't set GPU Fan Curve");
+            return false;
+        }
+
+        if (!atk.SetCpuLimit(profile.CpuLimit))
+        {
+            Common.TraceWarning("Can't set CPU Power Limit");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -83,7 +83,7 @@
                 Style="{StaticResource ButtonStyle}"
                 IsChecked="{Binding BoostCommand.IsChecked, Mode=OneWay}"
                 Command="{Binding BoostCommand, Mode=OneTime}">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding ImageResources.Hardware.Cpu}"/>
@@ -98,7 +98,7 @@
                 Style="{StaticResource ButtonStyle}" 
                 Grid.Row="0" 
                 Grid.Column="1">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding PerformanceProfileImage, Mode=OneWay}"/>
@@ -118,11 +118,11 @@
                 Grid.Column="2" 
                 Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}, ConverterParameter='!'}"
                 Style="{StaticResource ButtonStyle}">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding PowerModeImage, Mode=OneWay}"/>
-                
+
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom" x:Name="powerModesMenu"/>
                 </DropDownButton.Flyout>
@@ -141,7 +141,7 @@
                 Grid.Row="0" 
                 Grid.Column="2" 
                 Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding ImageResources.PowerMode.BatterySaver, Mode=OneWay}"/>
@@ -160,7 +160,7 @@
                 Style="{StaticResource ButtonStyle}"
                 IsChecked="{Binding DisplayRefreshRateCommand.IsChecked, Mode=OneWay}"
                 Command="{Binding DisplayRefreshRateCommand, Mode=OneTime}">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding ImageResources.Hardware.Screen}"/>
@@ -177,7 +177,7 @@
                 Style="{StaticResource ButtonStyle}"
                 IsChecked="{Binding GpuCommand.IsChecked, Mode=OneWay}"
                 Command="{Binding GpuCommand, Mode=OneTime}">
-                
+
                 <FontIcon
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding ImageResources.Hardware.Gpu}"/>
@@ -194,7 +194,7 @@
                 Style="{StaticResource ButtonStyle}"                          
                 IsChecked="{Binding TouchPadCommand.IsChecked, Mode=OneWay}"
                 Command="{Binding TouchPadCommand, Mode=OneTime}">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding ImageResources.Hardware.TouchPad}"/>
@@ -230,10 +230,11 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                     </Style>
                 </StackPanel.Resources>
+
                 <StackPanel 
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowBatteryChargeRate, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
-                    
+
                     <FontIcon 
                         Glyph="{Binding BatteryImage}"
                         FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
@@ -248,7 +249,7 @@
                 <StackPanel 
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowCpuTemperature, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
-                    
+
                     <FontIcon 
                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Glyph="{Binding ImageResources.Common.Temperature}"/>
@@ -256,6 +257,28 @@
                         <Run Text="{Binding CpuTemperature}"/>
                         <Run Text="&#x2103;"/>
                     </TextBlock>
+                </StackPanel>
+
+                <StackPanel 
+                    Orientation="Horizontal"                    
+                    Visibility="{Binding ShowFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+
+                    <FontIcon 
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Glyph="{Binding ImageResources.Common.Diagnostic}"/>
+
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <ProgressBar 
+                            Margin="0,2"
+                            Width="40"
+                            Visibility="{Binding ShowCpuFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                            Value="{Binding CpuFanSpeed}"/>
+                        <ProgressBar 
+                            Margin="0,2"
+                            Width="40"
+                            Visibility="{Binding ShowGpuFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                            Value="{Binding GpuFanSpeed}"/>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
 
@@ -266,7 +289,7 @@
                 Background="Transparent"
                 BorderBrush="Transparent"
                 Command="{Binding ConfigCommand, Mode=OneTime}">
-                
+
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}"
                     FontSize="16"

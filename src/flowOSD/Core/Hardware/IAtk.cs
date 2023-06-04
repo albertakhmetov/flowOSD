@@ -27,6 +27,10 @@ public interface IAtk
 
     IObservable<int> CpuTemperature { get; }
 
+    IObservable<int> CpuFanSpeed { get; }
+
+    IObservable<int> GpuFanSpeed { get; }
+
     IObservable<TabletMode> TabletMode { get; }
 
     IObservable<ChargerTypes> Charger { get; }

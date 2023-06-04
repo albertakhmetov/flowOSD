@@ -50,6 +50,8 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 
     public bool IsCpuTemperatureVisible => hardwareFeatures.CpuTemperature;
 
+    public bool IsFanSpeedVisible => hardwareFeatures.CpuFanSpeed || hardwareFeatures.GpuFanSpeed;
+
     public bool ShowBatteryChargeRate
     {
         get => Config.Common.ShowBatteryChargeRate;
@@ -60,6 +62,12 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
     {
         get => Config.Common.ShowCpuTemperature;
         set => Config.Common.ShowCpuTemperature = value;
+    }
+
+    public bool ShowFanSpeed
+    {
+        get => Config.Common.ShowFanSpeed;
+        set => Config.Common.ShowFanSpeed = value;
     }
 
     public void Dispose()

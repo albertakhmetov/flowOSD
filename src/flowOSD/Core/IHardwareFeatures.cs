@@ -25,6 +25,10 @@ public interface IHardwareFeatures
 
     public bool CpuTemperature { get; }
 
+    public bool CpuFanSpeed { get; }
+
+    public bool GpuFanSpeed { get; }
+
     public bool PerformanceSwitch { get; }
 
     public bool GpuSwitch { get; }
