@@ -547,11 +547,15 @@ public class FanCurveTuner : Control
             return;
         }
 
-        var minX = GetTemperatureX(MinTemperature + index * 10);
-        var maxX = GetTemperatureX(MinTemperature + (index + 1) * 10 - Convert.ToInt32(DataSource.GridSize));
+        var minX = index == 0 
+            ? 0 
+            : GetTemperatureX(DataSource[index - 1].Temperature + DataSource.GridSize);
+        var maxX = index == DataSource.Count - 1
+            ? Canvas.ActualWidth
+            : GetTemperatureX(DataSource[index + 1].Temperature - DataSource.GridSize);
 
         var minY = 0;
-        var maxY = index >= 5 ? GetValueY(FanDataPoint.GetMinValue(MinTemperature + index * 10)) : Canvas.ActualHeight;
+        var maxY = Canvas.ActualHeight;
 
         var left = Math.Min(maxX, Math.Max(minX, x)) - ThumbRadius;
         var top = Math.Min(maxY, Math.Max(minY, y)) - ThumbRadius;

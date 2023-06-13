@@ -178,7 +178,9 @@ sealed class PerformanceService : IDisposable, IPerformanceService
         {
             if (!SetCustomProfile(profile))
             {
-                ApplyProfile(PerformanceProfile.Default);
+                Common.TraceWarning("Can't set custom profile");
+
+                activeProfileSubject.OnNext(PerformanceProfile.Default);
             }
         }
     }

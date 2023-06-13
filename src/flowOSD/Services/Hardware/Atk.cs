@@ -87,6 +87,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     private ManagementEventWatcher? watcher;
 
     private IDisposable? updateSubscription;
+    private IDisposable? zeroGpuFanFix;
 
     private readonly object ControlLocker = new object();
 
@@ -264,21 +265,19 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
             throw new ArgumentNullException(nameof(dataPoints));
         }
 
-        var data = new byte[16];
-        for (var i = 0; i < dataPoints.Count; i++)
+        if (!dataPoints.Any(i => i.Value > 0))
         {
-            data[i] = dataPoints[i].Temperature;
-            data[8 + i] = Math.Min((byte)99, dataPoints[i].Value);
+            Common.TraceWarning($"Can't set empty fan {fanType} curve");
+            return false;
         }
 
-        byte[] buffer;
         switch (fanType)
         {
             case FanType.Cpu:
-                return Set(CPU_FAN_CURVE, data, out buffer) && IsOk(buffer);
+                return SetCpuFanSpeed(dataPoints);
 
             case FanType.Gpu:
-                return Set(GPU_FAN_CURVE, data, out buffer) && IsOk(buffer);
+                return SetGpuFanSpeed(dataPoints);
         }
 
         return false;
@@ -314,6 +313,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public bool SetPerformanceMode(PerformanceMode performanceMode)
     {
+        DisableZeroGpuFanFix();
+
         if (Set(DEVID_THROTTLE_THERMAL_POLICY, (uint)performanceMode, out var buffer) && IsOk(buffer))
         {
             performanceModeSubject.OnNext(performanceMode);
@@ -343,6 +344,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public void Dispose()
     {
+        DisableZeroGpuFanFix();
+
         watcher?.Dispose();
         watcher = null;
 
@@ -414,6 +417,64 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
             default:
                 return ChargerTypes.Connected;
         }
+    }
+
+    private bool SetCpuFanSpeed(IList<FanDataPoint> dataPoints)
+    {
+        var data = new byte[16];
+        for (var i = 0; i < dataPoints.Count; i++)
+        {
+            data[i] = dataPoints[i].Temperature;
+            data[8 + i] = Math.Min((byte)100, dataPoints[i].Value);
+        }
+
+        return Set(CPU_FAN_CURVE, data, out var buffer) && IsOk(buffer);
+    }
+
+    private bool SetGpuFanSpeed(IList<FanDataPoint> dataPoints)
+    {
+        DisableZeroGpuFanFix();
+
+        // Fix for zero gpu fan speed
+        if (dataPoints.Any(i => i.Value == 0))
+        {
+            var firstNonZeroTemperature = dataPoints.First(i => i.Value > 0).Temperature;
+
+            zeroGpuFanFix = Observable.Interval(TimeSpan.FromMilliseconds(500))
+                .Subscribe(_ =>
+                {
+                    if (!Get(CPU_TEMPERATURE, out var temperature))
+                    {
+                        Common.TraceWarning("Can't get CPU temperature. Silent GPU profiles are not allowed");
+                        SetPerformanceMode(Core.Hardware.PerformanceMode.Default);
+                    }
+
+                    if (temperature > firstNonZeroTemperature * 1.1)
+                    {
+                        SetGpuFanSpeed(dataPoints.Where(i => i.Value > 0).ToArray());
+                    }
+
+                    if (temperature < firstNonZeroTemperature)
+                    {
+                        SetGpuFanSpeed(dataPoints);
+                    }
+                });
+        }
+
+        var data = new byte[16];
+        for (var i = 0; i < dataPoints.Count; i++)
+        {
+            data[i] = dataPoints[i].Temperature;
+            data[8 + i] = Math.Min((byte)100, dataPoints[i].Value);
+        }
+
+        return Set(GPU_FAN_CURVE, data, out var buffer) && IsOk(buffer);
+    }
+
+    private void DisableZeroGpuFanFix()
+    {
+        zeroGpuFanFix?.Dispose();
+        zeroGpuFanFix = null;
     }
 
     private async void NotifySystemTabletState()

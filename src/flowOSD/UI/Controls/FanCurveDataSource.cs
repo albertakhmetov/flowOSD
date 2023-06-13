@@ -36,7 +36,7 @@ public class FanCurveDataSource : IEnumerable<FanDataPoint>, INotifyPropertyChan
 
     public int Count => items.Length;
 
-    public float GridSize => 5;
+    public byte GridSize => 5;
 
     public bool IsUserData
     {
@@ -112,8 +112,8 @@ public class FanCurveDataSource : IEnumerable<FanDataPoint>, INotifyPropertyChan
 
     private FanDataPoint AdjustToGrid(ref FanDataPoint i)
     {
-        var temperature = Convert.ToByte(Math.Round(i.Temperature / GridSize) * GridSize);
-        var value = Convert.ToByte(Math.Round(i.Value / GridSize) * GridSize);
+        var temperature = Convert.ToByte(Math.Round(1f * i.Temperature / GridSize) * GridSize);
+        var value = Convert.ToByte(Math.Round(1f * i.Value / GridSize) * GridSize);
 
         if (temperature != i.Temperature || value != i.Value)
         {

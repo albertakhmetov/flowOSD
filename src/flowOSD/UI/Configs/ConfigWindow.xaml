@@ -661,6 +661,16 @@
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
+                        <InfoBar
+                            Margin="10, 5"
+                            IsClosable="false"
+                            IsOpen="{Binding FanCurveError}"
+                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                            Severity="Error"
+                            Title="{Binding TextResources.Config.Performance.FanCurveErrorTitle}"
+                            Message="{Binding TextResources.Config.Performance.FanCurveErrorMessage}" />
+
                         <Border 
                             Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
                             Style="{StaticResource CxConfigBorderStyle}">

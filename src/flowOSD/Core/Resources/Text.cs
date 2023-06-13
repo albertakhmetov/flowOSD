@@ -282,6 +282,10 @@ public sealed class Text
             public string CpuFanCurve => "CPU Fan Curve";
 
             public string GpuFanCurve => "GPU Fan Curve";
+
+            public string FanCurveErrorTitle => "Fan Curve Error";
+
+            public string FanCurveErrorMessage => "Fan Curve can't be empty line. Also is recommended to set at least 50% fan speed after 80\u2103 to avoid throttling.";
         }
 
         public sealed class TabletSection

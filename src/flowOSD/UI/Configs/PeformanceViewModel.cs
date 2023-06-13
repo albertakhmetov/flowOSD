@@ -47,7 +47,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private IReadOnlyCollection<PerformanceProfile> profiles;
     private PerformanceProfile? currentProfile;
-
+    
+    private bool fanCurveError;
     private uint cpuLimit;
 
     public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
@@ -119,6 +120,12 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     }
 
     public bool IsUserProfile => CurrentProfile?.IsUserProfile ?? false;
+
+    public bool FanCurveError
+    {
+        get => fanCurveError;
+        private set => SetProperty(ref fanCurveError, value);
+    }
 
     public uint CpuLimit
     {
@@ -205,6 +212,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private void FanCurveChanged(object? sender, EventArgs e)
     {
+        FanCurveError = !cpu.Any(i => i.Value > 0) || !gpu.Any(i => i.Value > 0);
+
         isDirtySubject.OnNext(true);
     }
 
