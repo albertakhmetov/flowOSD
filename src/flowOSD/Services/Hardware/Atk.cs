@@ -36,6 +36,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 {
     public const int FEATURE_KBD_REPORT_ID = 0x5a;
 
+    private const int FAN_CURVE_POINTS = 8;
+
     private const uint IO_CONTROL_CODE = 0x0022240C;
     private const uint ASUS_WMI_METHODID_INIT = 0x54494E49;
 
@@ -421,7 +423,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     private bool SetCpuFanSpeed(IList<FanDataPoint> dataPoints)
     {
-        var data = new byte[16];
+        var data = new byte[FAN_CURVE_POINTS * 2];
         for (var i = 0; i < dataPoints.Count; i++)
         {
             data[i] = dataPoints[i].Temperature;
@@ -433,7 +435,10 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     private bool SetGpuFanSpeed(IList<FanDataPoint> dataPoints)
     {
-        DisableZeroGpuFanFix();
+        if (dataPoints.Count == FAN_CURVE_POINTS)
+        {
+            DisableZeroGpuFanFix();
+        }
 
         // Fix for zero gpu fan speed
         if (dataPoints.Any(i => i.Value == 0))
@@ -443,29 +448,40 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
             zeroGpuFanFix = Observable.Interval(TimeSpan.FromMilliseconds(500))
                 .Subscribe(_ =>
                 {
-                    if (!Get(CPU_TEMPERATURE, out var temperature))
+                    if (!Get(GPU_TEMPERATURE, out var temperature))
                     {
-                        Common.TraceWarning("Can't get CPU temperature. Silent GPU profiles are not allowed");
+                        Common.TraceWarning("Can't get GPU temperature. Silent GPU profiles are not allowed");
                         SetPerformanceMode(Core.Hardware.PerformanceMode.Default);
                     }
 
-                    if (temperature > firstNonZeroTemperature * 1.1)
+                    if (temperature > firstNonZeroTemperature * 0.9)
                     {
                         SetGpuFanSpeed(dataPoints.Where(i => i.Value > 0).ToArray());
                     }
 
-                    if (temperature < firstNonZeroTemperature)
+                    if (temperature < firstNonZeroTemperature * 0.8)
                     {
                         SetGpuFanSpeed(dataPoints);
                     }
                 });
         }
 
-        var data = new byte[16];
+        var data = new byte[FAN_CURVE_POINTS * 2];
         for (var i = 0; i < dataPoints.Count; i++)
         {
             data[i] = dataPoints[i].Temperature;
             data[8 + i] = Math.Min((byte)100, dataPoints[i].Value);
+        }
+
+        if (dataPoints.Count < data.Length / 2)
+        {
+            var last = dataPoints.Last();
+
+            for (var i = dataPoints.Count; i < data.Length / 2; i++)
+            {
+                data[i] = last.Temperature;
+                data[8 + i] = Math.Min((byte)100, last.Value);
+            }
         }
 
         return Set(GPU_FAN_CURVE, data, out var buffer) && IsOk(buffer);
