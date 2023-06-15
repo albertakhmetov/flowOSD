@@ -82,6 +82,8 @@ public partial class App : Application
         {
             disposable = new CompositeDisposable();
 
+            new ToastNotificationService().DisposeWith(disposable);
+
             configService = new ConfigService().DisposeWith(disposable);
             updateService = new UpdateService(configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);

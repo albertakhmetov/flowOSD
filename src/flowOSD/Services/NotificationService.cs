@@ -30,6 +30,8 @@ using flowOSD.Native;
 using flowOSD.Services;
 using flowOSD.UI;
 using flowOSD.UI.Commands;
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 using static flowOSD.Extensions.Common;
 using static flowOSD.Native.User32;
 
@@ -292,6 +294,8 @@ sealed class NotificationService : IDisposable, INotificationService
 
     private void ShowBoostNotification(bool isEnabled)
     {
+        ShowWarning(WarningType.LowerPowerCharger, "Low Power Charger", "The low power charger is connected. Max performance isn't avaible.");
+
         if (!config.Notifications[NotificationType.Boost])
         {
             return;
