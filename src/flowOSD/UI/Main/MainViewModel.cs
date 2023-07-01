@@ -200,7 +200,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             {
                 PerformanceProfileText = profile.Name;
 
-                if (profile.Id == PerformanceProfile.Default.Id)
+                if (profile.Id == PerformanceProfile.Performance.Id)
                 {
                     PerformanceProfileImage = Images.Instance.PerformanceMode.Performance;
                 }

@@ -23,6 +23,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
@@ -32,18 +33,23 @@ sealed class PerformanceService : IDisposable, IPerformanceService
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private IConfig config;
+    private INotificationService notificationService;
     private IAtk atk;
     private IPowerManagement powerManagement;
 
     private BehaviorSubject<PerformanceProfile> activeProfileSubject;
 
-    public PerformanceService(IConfig config, IAtk atk, IPowerManagement powerManagement)
+    public PerformanceService(
+        IConfig config,
+        INotificationService notificationService,
+        IAtk atk, 
+        IPowerManagement powerManagement)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
 
-        activeProfileSubject = new BehaviorSubject<PerformanceProfile>(PerformanceProfile.Default);
+        activeProfileSubject = new BehaviorSubject<PerformanceProfile>(PerformanceProfile.Performance);
         activeProfileSubject
             .Skip(1)
             .ObserveOn(SynchronizationContext.Current!)
@@ -71,6 +77,13 @@ sealed class PerformanceService : IDisposable, IPerformanceService
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(UpdateActiveProfile)
             .DisposeWith(disposable);
+
+        this.atk.GpuMode
+            .Skip(1)
+            .Throttle(TimeSpan.FromMicroseconds(1000))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => Update())
+            .DisposeWith(disposable);
     }
 
     public IObservable<PerformanceProfile> ActiveProfile { get; }
@@ -93,9 +106,9 @@ sealed class PerformanceService : IDisposable, IPerformanceService
 
     public PerformanceProfile GetProfile(Guid id)
     {
-        if (id == PerformanceProfile.Default.Id)
+        if (id == PerformanceProfile.Performance.Id)
         {
-            return PerformanceProfile.Default;
+            return PerformanceProfile.Performance;
         }
         else if (id == PerformanceProfile.Turbo.Id)
         {
@@ -107,7 +120,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
         }
         else
         {
-            return config.Performance[id] ?? PerformanceProfile.Default;
+            return config.Performance[id] ?? PerformanceProfile.Performance;
         }
     }
 
@@ -160,43 +173,34 @@ sealed class PerformanceService : IDisposable, IPerformanceService
             propertyName == nameof(PerformanceConfig.TabletProfile);
     }
 
-    private void ApplyProfile(PerformanceProfile profile)
+    private async void ApplyProfile(PerformanceProfile profile)
     {
-        if (profile.Id == PerformanceProfile.Default.Id)
-        {
-            atk.SetPerformanceMode(PerformanceMode.Default);
-        }
-        else if (profile.Id == PerformanceProfile.Turbo.Id)
-        {
-            atk.SetPerformanceMode(PerformanceMode.Turbo);
-        }
-        else if (profile.Id == PerformanceProfile.Silent.Id)
-        {
-            atk.SetPerformanceMode(PerformanceMode.Silent);
-        }
-        else
-        {
-            if (!SetCustomProfile(profile))
-            {
-                Common.TraceWarning("Can't set custom profile");
+        atk.SetPerformanceMode(profile.PerformanceMode);
 
-                activeProfileSubject.OnNext(PerformanceProfile.Default);
-            }
+        if (profile.IsUserProfile && !await SetCustomProfile(profile))
+        {
+            Common.TraceWarning("Can't set custom profile");
+
+            activeProfileSubject.OnNext(PerformanceProfile.Performance);
         }
     }
 
-    private bool SetCustomProfile(PerformanceProfile profile)
+    private async Task<bool> SetCustomProfile(PerformanceProfile profile)
     {
-        if (!atk.SetFanCurve(FanType.Cpu, profile.CpuFanCurve))
+        var gpuMode = await atk.GpuMode.FirstAsync();
+        if (gpuMode == GpuMode.dGpu)
         {
-            Common.TraceWarning("Can't set CPU Fan Curve");
-            return false;
-        }
+            if (!atk.SetFanCurve(FanType.Cpu, profile.CpuFanCurve))
+            {
+                Common.TraceWarning("Can't set CPU Fan Curve");
+                return false;
+            }
 
-        if (!atk.SetFanCurve(FanType.Gpu, profile.GpuFanCurve))
-        {
-            Common.TraceWarning("Can't set GPU Fan Curve");
-            return false;
+            if (!atk.SetFanCurve(FanType.Gpu, profile.GpuFanCurve))
+            {
+                Common.TraceWarning("Can't set GPU Fan Curve");
+                return false;
+            }
         }
 
         if (!atk.SetCpuLimit(profile.CpuLimit))

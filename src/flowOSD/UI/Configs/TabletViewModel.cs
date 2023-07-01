@@ -115,7 +115,7 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
         Profiles = new ReadOnlyCollection<PerformanceProfile>(
             new PerformanceProfile[]
             {
-                PerformanceProfile.Default,
+                PerformanceProfile.Performance,
                 PerformanceProfile.Turbo,
                 PerformanceProfile.Silent
             }.Union(Config.Performance.GetProfiles()).ToArray());

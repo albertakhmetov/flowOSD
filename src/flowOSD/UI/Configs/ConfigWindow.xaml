@@ -622,7 +622,27 @@
                                         Content="{Binding TextResources.Config.Performance.CreateProfile}" Margin="10,0,0,0"/>
                                 </StackPanel>
                             </StackPanel>
+                        </Border>
 
+                        <Border 
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}">
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock VerticalAlignment="Center" Text= "{Binding TextResources.Config.Performance.PerformanceMode}"/>
+
+                                <ComboBox 
+                                    Grid.Column="1"
+                                    ItemsSource="{Binding PerformanceModes, Mode=OneWay}"
+                                    SelectedItem="{Binding PerformanceMode, Mode=TwoWay}"
+                                    HorizontalAlignment="Stretch"  
+                                    VerticalAlignment="Center"/>
+                            </Grid>
                         </Border>
 
                         <TextBlock 
@@ -708,7 +728,6 @@
                         </Border>
 
                         <Border Style="{StaticResource CxConfigBorderStyle}">
-
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>

@@ -52,11 +52,15 @@ public sealed partial class MainWindow : Window, IDisposable
     private ISystemEvents systemEvents;
     private IHardwareService hardwareServices;
 
+    private IAtk atk;
+
     public MainWindow(IConfig config, ISystemEvents systemEvents, IHardwareService hardwareServices, MainViewModel viewModel)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.hardwareServices = hardwareServices ?? throw new ArgumentNullException(nameof(hardwareServices));
+
+        atk = this.hardwareServices.ResolveNotNull<IAtk>();
 
         ViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         InitializeComponent();
@@ -83,6 +87,11 @@ public sealed partial class MainWindow : Window, IDisposable
             .Subscribe(_ => UpdatePerformanceProfilesMenu())
             .DisposeWith(disposable);
 
+        atk.GpuMode
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => UpdatePerformanceProfilesMenu())
+            .DisposeWith(disposable);
+
         UpdatePerformanceProfilesMenu();
         UpdatePowerModesMenu();
     }
@@ -94,7 +103,7 @@ public sealed partial class MainWindow : Window, IDisposable
             performanceProfilesMenu.Items.Add(new MenuFlyoutItem
             {
                 Command = ViewModel.PerformanceCommand,
-                CommandParameter = PerformanceProfile.Default.Id,
+                CommandParameter = PerformanceProfile.Performance.Id,
                 Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Performance },
                 Text = Text.Instance.PerformanceMode.Performance,
             });

@@ -49,6 +49,7 @@ public partial class App : Application
     private IUpdateService updateService;
 
     private ConfigService configService;
+    private NotificationService notificationService;
     private MessageQueue messageQueue;
     private SystemEvents systemEvents;
     private KeysSender keysSender;
@@ -58,7 +59,7 @@ public partial class App : Application
     private CommandService commandService;
     private HotKeysService hotKeyService;
 
-    private NotificationService notificationService;
+    private OsdNotificationService osdNotificationService;
 
     private NotifyIconService notifyIconService;
 
@@ -82,9 +83,9 @@ public partial class App : Application
         {
             disposable = new CompositeDisposable();
 
-            new ToastNotificationService().DisposeWith(disposable);
 
             configService = new ConfigService().DisposeWith(disposable);
+            notificationService = new NotificationService(configService).DisposeWith(disposable);
             updateService = new UpdateService(configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
@@ -94,10 +95,11 @@ public partial class App : Application
 
             hardwareService = new HardwareService(
                 configService,
+                notificationService,
                 messageQueue,
                 keysSender).DisposeWith(disposable);
 
-            notificationService = new NotificationService(
+            osdNotificationService = new OsdNotificationService(
                 configService,
                 osd,
                 hardwareService).DisposeWith(disposable);

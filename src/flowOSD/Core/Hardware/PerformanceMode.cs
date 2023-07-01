@@ -21,7 +21,7 @@ namespace flowOSD.Core.Hardware;
 
 public enum PerformanceMode : uint
 {
-    Default = 0,
+    Performance = 0,
     Turbo = 1,
     Silent = 2
 }

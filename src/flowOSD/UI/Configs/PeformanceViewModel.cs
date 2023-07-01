@@ -47,8 +47,9 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     private IReadOnlyCollection<PerformanceProfile> profiles;
     private PerformanceProfile? currentProfile;
-    
+
     private bool fanCurveError;
+    private PerformanceMode performanceMode;
     private uint cpuLimit;
 
     public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
@@ -72,7 +73,14 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         gpu = new FanCurveDataSource();
         gpu.Changed += FanCurveChanged;
 
-        UpdateProfiles(Guid.Empty);
+        PerformanceModes = new ReadOnlyCollection<PerformanceMode>(new PerformanceMode[]
+        {
+            PerformanceMode.Performance,
+            PerformanceMode.Turbo,
+            PerformanceMode.Silent,
+        });
+
+       UpdateProfiles(Guid.Empty);
 
         MinPowerLimit = atk.MinPowerLimit;
         MaxPowerLimit = atk.MaxPowerLimit;
@@ -86,6 +94,8 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     {
         get => hardwareFeatures.CpuPowerLimit && IsUserProfile;
     }
+
+    public IReadOnlyCollection<PerformanceMode> PerformanceModes { get; }
 
     public IReadOnlyCollection<PerformanceProfile> Profiles
     {
@@ -105,6 +115,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
                 return;
             }
 
+            performanceMode = currentProfile.PerformanceMode;
             cpuLimit = currentProfile.CpuLimit;
 
             OnPropertyChanged(null);
@@ -125,6 +136,16 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     {
         get => fanCurveError;
         private set => SetProperty(ref fanCurveError, value);
+    }
+
+    public PerformanceMode PerformanceMode
+    {
+        get => performanceMode;
+        set
+        {
+            SetProperty(ref performanceMode, value);
+            isDirtySubject.OnNext(true);
+        }
     }
 
     public uint CpuLimit
@@ -162,6 +183,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         var profile = new PerformanceProfile(
             Guid.NewGuid(),
             profileName,
+            PerformanceMode.Performance,
             35,
             FanDataPoint.CreateDefaultCurve(),
             FanDataPoint.CreateDefaultCurve());
@@ -244,6 +266,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             var profile = new PerformanceProfile(
             CurrentProfile.Id,
             newProfileName ?? CurrentProfile.Name,
+            PerformanceMode,
             CpuLimit,
             Cpu.ToArray(),
             Gpu.ToArray());

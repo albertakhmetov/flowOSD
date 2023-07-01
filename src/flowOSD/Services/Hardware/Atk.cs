@@ -89,7 +89,6 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     private ManagementEventWatcher? watcher;
 
     private IDisposable? updateSubscription;
-    private IDisposable? zeroGpuFanFix;
 
     private readonly object ControlLocker = new object();
 
@@ -122,7 +121,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         ChargeLimitSupported = Get(DEVID_BATTERY_LIMIT, out _);
         CpuPowerLimitSupported = (Get(PPT_APU, out _) && Get(PPT_CPU, out _)) || Get(PPT_CPUB0, out _);
 
-        performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Default);
+        performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Performance);
         gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)gpuMode);
         cpuTemperatureSubject = new CountableSubject<int>(cpuTemperature);
         cpuFanSpeedSubject = new CountableSubject<int>(cpuFanSpeed);
@@ -140,7 +139,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         Charger = chargerSubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
 
-        SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Default);
+        SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Performance);
 
         cpuTemperatureSubject.Count
             .CombineLatest(cpuFanSpeedSubject, gpuFanSpeedSubject, (cpuT, cpuF, gpuF) => cpuT + cpuF + gpuF)
@@ -262,27 +261,31 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints)
     {
-        if (dataPoints == null || dataPoints.Count != 8)
+        if (dataPoints == null || dataPoints.Count != 8 || !dataPoints.Any(i => i.Value > 0))
         {
-            throw new ArgumentNullException(nameof(dataPoints));
+            throw new ArgumentException("Incorrect fan curve", nameof(dataPoints));
         }
 
-        if (!dataPoints.Any(i => i.Value > 0))
+        uint fanDeviceId = fanType switch
         {
-            Common.TraceWarning($"Can't set empty fan {fanType} curve");
+            FanType.Cpu => CPU_FAN_CURVE,
+            FanType.Gpu => GPU_FAN_CURVE,
+            _ => 0,
+        };
+
+        if (fanDeviceId == 0)
+        {
             return false;
         }
 
-        switch (fanType)
+        var data = new byte[FAN_CURVE_POINTS * 2];
+        for (var i = 0; i < dataPoints.Count; i++)
         {
-            case FanType.Cpu:
-                return SetCpuFanSpeed(dataPoints);
-
-            case FanType.Gpu:
-                return SetGpuFanSpeed(dataPoints);
+            data[i] = dataPoints[i].Temperature;
+            data[8 + i] = Math.Min((byte)100, dataPoints[i].Value);
         }
 
-        return false;
+        return Set(fanDeviceId, data, out var buffer) && IsOk(buffer);
     }
 
     public IList<FanDataPoint> GetFanCurve(FanType fanType, PerformanceMode performanceMode)
@@ -315,8 +318,6 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public bool SetPerformanceMode(PerformanceMode performanceMode)
     {
-        DisableZeroGpuFanFix();
-
         if (Set(DEVID_THROTTLE_THERMAL_POLICY, (uint)performanceMode, out var buffer) && IsOk(buffer))
         {
             performanceModeSubject.OnNext(performanceMode);
@@ -346,8 +347,6 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public void Dispose()
     {
-        DisableZeroGpuFanFix();
-
         watcher?.Dispose();
         watcher = null;
 
@@ -421,78 +420,6 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         }
     }
 
-    private bool SetCpuFanSpeed(IList<FanDataPoint> dataPoints)
-    {
-        var data = new byte[FAN_CURVE_POINTS * 2];
-        for (var i = 0; i < dataPoints.Count; i++)
-        {
-            data[i] = dataPoints[i].Temperature;
-            data[8 + i] = Math.Min((byte)100, dataPoints[i].Value);
-        }
-
-        return Set(CPU_FAN_CURVE, data, out var buffer) && IsOk(buffer);
-    }
-
-    private bool SetGpuFanSpeed(IList<FanDataPoint> dataPoints)
-    {
-        if (dataPoints.Count == FAN_CURVE_POINTS)
-        {
-            DisableZeroGpuFanFix();
-        }
-
-        // Fix for zero gpu fan speed
-        if (dataPoints.Any(i => i.Value == 0))
-        {
-            var firstNonZeroTemperature = dataPoints.First(i => i.Value > 0).Temperature;
-
-            zeroGpuFanFix = Observable.Interval(TimeSpan.FromMilliseconds(500))
-                .Subscribe(_ =>
-                {
-                    if (!Get(GPU_TEMPERATURE, out var temperature))
-                    {
-                        Common.TraceWarning("Can't get GPU temperature. Silent GPU profiles are not allowed");
-                        SetPerformanceMode(Core.Hardware.PerformanceMode.Default);
-                    }
-
-                    if (temperature > firstNonZeroTemperature * 0.9)
-                    {
-                        SetGpuFanSpeed(dataPoints.Where(i => i.Value > 0).ToArray());
-                    }
-
-                    if (temperature < firstNonZeroTemperature * 0.8)
-                    {
-                        SetGpuFanSpeed(dataPoints);
-                    }
-                });
-        }
-
-        var data = new byte[FAN_CURVE_POINTS * 2];
-        for (var i = 0; i < dataPoints.Count; i++)
-        {
-            data[i] = dataPoints[i].Temperature;
-            data[8 + i] = Math.Min((byte)100, dataPoints[i].Value);
-        }
-
-        if (dataPoints.Count < data.Length / 2)
-        {
-            var last = dataPoints.Last();
-
-            for (var i = dataPoints.Count; i < data.Length / 2; i++)
-            {
-                data[i] = last.Temperature;
-                data[8 + i] = Math.Min((byte)100, last.Value);
-            }
-        }
-
-        return Set(GPU_FAN_CURVE, data, out var buffer) && IsOk(buffer);
-    }
-
-    private void DisableZeroGpuFanFix()
-    {
-        zeroGpuFanFix?.Dispose();
-        zeroGpuFanFix = null;
-    }
-
     private async void NotifySystemTabletState()
     {
         await Task.Delay(500);
@@ -508,6 +435,11 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         {
             var acpiBuffer = new byte[8 + args.Length];
             outBuffer = new byte[20];
+
+            if (handle.IsClosed || handle.IsInvalid)
+            {
+                return false;
+            }
 
             BitConverter.GetBytes(MethodId).CopyTo(acpiBuffer, 0);
             BitConverter.GetBytes(args.Length).CopyTo(acpiBuffer, 4);

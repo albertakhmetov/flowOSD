@@ -26,21 +26,25 @@ using flowOSD.Core.Resources;
 
 public class PerformanceProfile
 {
-    public readonly static PerformanceProfile Default = new PerformanceProfile(
+    public readonly static PerformanceProfile Performance = new PerformanceProfile(
         Guid.Parse("{8ACA6E25-592B-49B7-8A9F-6612AD5B52C4}"),
-        Text.Instance.PerformanceMode.Performance);
+        Text.Instance.PerformanceMode.Performance,
+        PerformanceMode.Performance);
 
     public readonly static PerformanceProfile Turbo = new PerformanceProfile(
         Guid.Parse("{B0D2F613-FE12-4B77-9A51-1AB4CC9CE676}"),
-        Text.Instance.PerformanceMode.Turbo);
+        Text.Instance.PerformanceMode.Turbo,
+        PerformanceMode.Turbo);
 
     public readonly static PerformanceProfile Silent = new PerformanceProfile(
         Guid.Parse("{908F1186-ECCD-42A1-B581-D5E7F02DC385}"),
-        Text.Instance.PerformanceMode.Silent);
+        Text.Instance.PerformanceMode.Silent,
+        PerformanceMode.Silent);
 
     public PerformanceProfile(
         Guid id,
         string name,
+        PerformanceMode performanceMode,
         uint cpuLimit,
         IList<FanDataPoint> cpuFanCurve,
         IList<FanDataPoint> gpuFanCurve)
@@ -48,6 +52,7 @@ public class PerformanceProfile
         IsUserProfile = true;
         Id = id;
         Name = name ?? throw new ArgumentNullException(nameof(name));
+        PerformanceMode = performanceMode;
         CpuLimit = cpuLimit;
         CpuFanCurve = new ReadOnlyCollection<FanDataPoint>(cpuFanCurve);
         GpuFanCurve = new ReadOnlyCollection<FanDataPoint>(gpuFanCurve);
@@ -55,15 +60,20 @@ public class PerformanceProfile
 
     private PerformanceProfile(
         Guid id,
-        string name)
+        string name,
+        PerformanceMode performanceMode)
     {
         IsUserProfile = false;
         Id = id;
         Name = name ?? throw new ArgumentNullException(nameof(name));
+        PerformanceMode = performanceMode;
         CpuLimit = 0;
         CpuFanCurve = new FanDataPoint[0];
         GpuFanCurve = new FanDataPoint[0];
     }
+
+    [JsonIgnore]
+    public bool IsSystemProfile => !IsUserProfile;
 
     [JsonIgnore]
     public bool IsUserProfile { get; }
@@ -71,6 +81,8 @@ public class PerformanceProfile
     public Guid Id { get; }
 
     public string Name { get; }
+
+    public PerformanceMode PerformanceMode { get; }
 
     public uint CpuLimit { get; }
 
@@ -88,6 +100,7 @@ public class PerformanceProfile
         return new PerformanceProfile(
             Id,
             profileName,
+            PerformanceMode,
             CpuLimit,
             CpuFanCurve.ToArray(),
             GpuFanCurve.ToArray());

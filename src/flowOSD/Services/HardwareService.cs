@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.Services;
 
 using System.Diagnostics;
@@ -59,7 +60,11 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
     private RefreshRateService refreshRateService;
     private BatteryChargeService? batteryChargeService;
 
-    public HardwareService(IConfig config, IMessageQueue messageQueue, IKeysSender keysSender)
+    public HardwareService(
+        IConfig config,
+        INotificationService notificationService,
+        IMessageQueue messageQueue, 
+        IKeysSender keysSender)
     {
         try
         {
@@ -75,7 +80,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
 
-        atk = new Atk(PerformanceMode.Default);
+        atk = new Atk(PerformanceMode.Performance);
 
         if (OptimizationService)
         {
@@ -109,7 +114,11 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
         microphone = new Microphone();
 
-        performanceService = new PerformanceService(config, atk, powerManagement);
+        performanceService = new PerformanceService(
+            config,
+            notificationService,
+            atk, 
+            powerManagement);
 
         Register<IAtk>(atk);
         Register<IKeyboard>(keyboard);

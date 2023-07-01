@@ -47,7 +47,7 @@ public class PerformanceCommand : CommandBase
 
         this.performanceService.ActiveProfile
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.Default.Id)
+            .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.Performance.Id)
             .DisposeWith(Disposable!);
 
         Description = TextResources.Commands.Performance.Description;
@@ -95,7 +95,7 @@ public class PerformanceCommand : CommandBase
     private async Task<Guid> GetNextProfileId()
     {
         var profile = await performanceService.ActiveProfile.FirstAsync();
-        if (profile.Id == PerformanceProfile.Default.Id)
+        if (profile.Id == PerformanceProfile.Performance.Id)
         {
             return PerformanceProfile.Turbo.Id;
         }
@@ -105,7 +105,7 @@ public class PerformanceCommand : CommandBase
         }
         else
         {
-            return PerformanceProfile.Default.Id;
+            return PerformanceProfile.Performance.Id;
         }
     }
 }

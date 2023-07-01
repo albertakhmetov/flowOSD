@@ -27,7 +27,7 @@ public interface INotificationService
 
     void ShowError(string message, string? details = null);
 
-    void ShowWarning(WarningType warningType, string message, string? details = null);
+    void ShowWarning(WarningType warningType);
 
     bool ShowConfirmation(string message, string? details = null);
 }

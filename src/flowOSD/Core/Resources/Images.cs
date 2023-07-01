@@ -151,7 +151,7 @@ public sealed class Images
         {
             switch (performanceMode)
             {
-                case Core.Hardware.PerformanceMode.Default:
+                case Core.Hardware.PerformanceMode.Performance:
                     return Performance;
 
                 case Core.Hardware.PerformanceMode.Silent:

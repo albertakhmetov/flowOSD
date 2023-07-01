@@ -64,7 +64,7 @@ public sealed class Text
         {
             switch (performanceMode)
             {
-                case Hardware.PerformanceMode.Default:
+                case Hardware.PerformanceMode.Performance:
                     return Performance;
 
                 case Hardware.PerformanceMode.Silent:
@@ -276,6 +276,8 @@ public sealed class Text
             public string RenameProfile => "Rename Profile";
 
             public string RemoveProfile => "Remove Profile";
+
+            public string PerformanceMode => "Performance Mode";
 
             public string Cpu => "Cpu";
 

@@ -26,9 +26,7 @@ using flowOSD.Core.Hardware;
 
 public sealed class PerformanceConfig : ConfigBase
 {
-    private Guid chargerProfile;
-    private Guid batteryProfile;
-    private Guid tabletProfile;
+    private Guid chargerProfile, batteryProfile, tabletProfile;
 
     private Dictionary<Guid, PerformanceProfile> profiles;
     private Subject<Guid> profileChangedSubject;
@@ -48,8 +46,8 @@ public sealed class PerformanceConfig : ConfigBase
         profileChangedSubject = new Subject<Guid>();
         ProfileChanged = profileChangedSubject.AsObservable();
 
-        chargerProfile = PerformanceProfile.Default.Id;
-        batteryProfile = PerformanceProfile.Default.Id;
+        chargerProfile = PerformanceProfile.Performance.Id;
+        batteryProfile = PerformanceProfile.Performance.Id;
         tabletProfile = PerformanceProfile.Silent.Id;
     }
 

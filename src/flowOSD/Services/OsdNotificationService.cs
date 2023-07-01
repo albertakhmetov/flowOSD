@@ -1,0 +1,295 @@
+﻿/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
+ *
+ *  This file is part of flowOSD.
+ *
+ *  flowOSD is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  flowOSD is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
+ *
+ */
+namespace flowOSD;
+
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reflection;
+using flowOSD.Core;
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
+using flowOSD.Extensions;
+using flowOSD.Native;
+using flowOSD.Services;
+using flowOSD.UI;
+using flowOSD.UI.Commands;
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
+using static flowOSD.Extensions.Common;
+using static flowOSD.Native.User32;
+
+sealed class OsdNotificationService : IDisposable
+{
+    private CompositeDisposable? disposable = new CompositeDisposable();
+
+    private IConfig config;
+    private IOsd osd;
+
+    private IAtk atk;
+    private IPowerManagement powerManagement;
+    private ITouchPad touchPad;
+    private IDisplay display;
+    private IDisplayBrightness displayBrightness;
+    private IKeyboard keyboard;
+    private IKeyboardBacklight keyboardBacklight;
+    private IMicrophone microphone;
+
+    private IHardwareFeatures hardwareFeatures;
+
+    public OsdNotificationService(IConfig config, IOsd osd, IHardwareService hardwareService)
+    {
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
+
+        if (hardwareService == null)
+        {
+            throw new ArgumentNullException(nameof(hardwareService));
+        }
+
+        atk = hardwareService.ResolveNotNull<IAtk>();
+        powerManagement = hardwareService.ResolveNotNull<IPowerManagement>();
+        touchPad = hardwareService.ResolveNotNull<ITouchPad>();
+        display = hardwareService.ResolveNotNull<IDisplay>();
+        displayBrightness = hardwareService.ResolveNotNull<IDisplayBrightness>();
+        keyboard = hardwareService.ResolveNotNull<IKeyboard>();
+        keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
+        microphone = hardwareService.ResolveNotNull<IMicrophone>();
+
+        hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+
+        Init(disposable);
+
+        if (hardwareFeatures.OptimizationService)
+        {
+            InitForOptimizationService(disposable);
+        }
+    }
+
+    public void Dispose()
+    {
+        disposable?.Dispose();
+        disposable = null;
+    }
+
+    private void Init(CompositeDisposable disposable)
+    {
+        powerManagement.PowerMode
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowPowerModeNotification)
+            .DisposeWith(disposable);
+
+        if (hardwareFeatures.Charger)
+        {
+            atk.Charger
+                .Skip(1)
+                .DistinctUntilChanged()
+                .Throttle(TimeSpan.FromSeconds(2))
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(ShowPowerSourceNotification)
+                .DisposeWith(disposable);
+        }
+        else
+        {
+            powerManagement.PowerSource
+                .Skip(1)
+                .DistinctUntilChanged()
+                .Throttle(TimeSpan.FromSeconds(2))
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(ShowPowerSourceNotification)
+                .DisposeWith(disposable);
+        }
+
+        touchPad.State
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowTouchPadNotification)
+            .DisposeWith(disposable);
+
+        powerManagement.IsBoost
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowBoostNotification)
+            .DisposeWith(disposable);
+
+        display.RefreshRate
+            .CombineLatest(display.State, (refreshRate, displayState) => new { refreshRate, displayState })
+            .Where(x => x.displayState == DeviceState.Enabled)
+            .Select(x => x.refreshRate)
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowDisplayRefreshRateNotification)
+            .DisposeWith(disposable);
+
+        atk.GpuMode
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowGpuNotification)
+            .DisposeWith(disposable);
+    }
+
+    private void InitForOptimizationService(CompositeDisposable disposable)
+    {
+        keyboard.KeyPressed
+            .Where(key => key == AtkKey.BacklightDown || key == AtkKey.BacklightUp)
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowKeyboardBacklightNotification)
+            .DisposeWith(disposable);
+
+        keyboard.KeyPressed
+            .Where(key => key == AtkKey.Mic)
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => ShowMicNotification())
+            .DisposeWith(disposable);
+    }
+
+    private void ShowMicNotification()
+    {
+        var isMuted = microphone.IsMicMuted();
+        osd.Show(new OsdMessage(
+            isMuted ? Text.Instance.Notifications.MicOff : Text.Instance.Notifications.MicOn,
+            isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
+    }
+
+    private async void ShowKeyboardBacklightNotification(AtkKey key)
+    {
+        var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
+
+        var icon = key == AtkKey.BacklightUp
+            ? Images.Instance.Hardware.KeyboardLightUp
+            : Images.Instance.Hardware.KeyboardLightDown;
+
+        osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
+    }
+
+    private void ShowPerformanceModeNotification(PerformanceMode performanceMode)
+    {
+        if (!config.Notifications[NotificationType.PerformanceMode])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(
+            $"{Text.Instance.PerformanceMode.From(performanceMode)} performance mode",
+            Images.Instance.PerformanceMode.From(performanceMode)));
+    }
+
+    private void ShowPowerModeNotification(PowerMode powerMode)
+    {
+        if (!config.Notifications[NotificationType.PowerMode])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(
+            $"{Text.Instance.PowerMode.From(powerMode)} power mode",
+            Images.Instance.PowerMode.From(powerMode)));
+    }
+
+    private void ShowPowerSourceNotification(PowerSource powerSource)
+    {
+        if (!config.Notifications[NotificationType.PowerSource])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(
+            powerSource == PowerSource.Battery ? Text.Instance.Charger.Battery : Text.Instance.Charger.Connected,
+            powerSource == PowerSource.Battery ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
+    }
+
+    private void ShowPowerSourceNotification(ChargerTypes chargerTypes)
+    {
+        if (!config.Notifications[NotificationType.PowerSource])
+        {
+            return;
+        }
+
+        string text;
+
+        if ((chargerTypes & ChargerTypes.LowPower) == ChargerTypes.LowPower)
+        {
+            text = Text.Instance.Charger.LowPower;
+        }
+        else if ((chargerTypes & ChargerTypes.Connected) == ChargerTypes.Connected)
+        {
+            text = Text.Instance.Charger.Connected;
+        }
+        else
+        {
+            text = Text.Instance.Charger.Battery;
+        }
+
+        osd.Show(new OsdMessage(
+            text,
+            (chargerTypes & ChargerTypes.None) == ChargerTypes.None ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
+    }
+
+    private void ShowDisplayRefreshRateNotification(uint refreshRate)
+    {
+        if (!config.Notifications[NotificationType.DisplayRefreshRate])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate", Images.Instance.Hardware.Screen));
+    }
+
+    private void ShowBoostNotification(bool isEnabled)
+    {
+        if (!config.Notifications[NotificationType.Boost])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(isEnabled ? "Boost Mode is on" : "Boost Mode is off", Images.Instance.Hardware.Cpu));
+    }
+
+    private void ShowTouchPadNotification(DeviceState state)
+    {
+        if (!config.Notifications[NotificationType.TouchPad])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", Images.Instance.Hardware.TouchPad));
+    }
+
+    private void ShowGpuNotification(GpuMode gpuMode)
+    {
+        if (!config.Notifications[NotificationType.Gpu])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", Images.Instance.Hardware.Gpu));
+    }
+}
