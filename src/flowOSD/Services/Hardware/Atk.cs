@@ -135,7 +135,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         CpuTemperature = cpuTemperatureSubject.AsObservable();
         CpuFanSpeed = cpuFanSpeedSubject.AsObservable();
         GpuFanSpeed = gpuFanSpeedSubject.AsObservable();
-        TabletMode = tabletModeSubject.AsObservable();
+        TabletMode = tabletModeSubject.Throttle(TimeSpan.FromSeconds(2)).AsObservable();
         Charger = chargerSubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
 
