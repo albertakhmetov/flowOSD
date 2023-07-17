@@ -119,7 +119,7 @@ sealed class OsdNotificationService : IDisposable
                 .DisposeWith(disposable);
         }
 
-        touchPad.State
+        touchPad.State.Throttle(TimeSpan.FromSeconds(1))
             .Skip(1)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(50))

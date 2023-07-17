@@ -135,7 +135,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         CpuTemperature = cpuTemperatureSubject.AsObservable();
         CpuFanSpeed = cpuFanSpeedSubject.AsObservable();
         GpuFanSpeed = gpuFanSpeedSubject.AsObservable();
-        TabletMode = tabletModeSubject.Throttle(TimeSpan.FromSeconds(2)).AsObservable();
+        TabletMode = tabletModeSubject.AsObservable();
         Charger = chargerSubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
 
@@ -163,15 +163,16 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
                                 }
 
                                 int fanSpeed;
+                                const float maxCpuFanSpeed = 0.92f, maxGpuFanSpeed = 0.75f;
 
                                 if (Get(CPU_FAN_SPEED, out fanSpeed))
                                 {
-                                    cpuFanSpeedSubject.OnNext(fanSpeed);
+                                    cpuFanSpeedSubject.OnNext(Convert.ToInt32(Math.Round(fanSpeed / maxCpuFanSpeed)));
                                 }
 
                                 if (Get(GPU_FAN_SPEED, out fanSpeed))
                                 {
-                                    gpuFanSpeedSubject.OnNext(fanSpeed);
+                                    gpuFanSpeedSubject.OnNext(Convert.ToInt32(Math.Round(fanSpeed / maxGpuFanSpeed)));
                                 }
                             });
                 }

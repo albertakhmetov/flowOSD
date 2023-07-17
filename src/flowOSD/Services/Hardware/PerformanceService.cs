@@ -58,8 +58,8 @@ sealed class PerformanceService : IDisposable, IPerformanceService
 
         ActiveProfile = activeProfileSubject.AsObservable();
 
-        this.powerManagement.PowerSource
-            .CombineLatest(this.atk.TabletMode, (powerSource, tabletMode) => new { powerSource, tabletMode })
+        this.powerManagement.PowerSource.Throttle(TimeSpan.FromSeconds(2))
+            .CombineLatest(this.atk.TabletMode.Throttle(TimeSpan.FromSeconds(2)), (powerSource, tabletMode) => new { powerSource, tabletMode })
             .Throttle(TimeSpan.FromMicroseconds(2000))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(x => ChangeActiveProfile(x.powerSource, x.tabletMode))
