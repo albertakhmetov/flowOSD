@@ -40,6 +40,7 @@ using flowOSD.Core;
 using flowOSD.Core.Hardware;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Resources;
+using System.Text;
 
 public sealed partial class MainWindow : Window, IDisposable
 {
@@ -239,6 +240,43 @@ public sealed partial class MainWindow : Window, IDisposable
         if (Content is FrameworkElement content)
         {
             content.RequestedTheme = isDark ? ElementTheme.Dark : ElementTheme.Light;
+        }
+    }
+
+    private void BatteryToolTip_Opened(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel != null && sender is ToolTip t)
+        {
+            var sb = new StringBuilder();
+
+            sb.Append($"{Text.Instance.Main.BatteryRemaining}: {100F * ViewModel.Capacity / ViewModel.FullChargedCapacity:N0}%");
+            if (ViewModel.Rate < 0)
+            {
+                sb.AppendLine();
+                sb.Append($"{Text.Instance.Config.Battery.EstimatedTime}: {TimeSpan.FromSeconds(ViewModel.EstimatedTime).ToString(@"hh\:mm")}");
+            }
+
+            if (ViewModel.IsLowPower)
+            {
+                sb.AppendLine();
+                sb.AppendLine();
+                sb.Append(Text.Instance.Charger.LowPower.ToUpper());
+            }
+
+            t.Content = sb.ToString();
+        }
+    }
+
+    private void FanSpeedToolTip_Opened(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel != null && sender is ToolTip t)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"{Text.Instance.Main.CpuFanSpeed}: {ViewModel.CpuFanSpeed}%");
+            sb.Append($"{Text.Instance.Main.GpuFanSpeed}: {ViewModel.GpuFanSpeed}%");
+
+            t.Content = sb.ToString();
         }
     }
 }

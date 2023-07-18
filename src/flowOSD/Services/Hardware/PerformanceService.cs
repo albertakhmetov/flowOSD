@@ -188,7 +188,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
     private async Task<bool> SetCustomProfile(PerformanceProfile profile)
     {
         var gpuMode = await atk.GpuMode.FirstAsync();
-        if (gpuMode == GpuMode.dGpu)
+        if (gpuMode == GpuMode.dGpu || config.Common.ForceCustomFanCurves)
         {
             if (!atk.SetFanCurve(FanType.Cpu, profile.CpuFanCurve))
             {

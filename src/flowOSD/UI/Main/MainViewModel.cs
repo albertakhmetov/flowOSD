@@ -50,6 +50,8 @@ public class MainViewModel : ViewModelBase, IDisposable
     private string batteryImage;
     private int rate, cpuTemperature, cpuFanSpeed, gpuFanSpeed;
 
+    private uint capacity, fullChargedCapacity, estimatedTime;
+
     public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
     {
         if (commandService == null)
@@ -168,6 +170,24 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         get => rate;
         set => SetProperty(ref rate, value);
+    }
+
+    public uint Capacity
+    {
+        get => capacity;
+        set => SetProperty(ref capacity, value);
+    }
+
+    public uint FullChargedCapacity
+    {
+        get => fullChargedCapacity;
+        set => SetProperty(ref fullChargedCapacity, value);
+    }
+
+    public uint EstimatedTime
+    {
+        get => estimatedTime;
+        set => SetProperty(ref estimatedTime, value);
     }
 
     public int CpuTemperature
@@ -317,6 +337,10 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         HasRate = Math.Abs(rate) > 500;
         Rate = HasRate ? Convert.ToInt32(Math.Round(rate / 1000f)) : 0;
+
+        Capacity = capacity;
+        FullChargedCapacity = battery.FullChargedCapacity;
+        EstimatedTime = estimatedTime;
 
         BatteryImage = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
     }

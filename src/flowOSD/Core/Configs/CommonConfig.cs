@@ -44,6 +44,7 @@ public sealed class CommonConfig : ConfigBase
 
     private bool useBatteryChargeLimit;
     private uint batteryChargeLimit;
+    private bool forceCustomFanCurves;
 
     public CommonConfig()
     {
@@ -55,7 +56,7 @@ public sealed class CommonConfig : ConfigBase
         checkForUpdates = true;
 
         keyboardBacklightLevel = KeyboardBacklightLevel.Low;
-        keyboardBacklightTimeout = 60; 
+        keyboardBacklightTimeout = 60;
         keyboardBacklightWithDisplay = true;
 
         showBatteryChargeRate = true;
@@ -64,6 +65,7 @@ public sealed class CommonConfig : ConfigBase
 
         useBatteryChargeLimit = false;
         batteryChargeLimit = 80;
+        forceCustomFanCurves = false;
     }
 
     [JsonIgnore]
@@ -145,4 +147,9 @@ public sealed class CommonConfig : ConfigBase
         set => SetProperty(ref batteryChargeLimit, value);
     }
 
+    public bool ForceCustomFanCurves
+    {
+        get => forceCustomFanCurves;
+        set => SetProperty(ref forceCustomFanCurves, value);
+    }
 }

@@ -27,5 +27,7 @@ public sealed class Urls
 
     public string Optimization => "https://github.com/albertakhmetov/flowOSD/wiki/ASUS-Optimization";
 
+    public string CustomFanCurves => "https://github.com/albertakhmetov/flowOSD/wiki/Custom-Fan-Curves";
+
     public string GitLatest => "https://github.com/albertakhmetov/flowOSD/releases/latest";
 }

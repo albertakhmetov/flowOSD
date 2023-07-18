@@ -86,9 +86,14 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         MaxPowerLimit = atk.MaxPowerLimit;
 
         CreateProfileCommand = new RelayCommand(x => CreateProfile(x as string));
+        IsFanCurvesWarningVisible = !config.Common.ForceCustomFanCurves;
     }
 
     public Text TextResources => Text.Instance;
+
+    public string CustomFanCurvesPageUrl => Urls.Instance.CustomFanCurves;
+
+    public bool IsFanCurvesWarningVisible { get; }
 
     public bool IsCpuPowerLimitVisible
     {

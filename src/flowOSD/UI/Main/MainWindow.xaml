@@ -231,9 +231,13 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <StackPanel 
+                <StackPanel                   
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowBatteryChargeRate, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+                   
+                    <ToolTipService.ToolTip>
+                        <ToolTip Opened="BatteryToolTip_Opened"/>
+                    </ToolTipService.ToolTip>
 
                     <Grid>
                         <FontIcon 
@@ -279,7 +283,11 @@
                 <StackPanel 
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
-
+                   
+                    <ToolTipService.ToolTip>
+                        <ToolTip Opened="FanSpeedToolTip_Opened"/>
+                    </ToolTipService.ToolTip>
+                    
                     <FontIcon 
                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Glyph="{Binding ImageResources.Common.Diagnostic}"/>

@@ -634,7 +634,7 @@
                                     <ColumnDefinition Width="200"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock VerticalAlignment="Center" Text= "{Binding TextResources.Config.Performance.PerformanceMode}"/>
+                                <TextBlock VerticalAlignment="Center" Text= "{Binding TextResources.Config.Performance.BasePerformanceMode}"/>
 
                                 <ComboBox 
                                     Grid.Column="1"
@@ -684,12 +684,16 @@
                         <InfoBar
                             Margin="10, 5"
                             IsClosable="false"
-                            IsOpen="{Binding FanCurveError}"
+                            IsOpen="{Binding IsFanCurvesWarningVisible}"
                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                             Background="{ThemeResource ControlFillColorDefaultBrush}"
-                            Severity="Error"
-                            Title="{Binding TextResources.Config.Performance.FanCurveErrorTitle}"
-                            Message="{Binding TextResources.Config.Performance.FanCurveErrorMessage}" />
+                            Severity="Informational"
+                            Title=""
+                            Message="{Binding TextResources.Config.Performance.FanCurveWarningMessage}">
+                            <InfoBar.ActionButton>
+                                <HyperlinkButton NavigateUri="{Binding CustomFanCurvesPageUrl}" Content="{Binding TextResources.Config.Performance.FanCurveWarningMore}"/>
+                            </InfoBar.ActionButton>
+                        </InfoBar>
 
                         <Border 
                             Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"

@@ -132,6 +132,10 @@ public sealed class Text
         public string CpuFanSpeed => "Cpu";
 
         public string GpuFanSpeed => "Gpu";
+
+        public string BatteryStatus => "Battery status";
+
+        public string BatteryRemaining => "Remaining";
     }
 
     public sealed class ConfigSection
@@ -277,7 +281,7 @@ public sealed class Text
 
             public string RemoveProfile => "Remove Profile";
 
-            public string PerformanceMode => "Performance Mode";
+            public string BasePerformanceMode => "Base Performance Mode";
 
             public string Cpu => "Cpu";
 
@@ -288,6 +292,10 @@ public sealed class Text
             public string FanCurveErrorTitle => "Fan Curve Error";
 
             public string FanCurveErrorMessage => "Fan Curve can't be empty line. Also is recommended to set at least 50% fan speed after 80\u2103 to avoid throttling.";
+
+            public string FanCurveWarningMessage => "Custom Fan Curves are working only when dGPU is ON; otherwise default Fan Curves are applied.";
+
+            public string FanCurveWarningMore => "Learn more";
         }
 
         public sealed class TabletSection
