@@ -26,23 +26,30 @@ public sealed class OsdViewModel : ViewModelBase
 {
     private string? text, icon;
     private double value;
+    private bool showCaution;
 
     public string? Icon
     {
         get => icon;
-        set => SetProperty(ref icon, value);
+        private set => SetProperty(ref icon, value);
     }
 
     public string? Text
     {
         get => text;
-        set => SetProperty(ref text, value);
+        private set => SetProperty(ref text, value);
     }
 
     public double Value
     {
         get => value;
-        set => SetProperty(ref this.value, value);
+        private set => SetProperty(ref this.value, value);
+    }
+
+    public bool ShowCaution
+    {
+        get => showCaution;
+        private set => SetProperty(ref showCaution, value);
     }
 
     public bool IsValue => value >= 0;
@@ -63,6 +70,7 @@ public sealed class OsdViewModel : ViewModelBase
             value = -1;
             icon = m.Icon;
             text = m.Text;
+            showCaution = m.ShowCaution;
         }
 
         OnPropertyChanged(null);

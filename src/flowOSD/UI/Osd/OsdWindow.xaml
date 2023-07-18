@@ -51,19 +51,40 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <FontIcon Width="Auto"
-                      Margin="10"
-                      FontSize="16"
-                      FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                      VerticalAlignment="Center"
-                      Glyph="{Binding Icon, Mode=OneWay}"/>
-            <TextBlock Grid.Column="1"
-                       TextTrimming="None"
-                       FontSize="15"
-                       Margin="5,0,10,0" 
-                       Width="Auto"
-                       VerticalAlignment="Center"
-                       Text="{Binding Text, Mode=OneWay}"/>
+            <Grid>
+                <FontIcon 
+                    Width="Auto"
+                    Margin="10"
+                    FontSize="16"
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    VerticalAlignment="Center"
+                    Glyph="{Binding Icon, Mode=OneWay}"/>
+
+                <FontIcon 
+                    Visibility="{Binding ShowCaution, Converter={StaticResource VisibilityConverter}}"
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    FontSize="16"
+                    Margin="0,0,-5,-5"
+                    Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                    Glyph="&#xEA82;"/>
+
+                <FontIcon 
+                    Visibility="{Binding ShowCaution, Converter={StaticResource VisibilityConverter}}"
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    Margin="0,0,-5,-5"
+                    FontSize="16"
+                    Foreground="{ThemeResource SystemFillColorCautionBackgroundBrush}" 
+                    Glyph="&#xEA84;"/>
+            </Grid>
+            
+            <TextBlock 
+                Grid.Column="1"
+                TextTrimming="None"
+                FontSize="15"
+                Margin="5,0,10,0" 
+                Width="Auto"
+                VerticalAlignment="Center"
+                Text="{Binding Text, Mode=OneWay}"/>
         </Grid>
     </Grid>
 </Window>

@@ -45,6 +45,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     private string powerModeText, powerModeImage;
     private bool isBatterySaver;
 
+    private bool isLowPower;
     private bool hasRate;
     private string batteryImage;
     private int rate, cpuTemperature, cpuFanSpeed, gpuFanSpeed;
@@ -157,6 +158,12 @@ public class MainViewModel : ViewModelBase, IDisposable
         set => SetProperty(ref batteryImage, value);
     }
 
+    public bool IsLowPower
+    {
+        get => isLowPower;
+        set => SetProperty(ref isLowPower, value);
+    }
+
     public int Rate
     {
         get => rate;
@@ -260,6 +267,11 @@ public class MainViewModel : ViewModelBase, IDisposable
                     (rate, capacity, powerState, estimatedTime) => new { rate, capacity, powerState, estimatedTime })
                 .ObserveOn(SynchronizationContext.Current!)
                 .Subscribe(x => UpdateBattery(x.rate, x.capacity, x.powerState, x.estimatedTime))
+                .DisposeWith(disposable);
+
+            atk.Charger
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(x => IsLowPower = (x & ChargerTypes.LowPower) == ChargerTypes.LowPower)
                 .DisposeWith(disposable);
         }
 

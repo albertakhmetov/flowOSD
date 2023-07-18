@@ -114,7 +114,7 @@ public sealed class Text
 
         public string Connected => "Plugged In";
 
-        public string LowPower => "Plugged In (Low Power Charger)";
+        public string LowPower => "Low Power Charger";
     }
 
     public sealed class MainSection

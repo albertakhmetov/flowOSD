@@ -70,7 +70,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     private const int AK_CHARGER = 0x7B;
 
     private const int POWER_SOURCE_BATTERY = 0x00;
-    private const int POWER_SOURCE_LOW = 0x22;
+    private const int POWER_SOURCE_65 = 0x22;
+    private const int POWER_SOURCE_45 = 0x2D;
     private const int POWER_SOURCE_FULL = 0x2A;
 
     private CompositeDisposable? disposable = new CompositeDisposable();
@@ -413,7 +414,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
             case POWER_SOURCE_BATTERY:
                 return ChargerTypes.None;
 
-            case POWER_SOURCE_LOW:
+            case POWER_SOURCE_45:
+            case POWER_SOURCE_65:
                 return ChargerTypes.Connected | ChargerTypes.LowPower;
 
             default:

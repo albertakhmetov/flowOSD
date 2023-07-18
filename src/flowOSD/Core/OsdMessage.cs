@@ -21,7 +21,7 @@ namespace flowOSD.Core;
 
 public sealed class OsdMessage
 {
-    public OsdMessage(string text, string? icon)
+    public OsdMessage(string text, string? icon, bool showCaution = false)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -30,9 +30,12 @@ public sealed class OsdMessage
 
         Text = text;
         Icon = icon;
+        ShowCaution = showCaution;
     }
 
     public string Text { get; }
 
     public string? Icon { get; }
+
+    public bool ShowCaution { get; }
 }

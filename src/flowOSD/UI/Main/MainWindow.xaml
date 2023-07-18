@@ -235,9 +235,26 @@
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowBatteryChargeRate, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
 
-                    <FontIcon 
-                        Glyph="{Binding BatteryImage}"
-                        FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+                    <Grid>
+                        <FontIcon 
+                            Glyph="{Binding BatteryImage}"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+
+                        <FontIcon 
+                            Visibility="{Binding IsLowPower, Converter={StaticResource VisibilityConverter}}"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            Margin="0,0,-5,-5"
+                            Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                            Glyph="&#xEA82;"/>
+
+                        <FontIcon 
+                            Visibility="{Binding IsLowPower, Converter={StaticResource VisibilityConverter}}"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            Margin="0,0,-5,-5"
+                            Foreground="{ThemeResource SystemFillColorCautionBackgroundBrush}" 
+                            Glyph="&#xEA84;"/>
+                    </Grid>
+                    
                     <TextBlock
                         Visibility="{Binding Rate, Converter={StaticResource VisibilityConverter}}">
                         

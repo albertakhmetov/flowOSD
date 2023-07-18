@@ -50,6 +50,7 @@ sealed class OsdNotificationService : IDisposable
     private IKeyboard keyboard;
     private IKeyboardBacklight keyboardBacklight;
     private IMicrophone microphone;
+    private IBattery battery;
 
     private IHardwareFeatures hardwareFeatures;
 
@@ -71,6 +72,7 @@ sealed class OsdNotificationService : IDisposable
         keyboard = hardwareService.ResolveNotNull<IKeyboard>();
         keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
         microphone = hardwareService.ResolveNotNull<IMicrophone>();
+        battery = hardwareService.ResolveNotNull<IBattery>();
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
 
@@ -226,31 +228,39 @@ sealed class OsdNotificationService : IDisposable
             powerSource == PowerSource.Battery ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
     }
 
-    private void ShowPowerSourceNotification(ChargerTypes chargerTypes)
+    private async void ShowPowerSourceNotification(ChargerTypes chargerTypes)
     {
         if (!config.Notifications[NotificationType.PowerSource])
         {
             return;
         }
 
+        var capacity = await battery.Capacity.FirstAsync();
+        var fullChargedCapacity = battery.FullChargedCapacity;
+
         string text;
+        string image;
 
         if ((chargerTypes & ChargerTypes.LowPower) == ChargerTypes.LowPower)
         {
             text = Text.Instance.Charger.LowPower;
+            image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
         }
         else if ((chargerTypes & ChargerTypes.Connected) == ChargerTypes.Connected)
         {
             text = Text.Instance.Charger.Connected;
+            image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
         }
         else
         {
             text = Text.Instance.Charger.Battery;
+            image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.Discharging);
         }
 
         osd.Show(new OsdMessage(
             text,
-            (chargerTypes & ChargerTypes.None) == ChargerTypes.None ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
+            image,
+            (chargerTypes & ChargerTypes.LowPower) == ChargerTypes.LowPower));
     }
 
     private void ShowDisplayRefreshRateNotification(uint refreshRate)
