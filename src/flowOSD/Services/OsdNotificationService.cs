@@ -51,6 +51,7 @@ sealed class OsdNotificationService : IDisposable
     private IKeyboardBacklight keyboardBacklight;
     private IMicrophone microphone;
     private IBattery battery;
+    private IPerformanceService performanceService;
 
     private IHardwareFeatures hardwareFeatures;
 
@@ -73,6 +74,7 @@ sealed class OsdNotificationService : IDisposable
         keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
         microphone = hardwareService.ResolveNotNull<IMicrophone>();
         battery = hardwareService.ResolveNotNull<IBattery>();
+        performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
 
@@ -93,8 +95,8 @@ sealed class OsdNotificationService : IDisposable
     private void Init(CompositeDisposable disposable)
     {
         powerManagement.PowerMode
-            .Skip(1)
             .DistinctUntilChanged()
+            .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowPowerModeNotification)
@@ -103,8 +105,8 @@ sealed class OsdNotificationService : IDisposable
         if (hardwareFeatures.Charger)
         {
             atk.Charger
-                .Skip(1)
                 .DistinctUntilChanged()
+                .Skip(1)
                 .Throttle(TimeSpan.FromSeconds(2))
                 .ObserveOn(SynchronizationContext.Current!)
                 .Subscribe(ShowPowerSourceNotification)
@@ -113,8 +115,8 @@ sealed class OsdNotificationService : IDisposable
         else
         {
             powerManagement.PowerSource
-                .Skip(1)
                 .DistinctUntilChanged()
+                .Skip(1)
                 .Throttle(TimeSpan.FromSeconds(2))
                 .ObserveOn(SynchronizationContext.Current!)
                 .Subscribe(ShowPowerSourceNotification)
@@ -122,16 +124,16 @@ sealed class OsdNotificationService : IDisposable
         }
 
         touchPad.State.Throttle(TimeSpan.FromSeconds(1))
-            .Skip(1)
             .DistinctUntilChanged()
+            .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowTouchPadNotification)
             .DisposeWith(disposable);
 
         powerManagement.IsBoost
-            .Skip(1)
             .DistinctUntilChanged()
+            .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowBoostNotification)
@@ -141,19 +143,27 @@ sealed class OsdNotificationService : IDisposable
             .CombineLatest(display.State, (refreshRate, displayState) => new { refreshRate, displayState })
             .Where(x => x.displayState == DeviceState.Enabled)
             .Select(x => x.refreshRate)
-            .Skip(1)
             .DistinctUntilChanged()
+            .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowDisplayRefreshRateNotification)
             .DisposeWith(disposable);
 
         atk.GpuMode
-            .Skip(1)
             .DistinctUntilChanged()
+            .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowGpuNotification)
+            .DisposeWith(disposable);
+
+        performanceService.ActiveProfile
+            .DistinctUntilChanged()
+            .Skip(1)
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowPerformanceProfileNotification)
             .DisposeWith(disposable);
     }
 
@@ -192,7 +202,7 @@ sealed class OsdNotificationService : IDisposable
         osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
     }
 
-    private void ShowPerformanceModeNotification(PerformanceMode performanceMode)
+    private void ShowPerformanceProfileNotification(PerformanceProfile performanceProfile)
     {
         if (!config.Notifications[NotificationType.PerformanceMode])
         {
@@ -200,8 +210,8 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            $"{Text.Instance.PerformanceMode.From(performanceMode)} performance mode",
-            Images.Instance.PerformanceMode.From(performanceMode)));
+            performanceProfile.Name,
+            Images.Instance.PerformanceMode.From(performanceProfile.PerformanceMode)));
     }
 
     private void ShowPowerModeNotification(PowerMode powerMode)

@@ -52,6 +52,8 @@ public sealed class UpdateCommand : CommandBase
             .DisposeWith(Disposable!);
     }
 
+    public override bool CanExecuteWithHotKey => false;
+
     public int Progress
     {
         get => progress;
