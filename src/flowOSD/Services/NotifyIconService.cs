@@ -77,10 +77,23 @@ sealed partial class NotifyIconService : IDisposable
             .Subscribe(x => UpdateNotifyIcon(x.tabletMode, x.isDarkMode, x.dpi))
             .DisposeWith(disposable);
 
-        text = $"{this.config.ProductName} ({this.config.ProductVersion})";
-
         messageQueue.Subscribe(WM_TASKBARCREATED, ProcessMessage).DisposeWith(disposable);
         messageQueue.Subscribe(MessageId, ProcessMessage).DisposeWith(disposable);
+    }
+
+    public string Text
+    {
+        get => text;
+        set
+        {
+            if (text == value)
+            {
+                return;
+            }
+
+            text = value;
+            Update();
+        }
     }
 
     public Rect GetIconRectangle()

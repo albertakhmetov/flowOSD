@@ -33,6 +33,7 @@ using flowOSD.UI.NotifyIcon;
 using System.Runtime.InteropServices;
 using System.Reactive.Linq;
 using Microsoft.UI.Xaml;
+using System.Reactive.Subjects;
 
 sealed class NotifyMenuCommand : CommandBase
 {
@@ -41,20 +42,26 @@ sealed class NotifyMenuCommand : CommandBase
     private ICommandService commandService;
     private NotifyMenuWindow? window;
 
+    private BehaviorSubject<bool> isWindowVisibleSubject;
+
     public NotifyMenuCommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+      
+        isWindowVisibleSubject = new BehaviorSubject<bool>(false);
 
         CreateWindow();
 
         Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
         Description = Text;
         Enabled = true;
+        IsWindowVisible = isWindowVisibleSubject.AsObservable();
     }
 
- 
+    public IObservable<bool> IsWindowVisible { get; }
+
     public override bool CanExecuteWithHotKey => false;
 
     public override async void Execute(object? parameter = null)
@@ -104,6 +111,7 @@ sealed class NotifyMenuCommand : CommandBase
         }
 
         ShowAndActivate(window);
+        isWindowVisibleSubject.OnNext(true);
     }
 
     public override void Dispose()
@@ -155,6 +163,7 @@ sealed class NotifyMenuCommand : CommandBase
     {
         args.Cancel = true;
         sender.Hide();
+        isWindowVisibleSubject.OnNext(false);
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)

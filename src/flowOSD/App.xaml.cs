@@ -83,7 +83,6 @@ public partial class App : Application
         {
             disposable = new CompositeDisposable();
 
-
             configService = new ConfigService().DisposeWith(disposable);
             notificationService = new NotificationService(configService).DisposeWith(disposable);
             updateService = new UpdateService(configService);
@@ -174,6 +173,12 @@ public partial class App : Application
             {
                 updateService.CheckUpdate();
             }
+
+            commandService.ResolveNotNull<MainUICommand>().IsWindowVisible
+                .CombineLatest(commandService.ResolveNotNull<NotifyMenuCommand>().IsWindowVisible, (x, y) => x || y)
+                .ObserveOn(SynchronizationContext.Current!)
+                .Subscribe(x => notifyIconService.Text = x ? "" : $"{configService.ProductName}")
+                .DisposeWith(disposable);
         }
         catch (Exception ex)
         {

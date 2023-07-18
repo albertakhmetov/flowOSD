@@ -17,6 +17,9 @@
  *
  */
 namespace flowOSD.UI.Commands;
+
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Extensions;
@@ -37,6 +40,7 @@ sealed class MainUICommand : CommandBase
     private MainWindow? window;
 
     private uint deactivateTime;
+    private BehaviorSubject<bool> isWindowVisibleSubject;
 
     public MainUICommand(
         IConfig config,
@@ -49,10 +53,15 @@ sealed class MainUICommand : CommandBase
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
 
+        isWindowVisibleSubject = new BehaviorSubject<bool>(false);
+
         Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
         Description = Text;
         Enabled = true;
+        IsWindowVisible = isWindowVisibleSubject.AsObservable();
     }
+
+    public IObservable<bool> IsWindowVisible { get; }
 
     public override bool CanExecuteWithHotKey => true;
 
@@ -71,6 +80,7 @@ sealed class MainUICommand : CommandBase
         if (window!.AppWindow?.IsVisible == true)
         {
             window.AppWindow.Hide();
+            isWindowVisibleSubject.OnNext(false);
             return;
         }
 
@@ -90,6 +100,7 @@ sealed class MainUICommand : CommandBase
             (int)(workArea.Height - window.AppWindow.Size.Height - offsetY)));
 
         ShowAndActivate(window);
+        isWindowVisibleSubject.OnNext(true);
     }
 
     public override void Dispose()
@@ -151,5 +162,6 @@ sealed class MainUICommand : CommandBase
 
         deactivateTime = GetTickCount();
         window.AppWindow.Hide();
+        isWindowVisibleSubject.OnNext(false);
     }
 }
