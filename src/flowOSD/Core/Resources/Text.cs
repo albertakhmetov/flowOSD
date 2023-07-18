@@ -240,6 +240,10 @@ public sealed class Text
             public string HotKeys => "HotKeys";
 
             public string HotKeyAction => "Action";
+
+            public string Reset => "Reset to defaults";
+
+            public string ResetConfirmation => "All hotkeys will be reset to default. Do you want to continue?";
         }
 
         public sealed class MonitoringSection

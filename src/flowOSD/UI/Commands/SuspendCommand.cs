@@ -30,9 +30,11 @@ sealed class SuspendCommand : CommandBase
     public const string HIBERNATE = "hibernate";
     public const string SLEEP = "sleep";
 
-    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(HIBERNATE, Core.Resources.Text.Instance.Commands.Suspend.Hibernate),
-        new CommandParameterInfo(SLEEP, Core.Resources.Text.Instance.Commands.Suspend.Sleep));
+    // Tempory disabled
+
+    //private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
+    //    new CommandParameterInfo(HIBERNATE, Core.Resources.Text.Instance.Commands.Suspend.Hibernate),
+    //    new CommandParameterInfo(SLEEP, Core.Resources.Text.Instance.Commands.Suspend.Sleep));
 
     public SuspendCommand()
     {
@@ -43,15 +45,15 @@ sealed class SuspendCommand : CommandBase
 
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<CommandParameterInfo> Parameters => parameters;
+    //public override IList<CommandParameterInfo> Parameters => parameters;
 
     public override void Execute(object? parameter = null)
     {
-        if (parameter is string mode == false || !(mode != HIBERNATE || mode != SLEEP))
+        if (parameter is string mode == false)// || !(mode != HIBERNATE || mode != SLEEP))
         {
             return;
         }
 
-        Powrprof.SetSuspendState(mode == HIBERNATE, true, true);
+        Powrprof.SetSuspendState(true, true, true);
     }
 }

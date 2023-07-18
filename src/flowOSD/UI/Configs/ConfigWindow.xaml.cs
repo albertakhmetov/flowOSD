@@ -172,4 +172,11 @@ public sealed partial class ConfigWindow : Window, IDisposable
     {
         renameProfileName.Text = (performanceConfig.DataContext as PerformanceViewModel)?.CurrentProfile?.Name;
     }
+
+    private void ResetHotkeys(object sender, RoutedEventArgs e)
+    {
+        resetHotkeysFlyout.Hide();
+
+        (keyboardConfig.DataContext as KeyboardViewModel)?.ResetHotkeys();
+    }
 }

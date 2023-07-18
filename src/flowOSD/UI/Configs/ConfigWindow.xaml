@@ -364,6 +364,31 @@
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
+                        <Button
+                            Grid.Column="2"
+                            Margin="20,0,10,5"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Right"
+                            Content="{Binding TextResources.Config.Keyboard.Reset}"
+                            Style="{StaticResource AccentButtonStyle}">
+
+                            <Button.Flyout>
+                                <Flyout x:Name="resetHotkeysFlyout" Placement="Bottom">
+                                    <StackPanel MinWidth="200" MaxWidth="300">
+                                        <TextBlock
+                                            Style="{ThemeResource BaseTextBlockStyle}"
+                                            Text="{Binding TextResources.Config.Keyboard.ResetConfirmation}"/>
+                                        <Button 
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            HorizontalAlignment="Right" 
+                                            Click="ResetHotkeys"
+                                            Content="{Binding TextResources.Config.Keyboard.Reset}" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+
+                        </Button>
+
                         <ItemsControl ItemsSource="{Binding HotKeys}" Background="Transparent">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="local:KeyboardHotKeyViewModel">

@@ -23,6 +23,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
@@ -35,6 +36,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     private IHardwareFeatures hardwareFeatures;
+    private ICommandService commandService;
 
     public KeyboardViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
             : base(config, Text.Instance.Config.Keyboard.Title, Images.Instance.Common.KeyboardSettings)
@@ -44,16 +46,12 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
             throw new ArgumentNullException(nameof(config));
         }
 
-        if (commandService == null)
-        {
-            throw new ArgumentNullException(nameof(commandService));
-        }
-
         if (hardwareService == null)
         {
             throw new ArgumentNullException(nameof(hardwareService));
         }
 
+        this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
 
         BacklightControl = !hardwareFeatures.OptimizationService;
@@ -114,6 +112,63 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
     public void Dispose()
     {
         OnDeactivated();
+    }
+
+    public void ResetHotkeys()
+    {
+        foreach (var h in HotKeys)
+        {
+            switch (h.Key)
+            {
+                case AtkKey.Mic:
+                    h.Command = commandService.ResolveNotNull<MicrophoneCommand>();
+                    break;
+
+                case AtkKey.Rog:
+                    h.Command = commandService.ResolveNotNull<MainUICommand>();
+                    break;
+
+                case AtkKey.BacklightDown:
+                    h.Command = commandService.ResolveNotNull<KeyboardBacklightCommand>();
+                    h.ParameterInfo = h.Command.Parameters.First();
+                    break;
+
+                case AtkKey.BacklightUp:
+                    h.Command = commandService.ResolveNotNull<KeyboardBacklightCommand>();
+                    h.ParameterInfo = h.Command.Parameters.Last();
+                    break;
+
+                case AtkKey.Aura:
+                    h.Command = commandService.ResolveNotNull<DisplayRefreshRateCommand>();
+                    break;
+
+                case AtkKey.Fan:
+                    h.Command = commandService.ResolveNotNull<PerformanceCommand>();
+                    break;
+
+                case AtkKey.BrightnessDown:
+                    h.Command = commandService.ResolveNotNull<DisplayBrightnessCommand>();
+                    h.ParameterInfo = h.Command.Parameters.First();
+                    break;
+
+                case AtkKey.BrightnessUp:
+                    h.Command = commandService.ResolveNotNull<DisplayBrightnessCommand>();
+                    h.ParameterInfo = h.Command.Parameters.Last();
+                    break;
+
+                case AtkKey.TouchPad:
+                    h.Command = commandService.ResolveNotNull<TouchPadCommand>();
+                    break;
+
+                case AtkKey.Sleep:
+                    h.Command = commandService.ResolveNotNull<SuspendCommand>();
+                    break;
+
+                default:
+                    h.Reset();
+                    break;
+            }
+        }
     }
 
     protected override void OnActivated()

@@ -159,6 +159,11 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
         Deactivate();
     }
 
+    public void Reset()
+    {
+        Command = CommandBase.Empty;
+    }
+
     public void Activate()
     {
         disposable = new CompositeDisposable();
