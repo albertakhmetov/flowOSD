@@ -33,6 +33,10 @@ using static flowOSD.Native.User32;
 
 sealed class MainUICommand : CommandBase
 {
+    private const int OFFSET_X = 10;
+    private const int OFFSET_Y = 10;
+    private const int ANIMATION_DELTA = 200;
+
     private IConfig config;
     private ISystemEvents systemEvents;
     private ICommandService commandService;
@@ -67,7 +71,7 @@ sealed class MainUICommand : CommandBase
 
     public override void Execute(object? parameter = null)
     {
-        if (GetTickCount() - deactivateTime < 100)
+        if (GetTickCount() - deactivateTime < 500)
         {
             return;
         }
@@ -79,13 +83,11 @@ sealed class MainUICommand : CommandBase
 
         if (window!.AppWindow?.IsVisible == true)
         {
-            window.AppWindow.Hide();
+            WindowAnimation.Hide(window.AppWindow, GetWindowY(), ANIMATION_DELTA);
+
             isWindowVisibleSubject.OnNext(false);
             return;
         }
-
-        const int offsetX = 10;
-        const int offsetY = 10;
 
         window.AppWindow?.Move(new Windows.Graphics.PointInt32(0, 0));
 
@@ -96,10 +98,14 @@ sealed class MainUICommand : CommandBase
             (int)(370 * scale),
             (int)(300 * scale)));
         window.AppWindow?.Move(new Windows.Graphics.PointInt32(
-            (int)(workArea.Width - window.AppWindow.Size.Width - offsetX),
-            (int)(workArea.Height - window.AppWindow.Size.Height - offsetY)));
+            (int)(workArea.Width - window.AppWindow.Size.Width - OFFSET_X),
+            (int)(workArea.Height - window.AppWindow.Size.Height - OFFSET_Y)));
 
-        ShowAndActivate(window);
+        if (window.AppWindow != null)
+        {
+            WindowAnimation.Show(window.AppWindow, GetWindowY(), ANIMATION_DELTA, () => ShowAndActivate(window));
+        }
+
         isWindowVisibleSubject.OnNext(true);
     }
 
@@ -108,6 +114,11 @@ sealed class MainUICommand : CommandBase
         DisposeWindow();
 
         base.Dispose();
+    }
+
+    private int GetWindowY()
+    {
+        return window == null ? 0 : Convert.ToInt32(GetPrimaryWorkArea().Height - window.AppWindow.Size.Height - OFFSET_Y);
     }
 
     private void DisposeWindow()
@@ -161,7 +172,7 @@ sealed class MainUICommand : CommandBase
         }
 
         deactivateTime = GetTickCount();
-        window.AppWindow.Hide();
+        WindowAnimation.Hide(window.AppWindow, GetWindowY(), ANIMATION_DELTA);
         isWindowVisibleSubject.OnNext(false);
     }
 }

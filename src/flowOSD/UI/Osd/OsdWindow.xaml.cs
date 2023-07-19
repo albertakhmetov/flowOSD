@@ -42,7 +42,7 @@ public sealed partial class OsdWindow : Window, IDisposable
     private IConfig config;
     private ISystemEvents systemEvents;
 
-    private IDisposable? hideTimer;
+    private IDisposable? hideTimer, animationTimer;
 
     public OsdWindow(IConfig config, ISystemEvents systemEvents)
     {
@@ -93,6 +93,7 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         hideTimer?.Dispose();
         hideTimer = null;
+        animationTimer?.Dispose();
 
         ViewModel.Update(data);
 
@@ -102,7 +103,7 @@ public sealed partial class OsdWindow : Window, IDisposable
 
         if (AppWindow.IsVisible != true)
         {
-            AppWindow.Show(false);
+            animationTimer = WindowAnimation.Show(AppWindow, GetWindowY(), AppWindow.Size.Height / 2);
         }
 
         hideTimer = Observable
@@ -110,9 +111,10 @@ public sealed partial class OsdWindow : Window, IDisposable
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(t =>
             {
-                AppWindow?.Hide();
                 hideTimer?.Dispose();
                 hideTimer = null;
+                animationTimer?.Dispose();
+                animationTimer = WindowAnimation.Hide(AppWindow, GetWindowY(), AppWindow.Size.Height / 2);
             });
     }
 
@@ -130,9 +132,14 @@ public sealed partial class OsdWindow : Window, IDisposable
         var height = (int)(72f);
 
         var x = (int)((workArea.Width - width) / 2);
-        var y = (int)((workArea.Bottom - 90));
+        var y = GetWindowY();
 
         AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(x, y, width, height));
+    }
+
+    private int GetWindowY()
+    {
+        return Convert.ToInt32(GetPrimaryWorkArea().Bottom - 90);
     }
 
     private void UpdateTheme(bool isDark)
