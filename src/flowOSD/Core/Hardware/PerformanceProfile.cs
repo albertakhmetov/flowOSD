@@ -46,6 +46,7 @@ public class PerformanceProfile
         string name,
         PerformanceMode performanceMode,
         uint cpuLimit,
+        bool useCustomFanCurves,
         IList<FanDataPoint> cpuFanCurve,
         IList<FanDataPoint> gpuFanCurve)
     {
@@ -54,6 +55,7 @@ public class PerformanceProfile
         Name = name ?? throw new ArgumentNullException(nameof(name));
         PerformanceMode = performanceMode;
         CpuLimit = cpuLimit;
+        UseCustomFanCurves = useCustomFanCurves;
         CpuFanCurve = new ReadOnlyCollection<FanDataPoint>(cpuFanCurve);
         GpuFanCurve = new ReadOnlyCollection<FanDataPoint>(gpuFanCurve);
     }
@@ -68,6 +70,7 @@ public class PerformanceProfile
         Name = name ?? throw new ArgumentNullException(nameof(name));
         PerformanceMode = performanceMode;
         CpuLimit = 0;
+        UseCustomFanCurves = false;
         CpuFanCurve = new FanDataPoint[0];
         GpuFanCurve = new FanDataPoint[0];
     }
@@ -86,6 +89,8 @@ public class PerformanceProfile
 
     public uint CpuLimit { get; }
 
+    public bool UseCustomFanCurves { get; }
+
     public IList<FanDataPoint> CpuFanCurve { get; }
 
     public IList<FanDataPoint> GpuFanCurve { get; }
@@ -102,6 +107,7 @@ public class PerformanceProfile
             profileName,
             PerformanceMode,
             CpuLimit,
+            UseCustomFanCurves,
             CpuFanCurve.ToArray(),
             GpuFanCurve.ToArray());
     }

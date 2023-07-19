@@ -51,6 +51,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private bool fanCurveError;
     private PerformanceMode performanceMode;
     private uint cpuLimit;
+    private bool useCustomFanCurves;
 
     public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
         : base(config, Text.Instance.Config.Performance.Title, Images.Instance.PerformanceMode.Performance)
@@ -163,6 +164,16 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         }
     }
 
+    public bool UseCustomFanCurves
+    {
+        get => useCustomFanCurves;
+        set
+        {
+            SetProperty(ref useCustomFanCurves, value);
+            isDirtySubject.OnNext(true);
+        }
+    }
+
     public uint MinPowerLimit { get; }
 
     public uint MaxPowerLimit { get; }
@@ -190,6 +201,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             profileName,
             PerformanceMode.Performance,
             35,
+            false,
             FanDataPoint.CreateDefaultCurve(),
             FanDataPoint.CreateDefaultCurve());
 
@@ -273,6 +285,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             newProfileName ?? CurrentProfile.Name,
             PerformanceMode,
             CpuLimit,
+            UseCustomFanCurves,
             Cpu.ToArray(),
             Gpu.ToArray());
 

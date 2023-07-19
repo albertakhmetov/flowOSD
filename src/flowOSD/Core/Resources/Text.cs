@@ -300,6 +300,10 @@ public sealed class Text
             public string FanCurveWarningMessage => "Custom Fan Curves are working only when dGPU is ON; otherwise default Fan Curves are applied.";
 
             public string FanCurveWarningMore => "Learn more";
+
+            public string FanCurves => "Fan Curves";
+
+            public string UseCustomFanCurves => "Use Custom Fan Curves";
         }
 
         public sealed class TabletSection

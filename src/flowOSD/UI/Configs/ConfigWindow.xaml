@@ -702,45 +702,59 @@
 
                         <TextBlock 
                             Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
-                            Text="Fan Curves"
+                            Text="{Binding TextResources.Config.Performance.FanCurves}"
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
-                        <InfoBar
-                            Margin="10, 5"
-                            IsClosable="false"
-                            IsOpen="{Binding IsFanCurvesWarningVisible}"
-                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                            Background="{ThemeResource ControlFillColorDefaultBrush}"
-                            Severity="Informational"
-                            Title=""
-                            Message="{Binding TextResources.Config.Performance.FanCurveWarningMessage}">
-                            <InfoBar.ActionButton>
-                                <HyperlinkButton NavigateUri="{Binding CustomFanCurvesPageUrl}" Content="{Binding TextResources.Config.Performance.FanCurveWarningMore}"/>
-                            </InfoBar.ActionButton>
-                        </InfoBar>
-
-                        <Border 
-                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
-                            Style="{StaticResource CxConfigBorderStyle}">
-
-                            <controls:FanCurveTuner
-                                x:Name="cpuCurveTuner"
-                                IsEnabled="{Binding IsUserData, Mode=OneWay}"
-                                DataContext="{Binding Cpu, Mode=OneTime}"
-                                Height="200"/>
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding UseCustomFanCurves, Mode=TwoWay}">
+                                <ToggleSwitch.Header>
+                                    <TextBlock Text="{Binding TextResources.Config.Performance.UseCustomFanCurves}"/>
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
                         </Border>
 
-                        <Border 
-                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
-                            Style="{StaticResource CxConfigBorderStyle}">
+                        <StackPanel
+                            Orientation="Vertical"
+                            Visibility="{Binding UseCustomFanCurves, Converter={StaticResource VisibilityConverter}}">
 
-                            <controls:FanCurveTuner 
-                                x:Name="gpuCurveTuner"
-                                IsEnabled="{Binding IsUserData, Mode=OneWay}"
-                                DataContext="{Binding Gpu, Mode=OneTime}"
-                                Height="200"/>
-                        </Border>
+                            <InfoBar
+                                Margin="10, 5"
+                                IsClosable="false"
+                                IsOpen="{Binding IsFanCurvesWarningVisible}"
+                                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                Severity="Informational"
+                                Title=""
+                                Message="{Binding TextResources.Config.Performance.FanCurveWarningMessage}">
+
+                                <InfoBar.ActionButton>
+                                    <HyperlinkButton NavigateUri="{Binding CustomFanCurvesPageUrl}" Content="{Binding TextResources.Config.Performance.FanCurveWarningMore}"/>
+                                </InfoBar.ActionButton>
+                            </InfoBar>
+
+                            <Border 
+                                Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
+                                Style="{StaticResource CxConfigBorderStyle}">
+
+                                <controls:FanCurveTuner
+                                    x:Name="cpuCurveTuner"
+                                    IsEnabled="{Binding IsUserData, Mode=OneWay}"
+                                    DataContext="{Binding Cpu, Mode=OneTime}"
+                                    Height="200"/>
+                            </Border>
+
+                            <Border 
+                                Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}"
+                                Style="{StaticResource CxConfigBorderStyle}">
+
+                                <controls:FanCurveTuner 
+                                    x:Name="gpuCurveTuner"
+                                    IsEnabled="{Binding IsUserData, Mode=OneWay}"
+                                    DataContext="{Binding Gpu, Mode=OneTime}"
+                                    Height="200"/>
+                            </Border>
+                        </StackPanel>
 
                     </StackPanel>
 
