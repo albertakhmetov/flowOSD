@@ -981,10 +981,18 @@
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Runtime}" Style="{StaticResource Value}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ModelName}" Style="{StaticResource Value}"/>
 
-                                <HyperlinkButton
+                                <StackPanel
                                     Grid.Row="5"
                                     Margin="-13,0,0,0"
-                                    NavigateUri="{Binding HomePageUrl}" Content="{Binding HomePage}"/>
+                                    Orientation="Horizontal">
+
+                                    <HyperlinkButton
+                                        
+                                        NavigateUri="{Binding HomePageUrl}" Content="{Binding TextResources.Config.About.HomePage}"/>
+
+                                    <HyperlinkButton
+                                        NavigateUri="{Binding LicenseUrl}" Content="{Binding TextResources.Config.About.License}"/>
+                                </StackPanel>
                             </Grid>
                         </Border>
 

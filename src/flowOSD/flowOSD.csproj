@@ -22,7 +22,7 @@
 		<PackageIcon></PackageIcon>
 		<PackageIconUrl />
 		<ApplicationIcon>Resources\app.ico</ApplicationIcon>
-		<Description>flowOSD is an open-source application to control hardware and show OSD messages on ASUS ROG Flow x13 notebooks.</Description>
+		<Description>flowOSD is an open-source application to control hardware and show OSD messages on ASUS ROG Flow x13 notebooks. Licensed under GPL-3.0 license.</Description>
 	</PropertyGroup>
 	
 	<PropertyGroup>
@@ -144,5 +144,11 @@
 
 	<ItemGroup>
 	  <PRIResource Remove="UI\NotifyMenu\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\LICENSE" Link="LICENSE">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>

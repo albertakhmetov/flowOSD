@@ -352,6 +352,8 @@ public sealed class Text
 
             public string HomePage => "Home page";
 
+            public string License => "License";
+
             public string Version => "Version";
 
             public string Runtime => "Runtime";

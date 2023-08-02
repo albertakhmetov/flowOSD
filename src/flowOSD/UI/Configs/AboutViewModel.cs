@@ -62,6 +62,8 @@ public sealed class AboutViewModel : ConfigViewModelBase
         HomePage = TextResources.Config.About.HomePage;
         HomePageUrl = Urls.Instance.HomePage;
 
+        LicenseUrl = Urls.Instance.License;
+
         ModelName = config.ModelName;
 
         updateSubscription = updateService.State
@@ -86,6 +88,8 @@ public sealed class AboutViewModel : ConfigViewModelBase
     public string HomePage { get; }
 
     public string HomePageUrl { get; }
+
+    public string LicenseUrl { get; }
 
     public string ModelName { get; }
 

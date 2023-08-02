@@ -25,6 +25,8 @@ public sealed class Urls
 
     public string HomePage => "https://github.com/albertakhmetov/flowOSD";
 
+    public string License => "https://raw.githubusercontent.com/albertakhmetov/flowOSD/main/LICENSE";
+
     public string Optimization => "https://github.com/albertakhmetov/flowOSD/wiki/ASUS-Optimization";
 
     public string CustomFanCurves => "https://github.com/albertakhmetov/flowOSD/wiki/Custom-Fan-Curves";
