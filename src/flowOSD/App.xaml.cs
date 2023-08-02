@@ -55,7 +55,7 @@ public partial class App : Application
     private KeysSender keysSender;
     private Osd osd;
 
-    private HardwareService hardwareService;
+    private IHardwareService hardwareService;
     private CommandService commandService;
     private HotKeysService hotKeyService;
 
@@ -92,11 +92,20 @@ public partial class App : Application
             keysSender = new KeysSender();
             osd = new Osd(configService, systemEvents);
 
-            hardwareService = new HardwareService(
-                configService,
-                notificationService,
-                messageQueue,
-                keysSender).DisposeWith(disposable);
+            if (configService.Common.UseMockMode)
+            {
+                hardwareService = new MockHardwareService(
+                    configService,
+                    notificationService);
+            }
+            else
+            {
+                hardwareService = new HardwareService(
+                    configService,
+                    notificationService,
+                    messageQueue,
+                    keysSender).DisposeWith(disposable);
+            }
 
             osdNotificationService = new OsdNotificationService(
                 configService,

@@ -230,7 +230,7 @@ public sealed class Images
         var power = (powerState & BatteryPowerState.PowerOnLine) == BatteryPowerState.PowerOnLine
             ? 11
             : 0;
-        var c = Math.Round((capacity * 10f) / fullChargedCapacity);
+        var c = Math.Min(10, Math.Round((capacity * 10f) / fullChargedCapacity));
 
         return new string((char)(0xf5f2 + c + power), 1);
     }

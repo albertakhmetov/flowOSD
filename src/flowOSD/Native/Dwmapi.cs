@@ -19,6 +19,7 @@
 
 using System.Runtime.InteropServices;
 using System.Security;
+using flowOSD.Extensions;
 
 namespace flowOSD.Native;
 
@@ -42,6 +43,11 @@ static class Dwmapi
 
     public static void SetCornerPreference(IntPtr hWnd, DWM_WINDOW_CORNER_PREFERENCE cornerPreference)
     {
+        if (!Common.IsWindows11)
+        {
+            return;
+        }
+
         var value = GCHandle.Alloc((uint)cornerPreference, GCHandleType.Pinned);
         var result = DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, value.AddrOfPinnedObject(), sizeof(uint));
         value.Free();

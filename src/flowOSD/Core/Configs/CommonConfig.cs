@@ -46,6 +46,8 @@ public sealed class CommonConfig : ConfigBase
     private uint batteryChargeLimit;
     private bool forceCustomFanCurves;
 
+    private bool useMockMode;
+
     public CommonConfig()
     {
         // Default values
@@ -66,6 +68,8 @@ public sealed class CommonConfig : ConfigBase
         useBatteryChargeLimit = false;
         batteryChargeLimit = 80;
         forceCustomFanCurves = false;
+
+        useMockMode = false;
     }
 
     [JsonIgnore]
@@ -151,5 +155,11 @@ public sealed class CommonConfig : ConfigBase
     {
         get => forceCustomFanCurves;
         set => SetProperty(ref forceCustomFanCurves, value);
+    }
+
+    public bool UseMockMode
+    {
+        get => useMockMode;
+        set => SetProperty(ref useMockMode, value);
     }
 }
