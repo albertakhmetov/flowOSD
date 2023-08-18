@@ -150,6 +150,7 @@ sealed class ConfigService : IConfig, IDisposable
 
     private POCO Load()
     {
+        configFile.Refresh();
         try
         {
             using var stream = configFile.OpenRead();
@@ -195,6 +196,7 @@ sealed class ConfigService : IConfig, IDisposable
             JsonSerializer.Serialize<POCO>(stream, poco, options);
         }
 
+        configFile.Refresh();
         if (configFile.Exists)
         {
             tempFile.Replace(configFile.FullName, configFile.FullName + ".backup");
