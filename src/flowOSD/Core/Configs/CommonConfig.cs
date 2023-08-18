@@ -32,6 +32,8 @@ public sealed class CommonConfig : ConfigBase
     private bool disableTouchPadInTabletMode;
     private bool controlDisplayRefreshRate;
     private bool confirmGpuModeChange;
+    private bool disableVariBright;
+
     private bool checkForUpdates;
 
     private KeyboardBacklightLevel keyboardBacklightLevel;
@@ -70,6 +72,7 @@ public sealed class CommonConfig : ConfigBase
         forceCustomFanCurves = false;
 
         useMockMode = false;
+        disableVariBright = true;
     }
 
     [JsonIgnore]
@@ -101,6 +104,12 @@ public sealed class CommonConfig : ConfigBase
     {
         get => confirmGpuModeChange;
         set => SetProperty(ref confirmGpuModeChange, value);
+    }
+
+    public bool DisableVariBright
+    {
+        get => disableVariBright;
+        set => SetProperty(ref disableVariBright, value);
     }
 
     public KeyboardBacklightLevel KeyboardBacklightLevel

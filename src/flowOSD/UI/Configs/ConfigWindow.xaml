@@ -212,6 +212,12 @@
                                 Header="{Binding TextResources.Config.General.ConfirmGpuModeChange}"
                                 IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
                         </Border>
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{Binding TextResources.Config.General.DisableVariBright}"
+                                IsOn="{Binding DisableVariBright, Mode=TwoWay}" />
+                        </Border>
                     </StackPanel>
 
                     <!-- Notifications -->
@@ -706,7 +712,10 @@
                             FontWeight="SemiBold"
                             Margin="10,30,0,5"/>
 
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding CurrentProfile, Converter={StaticResource VisibilityConverter}}">
+                            
                             <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding UseCustomFanCurves, Mode=TwoWay}">
                                 <ToggleSwitch.Header>
                                     <TextBlock Text="{Binding TextResources.Config.Performance.UseCustomFanCurves}"/>

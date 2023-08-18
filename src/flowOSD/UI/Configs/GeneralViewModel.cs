@@ -68,6 +68,12 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         set => Config.Common.ConfirmGpuModeChange = value;
     }
 
+    public bool DisableVariBright
+    {
+        get => Config.Common.DisableVariBright;
+        set => Config.Common.DisableVariBright = value;
+    }
+
     public void Dispose()
     {
         OnDeactivated();

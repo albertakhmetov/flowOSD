@@ -54,6 +54,8 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
     private Microphone microphone;
     private PerformanceService performanceService;
 
+    private AmdGpu amd;
+
     private Dictionary<Type, object> devices = new Dictionary<Type, object>();
 
     private KeyboardBacklightService? keyboardBacklightService;
@@ -120,6 +122,8 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
             atk, 
             powerManagement);
 
+        amd = new AmdGpu();
+
         Register<IAtk>(atk);
         Register<IKeyboard>(keyboard);
         Register<IKeyboardBacklight>(keyboardBacklight);
@@ -171,6 +175,14 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
                 this.config,
                 atk).DisposeWith(disposable);
         }
+
+        config.Common.PropertyChanged
+            .Where(name => name == nameof(CommonConfig.DisableVariBright))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(_ => UpdateVariBrightState())
+            .DisposeWith(disposable);
+
+        UpdateVariBrightState();
     }
 
     public bool OptimizationService { get; }
@@ -251,6 +263,8 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         refreshRateService.Update();
         performanceService.Update();
         batteryChargeService?.Update();
+
+        UpdateVariBrightState();
     }
 
     private void InitHid()
@@ -287,5 +301,10 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
             touchPad.Toggle();
             return;
         }
+    }
+
+    private void UpdateVariBrightState()
+    {
+        amd.SetVariBright(!config.Common.DisableVariBright);
     }
 }

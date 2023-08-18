@@ -173,6 +173,8 @@ public sealed class Text
             public string ControlDisplayRefreshRate => "Control display refresh rate";
 
             public string ConfirmGpuModeChange => "Confirm GPU change";
+
+            public string DisableVariBright => "Disable Vari-Bright";
         }
 
         public sealed class NotificationsSection
