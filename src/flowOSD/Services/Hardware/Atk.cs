@@ -156,26 +156,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
                 if (sum > 0 && updateSubscription == null)
                 {
                     updateSubscription = Observable.Interval(TimeSpan.FromSeconds(1))
-                        .Subscribe(_ =>
-                            {
-                                if (Get(CPU_TEMPERATURE, out var temperature))
-                                {
-                                    cpuTemperatureSubject.OnNext(temperature);
-                                }
-
-                                int fanSpeed;
-                                const float maxCpuFanSpeed = 0.92f, maxGpuFanSpeed = 0.75f;
-
-                                if (Get(CPU_FAN_SPEED, out fanSpeed))
-                                {
-                                    cpuFanSpeedSubject.OnNext(Convert.ToInt32(Math.Round(fanSpeed / maxCpuFanSpeed)));
-                                }
-
-                                if (Get(GPU_FAN_SPEED, out fanSpeed))
-                                {
-                                    gpuFanSpeedSubject.OnNext(Convert.ToInt32(Math.Round(fanSpeed / maxGpuFanSpeed)));
-                                }
-                            });
+                        .Subscribe(_ => UpdateMonitoring());
                 }
             })
             .DisposeWith(disposable);
@@ -420,6 +401,27 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
             default:
                 return ChargerTypes.Connected;
+        }
+    }
+
+    private void UpdateMonitoring()
+    {
+        if (Get(CPU_TEMPERATURE, out var temperature))
+        {
+            cpuTemperatureSubject.OnNext(temperature);
+        }
+
+        int fanSpeed;
+        const float maxCpuFanSpeed = 0.92f, maxGpuFanSpeed = 0.75f;
+
+        if (Get(CPU_FAN_SPEED, out fanSpeed))
+        {
+            cpuFanSpeedSubject.OnNext(Convert.ToInt32(Math.Round(fanSpeed / maxCpuFanSpeed)));
+        }
+
+        if (Get(GPU_FAN_SPEED, out fanSpeed))
+        {
+            gpuFanSpeedSubject.OnNext(Convert.ToInt32(Math.Round(fanSpeed / maxGpuFanSpeed)));
         }
     }
 

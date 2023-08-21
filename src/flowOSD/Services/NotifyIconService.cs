@@ -81,7 +81,7 @@ sealed partial class NotifyIconService : IDisposable
         messageQueue.Subscribe(MessageId, ProcessMessage).DisposeWith(disposable);
     }
 
-    public string Text
+    public string? Text
     {
         get => text;
         set
