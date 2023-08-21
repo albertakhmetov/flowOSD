@@ -1,6 +1,6 @@
 # flowOSD
 
-[Download the latest version here](https://github.com/albertakhmetov/flowOSD/releases/download/v3.0.0/flowOSD-3.1.0.exe)
+[Download the latest version here](https://github.com/albertakhmetov/flowOSD/releases/download/v3.1.0/flowOSD-3.1.0.exe)
 
 <img width="320" alt="main" src="https://github.com/albertakhmetov/flowOSD/assets/5954460/96571d3a-0f6e-495e-b878-d815afc852f2">
 
