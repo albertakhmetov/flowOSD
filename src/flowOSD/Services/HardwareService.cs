@@ -166,6 +166,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
         refreshRateService = new RefreshRateService(
             this.config,
+            atk,
             display,
             powerManagement).DisposeWith(disposable);
 

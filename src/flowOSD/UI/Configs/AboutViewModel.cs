@@ -124,6 +124,8 @@ public sealed class AboutViewModel : ConfigViewModelBase
             .SubscribeOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
+
+        OnPropertyChanged(null);
     }
 
     protected override void OnDeactivated()

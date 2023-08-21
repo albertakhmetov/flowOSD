@@ -31,6 +31,7 @@ public sealed class CommonConfig : ConfigBase
     private bool runAtStartup;
     private bool disableTouchPadInTabletMode;
     private bool controlDisplayRefreshRate;
+    private bool tabletWithHighDisplayRefreshRate;
     private bool confirmGpuModeChange;
     private bool disableVariBright;
 
@@ -55,6 +56,7 @@ public sealed class CommonConfig : ConfigBase
         // Default values
 
         controlDisplayRefreshRate = true;
+        tabletWithHighDisplayRefreshRate = true;
         disableTouchPadInTabletMode = true;
         confirmGpuModeChange = true;
         checkForUpdates = true;
@@ -99,6 +101,12 @@ public sealed class CommonConfig : ConfigBase
         get => controlDisplayRefreshRate;
         set => SetProperty(ref controlDisplayRefreshRate, value);
     }
+
+    public bool TabletWithHighDisplayRefreshRate
+    {
+        get => tabletWithHighDisplayRefreshRate;
+        set => SetProperty(ref tabletWithHighDisplayRefreshRate, value);
+    }    
 
     public bool ConfirmGpuModeChange
     {

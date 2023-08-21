@@ -87,6 +87,8 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
             .SubscribeOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
+
+        OnPropertyChanged(null);
     }
 
     protected override void OnDeactivated()

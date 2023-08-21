@@ -797,6 +797,16 @@
                                     VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
+
+                        <Border
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding ControlDisplayRefreshRate, Converter={StaticResource VisibilityConverter}}">
+                            
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{Binding TextResources.Config.Tablet.TabletWithHighDisplayRefreshRate}"
+                                IsOn="{Binding TabletWithHighDisplayRefreshRate, Mode=TwoWay}" />
+                        </Border>
                     </StackPanel>
 
                     <!-- Battery -->

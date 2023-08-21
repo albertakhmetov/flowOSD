@@ -56,6 +56,17 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
         set => Config.Common.DisableTouchPadInTabletMode = value;
     }
 
+    public bool TabletWithHighDisplayRefreshRate
+    {
+        get => Config.Common.TabletWithHighDisplayRefreshRate;
+        set => Config.Common.TabletWithHighDisplayRefreshRate = value;
+    }
+
+    public bool ControlDisplayRefreshRate
+    {
+        get => Config.Common.ControlDisplayRefreshRate;
+    }
+
     public PerformanceProfile TabletProfile
     {
         get => performanceService.GetProfile(Config.Performance.TabletProfile);
@@ -102,6 +113,8 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
             .DisposeWith(disposable);
 
         UpdateProfiles(Guid.Empty);
+
+        OnPropertyChanged(null);
     }
 
     protected override void OnDeactivated()

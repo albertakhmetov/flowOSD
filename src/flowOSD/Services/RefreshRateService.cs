@@ -32,19 +32,24 @@ internal sealed class RefreshRateService : IDisposable
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private IConfig config;
+    private IAtk atk;
     private IDisplay display;
     private IPowerManagement powerManagement;
 
-    public RefreshRateService(IConfig config, IDisplay display, IPowerManagement powerManagement)
+    public RefreshRateService(IConfig config, IAtk atk, IDisplay display, IPowerManagement powerManagement)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.display = display ?? throw new ArgumentNullException(nameof(display));
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
 
         powerManagement.PowerSource
-            .CombineLatest(display.State, (powerSource, displayState) => new { powerSource, displayState })
+            .CombineLatest(
+                display.State, 
+                atk.TabletMode, 
+                (powerSource, displayState, tabletMode) => new { powerSource, displayState, tabletMode })
             .Throttle(TimeSpan.FromSeconds(5))
-            .Subscribe(x => Update(x.powerSource, x.displayState))
+            .Subscribe(x => Update(x.powerSource, x.displayState, x.tabletMode))
             .DisposeWith(disposable);
     }
 
@@ -56,10 +61,13 @@ internal sealed class RefreshRateService : IDisposable
 
     public async void Update()
     {
-        Update(await powerManagement.PowerSource.FirstOrDefaultAsync(), await display.State.FirstOrDefaultAsync());
+        Update(
+            await powerManagement.PowerSource.FirstOrDefaultAsync(), 
+            await display.State.FirstOrDefaultAsync(),
+            await atk.TabletMode.FirstOrDefaultAsync());
     }
 
-    private async void Update(PowerSource powerSource, DeviceState displayState)
+    private async void Update(PowerSource powerSource, DeviceState displayState, TabletMode tabletMode)
     {
         if (!config.Common.ControlDisplayRefreshRate || displayState == DeviceState.Disabled)
         {
@@ -70,7 +78,7 @@ internal sealed class RefreshRateService : IDisposable
         {
             var refreshRates = await display.RefreshRates.FirstOrDefaultAsync();
 
-            if (powerSource == PowerSource.Battery)
+            if (powerSource == PowerSource.Battery && (!config.Common.TabletWithHighDisplayRefreshRate || tabletMode == TabletMode.Notebook))
             {
                 display.SetRefreshRate(refreshRates?.Low);
             }

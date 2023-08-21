@@ -315,6 +315,8 @@ public sealed class Text
             public string DisableTouchPadInTabletMode => "Disable TouchPad in tablet mode";
 
             public string Profile => "Performance profile in tablet mode";
+
+            public string TabletWithHighDisplayRefreshRate => "Use high display refresh rate in tablet mode";
         }
 
         public sealed class BatterySection
