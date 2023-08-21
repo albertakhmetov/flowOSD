@@ -65,7 +65,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
     public HardwareService(
         IConfig config,
         INotificationService notificationService,
-        IMessageQueue messageQueue, 
+        IMessageQueue messageQueue,
         IKeysSender keysSender)
     {
         try
@@ -119,7 +119,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         performanceService = new PerformanceService(
             config,
             notificationService,
-            atk, 
+            atk,
             powerManagement);
 
         amd = new AmdGpu();
@@ -249,7 +249,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         }
     }
 
-    private void OnResume()
+    private async void OnResume()
     {
         battery.Reconnect();
 
@@ -264,6 +264,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         performanceService.Update();
         batteryChargeService?.Update();
 
+        UpdateTouchPad(await atk.TabletMode.FirstOrDefaultAsync());
         UpdateVariBrightState();
     }
 

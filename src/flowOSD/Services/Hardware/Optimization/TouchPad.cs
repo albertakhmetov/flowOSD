@@ -56,7 +56,7 @@ sealed class TouchPad : ITouchPad, IDisposable
 
     public void Toggle()
     {
-        //  keysSender.SendKeys(Keys.F24, Keys.ControlKey, Keys.LWin);
+        keysSender.SendKeys(Windows.System.VirtualKey.F24, Windows.System.VirtualKey.Control, Windows.System.VirtualKey.LeftWindows);
     }
 
     public void Dispose()
