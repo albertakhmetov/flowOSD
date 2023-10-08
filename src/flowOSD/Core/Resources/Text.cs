@@ -485,6 +485,8 @@ public sealed class Text
 
         public ExitSection Exit { get; } = new ExitSection();
 
+        public RestartSection Restart { get; } = new RestartSection();
+
         public KeyboardBacklightSection KeyboardBacklight { get; } = new KeyboardBacklightSection();
 
         public MicrophoneSection Microphone { get; } = new MicrophoneSection();
@@ -567,6 +569,13 @@ public sealed class Text
         public sealed class ExitSection
         {
             public string Description => "Exit";
+        }
+
+        public sealed class RestartSection
+        {
+            public string Description => "Restart";
+
+            public string ErrorText => "Something went wrong. Please restart the app manually";
         }
 
         public sealed class KeyboardBacklightSection

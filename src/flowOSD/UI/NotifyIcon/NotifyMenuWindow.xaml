@@ -21,6 +21,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <MenuFlyoutItem 
@@ -43,8 +45,14 @@
             CommandParameter="AboutViewModel"
             Click="OnMenuFlyoutItemClick"/>
         <MenuFlyoutSeparator Grid.Row="4" IsTabStop="False"/>
+        <MenuFlyoutItem
+            Grid.Row="5"
+            Text="{Binding RestartAppCommand.Text}"
+            Command="{Binding RestartAppCommand, Mode=OneTime}"
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutSeparator Grid.Row="6" IsTabStop="False"/>
         <MenuFlyoutItem 
-            Grid.Row="5" 
+            Grid.Row="7" 
             Text="{Binding ExitCommand.Text, Mode=OneWay}" 
             Command="{Binding ExitCommand, Mode=OneTime}" 
             Click="OnMenuFlyoutItemClick"/>

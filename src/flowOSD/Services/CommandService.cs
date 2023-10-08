@@ -67,6 +67,7 @@ sealed class CommandService : ICommandService, IDisposable
             config.Common));
 
         Register(() => new ExitCommand());
+        Register(() => new RestartAppCommand(notificationService));
         Register(() => new SuspendCommand());
 
         Register(() => new ConfigCommand(config, systemEvents, this, hardwareService, updateService));

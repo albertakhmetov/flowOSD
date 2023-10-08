@@ -20,6 +20,7 @@ public sealed class NotifyMenuViewModel : ViewModelBase
 
         MainUICommand = commandService.ResolveNotNull<MainUICommand>();
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
+        RestartAppCommand = commandService.ResolveNotNull<RestartAppCommand>();
         ExitCommand = commandService.ResolveNotNull<ExitCommand>();
     }
 
@@ -28,6 +29,8 @@ public sealed class NotifyMenuViewModel : ViewModelBase
     public CommandBase MainUICommand { get; }
 
     public CommandBase ConfigCommand { get; }
+
+    public CommandBase RestartAppCommand { get; }
 
     public CommandBase ExitCommand { get; }
 }

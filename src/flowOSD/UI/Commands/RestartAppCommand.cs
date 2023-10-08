@@ -19,15 +19,20 @@
 
 namespace flowOSD.UI.Commands;
 
-using System.ComponentModel;
-using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
+using System;
+using flowOSD.Core;
+using Microsoft.Windows.AppLifecycle;
+using Windows.ApplicationModel.Core;
 
-sealed class ExitCommand : CommandBase
+internal class RestartAppCommand : CommandBase
 {
-    public ExitCommand()
+    private INotificationService notificationService;
+
+    public RestartAppCommand(INotificationService notificationService)
     {
-        Text = TextResources.Commands.Exit.Description;
+        this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+
+        Text = TextResources.Commands.Restart.Description;
         Enabled = true;
     }
 
@@ -35,9 +40,9 @@ sealed class ExitCommand : CommandBase
 
     public override void Execute(object? parameter = null)
     {
-        if (Microsoft.UI.Xaml.Application.Current is App app)
+        if (AppInstance.Restart(string.Empty) != AppRestartFailureReason.RestartPending)
         {
-            app.ShutDown();
+            notificationService.ShowError(TextResources.Commands.Restart.ErrorText);
         }
     }
 }
