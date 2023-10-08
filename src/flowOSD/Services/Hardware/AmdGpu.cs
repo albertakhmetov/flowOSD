@@ -35,13 +35,23 @@ sealed class AmdGpu : IDisposable
 
     public AmdGpu()
     {
-        ADL2_Main_Control_Create(size => Marshal.AllocCoTaskMem(size), 1, out context);
+        try
+        {
+            ADL2_Main_Control_Create(size => Marshal.AllocCoTaskMem(size), 1, out context);
+            IsSupported = true;
+        }
+        catch(DllNotFoundException)
+        {
+            IsSupported = false;
+        }
     }
 
     ~AmdGpu()
     {
         Dispose(false);
     }
+
+    public bool IsSupported { get; }
 
     public void Dispose()
     {
@@ -51,7 +61,7 @@ sealed class AmdGpu : IDisposable
 
     public bool SetVariBright(bool enabled)
     {
-        if (context == IntPtr.Zero)
+        if (!IsSupported || context == IntPtr.Zero)
         {
             return false;
         }
@@ -73,7 +83,7 @@ sealed class AmdGpu : IDisposable
 
     public bool? GetVariBright()
     {
-        if (context == nint.Zero)
+        if (!IsSupported || context == IntPtr.Zero)
         {
             return false;
         }
@@ -147,7 +157,7 @@ sealed class AmdGpu : IDisposable
 
     private void Dispose(bool isDisposing)
     {
-        if (context != IntPtr.Zero)
+        if (IsSupported && context != IntPtr.Zero)
         {
             ADL2_Main_Control_Destroy(context);
             context = IntPtr.Zero;

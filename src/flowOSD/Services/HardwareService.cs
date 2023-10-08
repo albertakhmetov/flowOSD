@@ -204,6 +204,8 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     public bool CpuPowerLimit => atk.CpuPowerLimitSupported;
 
+    public bool AmdIntegratedGpu => amd.IsSupported;
+
     public void Dispose()
     {
         if (disposable != null)

@@ -38,4 +38,6 @@ public interface IHardwareFeatures
     public bool ChargeLimit { get; }
 
     public bool CpuPowerLimit { get; }
+
+    public bool AmdIntegratedGpu { get; }
 }

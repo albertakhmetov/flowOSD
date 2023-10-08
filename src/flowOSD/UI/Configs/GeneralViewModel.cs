@@ -48,6 +48,8 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 
     public bool IsOptimizationInfoVisible => hardwareFeatures.OptimizationService;
 
+    public bool VariBrightControlEnabled => hardwareFeatures.AmdIntegratedGpu;
+
     public string OptimizationPageUrl => Urls.Instance.Optimization;
 
     public bool RunAtStartup

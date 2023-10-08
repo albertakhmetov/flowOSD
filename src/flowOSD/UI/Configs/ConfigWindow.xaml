@@ -212,7 +212,10 @@
                                 Header="{Binding TextResources.Config.General.ConfirmGpuModeChange}"
                                 IsOn="{Binding ConfirmGpuModeChange, Mode=TwoWay}" />
                         </Border>
-                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                        <Border 
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding VariBrightControlEnabled, Converter={StaticResource VisibilityConverter}}">
+                            
                             <ToggleSwitch 
                                 HorizontalAlignment="Stretch"
                                 Header="{Binding TextResources.Config.General.DisableVariBright}"

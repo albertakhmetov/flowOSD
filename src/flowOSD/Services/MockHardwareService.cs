@@ -95,6 +95,8 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
 
     public bool CpuPowerLimit => true;
 
+    public bool AmdIntegratedGpu => true;
+
     public T? Resolve<T>() where T : class
     {
         return register.ContainsKey(typeof(T)) ? (T)register[typeof(T)] : null;
