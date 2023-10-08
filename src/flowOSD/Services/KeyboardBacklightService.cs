@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using flowOSD.Extensions;
@@ -36,7 +37,7 @@ sealed class KeyboardBacklightService : IDisposable
     private IConfig config;
     private IKeyboardBacklightControl keyboardBacklightControl;
     private IKeyboard keyboard;
-    private IPowerManagement powerManagement; 
+    private IPowerManagement powerManagement;
     private IDisplay display;
     private TimeSpan timeout;
 
@@ -46,7 +47,7 @@ sealed class KeyboardBacklightService : IDisposable
         IConfig config,
         IHardwareService hardwareService)
     {
-        if(hardwareService == null)
+        if (hardwareService == null)
         {
             throw new ArgumentNullException(nameof(hardwareService));
         }
@@ -81,8 +82,8 @@ sealed class KeyboardBacklightService : IDisposable
         powerManagement.PowerEvent
             .Where(x => x == PowerEvent.DisplayOn)
             .Subscribe(_ => lastActivityTime = GetTickCount())
-            .DisposeWith(disposable); 
-        
+            .DisposeWith(disposable);
+
         display.State
             .Where(x => x == DeviceState.Enabled)
             .Subscribe(_ => lastActivityTime = GetTickCount())

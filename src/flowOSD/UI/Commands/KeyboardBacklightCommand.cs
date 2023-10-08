@@ -42,6 +42,7 @@ sealed class KeyboardBacklightCommand : CommandBase
     private IOsd osd;
     private IKeyboardBacklight keyboardBacklight;
     private IKeyboardBacklightControl? keyboardBacklightControl;
+    private IDisplay display;
 
     public KeyboardBacklightCommand(IConfig config, IOsd osd, IHardwareService hardwareService)
     {
@@ -55,6 +56,7 @@ sealed class KeyboardBacklightCommand : CommandBase
 
         keyboardBacklight = hardwareService.ResolveNotNull<IKeyboardBacklight>();
         keyboardBacklightControl = hardwareService.Resolve<IKeyboardBacklightControl>();
+        display = hardwareService.ResolveNotNull<IDisplay>();
 
         Text = TextResources.Commands.KeyboardBacklight.Description;
         Description = Text;
@@ -68,6 +70,11 @@ sealed class KeyboardBacklightCommand : CommandBase
     public override async void Execute(object? parameter = null)
     {
         if (keyboardBacklightControl == null || parameter is string direction == false || !(direction != UP || direction != DOWN))
+        {
+            return;
+        }
+
+        if (config.Common.KeyboardBacklightWithDisplay && await display.State.FirstOrDefaultAsync() != DeviceState.Enabled)
         {
             return;
         }
