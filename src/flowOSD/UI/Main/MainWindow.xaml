@@ -88,7 +88,7 @@
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding ImageResources.Hardware.Cpu}"/>
             </controls:CxToggleButton>
-            <TextBlock 
+            <TextBlock
                 Grid.Row="1"
                 Grid.Column="0" 
                 Text="{Binding TextResources.Main.CpuBoost}" 
@@ -99,7 +99,7 @@
                 Grid.Row="0" 
                 Grid.Column="1">
 
-                <FontIcon 
+                <FontIcon                     
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                     Glyph="{Binding PerformanceProfileImage, Mode=OneWay}"/>
 
@@ -160,10 +160,18 @@
                 Style="{StaticResource ButtonStyle}"
                 IsChecked="{Binding DisplayRefreshRateCommand.IsChecked, Mode=OneWay}"
                 Command="{Binding DisplayRefreshRateCommand, Mode=OneTime}">
+                <Grid>
+                    <FontIcon 
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                        Glyph="{Binding ImageResources.Hardware.Screen}"/>
 
-                <FontIcon 
-                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                    Glyph="{Binding ImageResources.Hardware.Screen}"/>
+                    <FontIcon
+                        Visibility="{Binding ControlDisplayRefreshRate, Converter={StaticResource VisibilityConverter}}"
+                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                        Margin="5,5,0,0"
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                        Glyph="{Binding ImageResources.Common.Locked}"/>
+                </Grid>
             </controls:CxToggleButton>
             <TextBlock 
                 Grid.Row="3" 
@@ -234,7 +242,7 @@
                 <StackPanel                   
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowBatteryChargeRate, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
-                   
+
                     <ToolTipService.ToolTip>
                         <ToolTip Opened="BatteryToolTip_Opened"/>
                     </ToolTipService.ToolTip>
@@ -258,7 +266,7 @@
                             Foreground="{ThemeResource SystemFillColorCautionBackgroundBrush}" 
                             Glyph="&#xEA84;"/>
                     </Grid>
-                    
+
                     <TextBlock
                         Visibility="{Binding Rate, Converter={StaticResource VisibilityConverter}}">
                         
@@ -283,11 +291,11 @@
                 <StackPanel 
                     Orientation="Horizontal"                    
                     Visibility="{Binding ShowFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
-                   
+
                     <ToolTipService.ToolTip>
                         <ToolTip Opened="FanSpeedToolTip_Opened"/>
                     </ToolTipService.ToolTip>
-                    
+
                     <FontIcon 
                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
                         Glyph="{Binding ImageResources.Common.Diagnostic}"/>

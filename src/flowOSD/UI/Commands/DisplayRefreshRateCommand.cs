@@ -41,7 +41,7 @@ sealed class DisplayRefreshRateCommand : CommandBase
         this.userConfig = userConfig ?? throw new ArgumentNullException(nameof(userConfig));
 
         display.RefreshRates
-            .CombineLatest(display.State, (x, displayState) => (displayState == DeviceState.Enabled) && x.IsLowAvailable && x.IsHighAvailable)
+            .CombineLatest(display.State, (x, displayState) => (displayState == DeviceState.Enabled) && x.IsLowAvailable && x.IsHighAvailable && !userConfig.ControlDisplayRefreshRate)
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(x => Enabled = x)
@@ -51,6 +51,13 @@ sealed class DisplayRefreshRateCommand : CommandBase
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(Update)
+            .DisposeWith(Disposable!);
+
+        userConfig.PropertyChanged
+            .Throttle(TimeSpan.FromMilliseconds(200))
+            .Where(x => x == nameof(CommonConfig.ControlDisplayRefreshRate))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(async _ => Enabled = UpdateState(await display.RefreshRates.FirstOrDefaultAsync(), await display.State.FirstOrDefaultAsync()))
             .DisposeWith(Disposable!);
 
         Description = TextResources.Commands.DisplayRefreshRate.Description;
@@ -91,5 +98,13 @@ sealed class DisplayRefreshRateCommand : CommandBase
     {
         IsChecked = DisplayRefreshRates.IsHigh(refreshRate);
         Text = IsChecked ? TextResources.Commands.DisplayRefreshRate.Disable : TextResources.Commands.DisplayRefreshRate.Enable;
+    }
+
+    private bool UpdateState(DisplayRefreshRates refreshRrates, DeviceState displayState)
+    {
+        return displayState == DeviceState.Enabled
+            && refreshRrates.IsLowAvailable
+            && refreshRrates.IsHighAvailable
+            && !userConfig.ControlDisplayRefreshRate;
     }
 }

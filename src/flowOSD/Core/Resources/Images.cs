@@ -74,6 +74,8 @@ public sealed class Images
         public string Temperature => "\ue9ca";
 
         public string Settings => "\ue713";
+
+        public string Locked => "\uF809";
     }
 
     public sealed class HardwareSection

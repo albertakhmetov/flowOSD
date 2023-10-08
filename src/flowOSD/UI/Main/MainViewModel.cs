@@ -208,6 +208,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         set => SetProperty(ref gpuFanSpeed, value);
     }
 
+    public bool ControlDisplayRefreshRate => config.Common.ControlDisplayRefreshRate;
+
     public CommandBase DisplayRefreshRateCommand { get; }
 
     public CommandBase GpuCommand { get; }
@@ -261,7 +263,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             .DisposeWith(disposable);
 
         config.Common.PropertyChanged
-            .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature))
+            .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature) || propertyName == nameof(ControlDisplayRefreshRate))
             .SubscribeOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
