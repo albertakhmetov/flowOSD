@@ -108,6 +108,9 @@ public sealed class Images
 
         public string TouchPad => "\uefa5";
 
+        public string Notebook => "\uE7F8";
+
+        public string NotebookShield => "\uF552";
     }
 
     public sealed class PowerModeSection

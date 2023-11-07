@@ -77,6 +77,8 @@ sealed class CommandService : ICommandService, IDisposable
 
         Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(config, osd, hardwareService));
+
+        Register(() => new NotebookModeCommand(hardwareService.ResolveNotNull<INotebookModeService>()));
     }
 
     public void Dispose()

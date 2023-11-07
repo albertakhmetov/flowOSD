@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.Reactive.Linq;
@@ -96,7 +97,7 @@ sealed class MainUICommand : CommandBase
 
         window.AppWindow?.Resize(new Windows.Graphics.SizeInt32(
             (int)(370 * scale),
-            (int)(300 * scale)));
+            (int)(360 * scale)));
         window.AppWindow?.Move(new Windows.Graphics.PointInt32(
             (int)(workArea.Width - window.AppWindow.Size.Width - OFFSET_X),
             (int)(workArea.Height - window.AppWindow.Size.Height - OFFSET_Y)));

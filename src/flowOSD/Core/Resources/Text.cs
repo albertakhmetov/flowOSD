@@ -136,6 +136,8 @@ public sealed class Text
         public string BatteryStatus => "Battery status";
 
         public string BatteryRemaining => "Remaining";
+
+        public string NotebookMode => "Notebook Mode";
     }
 
     public sealed class ConfigSection
@@ -485,6 +487,8 @@ public sealed class Text
 
         public ExitSection Exit { get; } = new ExitSection();
 
+        public NotebookModeSection NotebookMode { get; } = new NotebookModeSection();
+
         public RestartSection Restart { get; } = new RestartSection();
 
         public KeyboardBacklightSection KeyboardBacklight { get; } = new KeyboardBacklightSection();
@@ -601,6 +605,11 @@ public sealed class Text
             public string CancelDownload => "Cancel";
 
             public string Install => "Install update";
+        }
+
+        public sealed class NotebookModeSection
+        {
+            public string Description => "Toggle Notebook Mode";
         }
     }
 }

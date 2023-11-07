@@ -75,6 +75,8 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <controls:CxToggleButton 
@@ -211,6 +213,23 @@
                 Grid.Row="3" 
                 Grid.Column="2" 
                 Text="{Binding TextResources.Main.TouchPad}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <controls:CxToggleButton
+                Grid.Row="4" 
+                Grid.Column="0" 
+                Style="{StaticResource ButtonStyle}"                          
+                IsChecked="{Binding NotebookModeCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding NotebookModeCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding NotebookModeImage}"/>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="5" 
+                Grid.Column="0" 
+                Text="{Binding TextResources.Main.NotebookMode}" 
                 Style="{StaticResource LabelStyle}"/>
 
         </Grid>

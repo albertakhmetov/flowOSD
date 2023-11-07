@@ -27,6 +27,12 @@ static class Kernel32
     public const uint FILE_ATTRIBUTE_OVERLAPPED = 0x40000000;
     public const uint FILE_ATTRIBUTE_NORMAL = 0x80;
 
+    public const Int32 INFINITE = -1;
+    public const Int32 WAIT_ABANDONED = 0x80;
+    public const Int32 WAIT_OBJECT_0 = 0x00;
+    public const Int32 WAIT_TIMEOUT = 0x102;
+    public const Int32 WAIT_FAILED = -1;
+
     [StructLayout(LayoutKind.Sequential)]
     public struct SECURITY_ATTRIBUTES
     {
@@ -161,4 +167,9 @@ static class Kernel32
     public static extern bool SetSystemPowerState(
         bool fSuspend,
         bool fForce);
+
+    [DllImport(nameof(Kernel32), SetLastError = true)]
+    public static extern Int32 WaitForSingleObject(
+        IntPtr Handle,
+        Int32 Wait);
 }

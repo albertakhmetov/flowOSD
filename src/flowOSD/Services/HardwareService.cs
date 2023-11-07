@@ -61,17 +61,23 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
     private KeyboardBacklightService? keyboardBacklightService;
     private RefreshRateService refreshRateService;
     private BatteryChargeService? batteryChargeService;
+    private NotebookModeService notebookModeService;
 
     public HardwareService(
         IConfig config,
         INotificationService notificationService,
         IMessageQueue messageQueue,
-        IKeysSender keysSender)
+        IKeysSender keysSender,
+        IServiceWatcher serviceWatcher)
     {
+        if (serviceWatcher == null)
+        {
+            throw new ArgumentNullException(nameof(serviceWatcher));
+        }
+
         try
         {
-            var service = new System.ServiceProcess.ServiceController("ASUSOptimization");
-            OptimizationService = service.Status != System.ServiceProcess.ServiceControllerStatus.Stopped;
+            OptimizationService = serviceWatcher.IsStarted("ASUSOptimization");
         }
         catch
         {
@@ -124,6 +130,8 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
         amd = new AmdGpu();
 
+        notebookModeService = new NotebookModeService(serviceWatcher);
+
         Register<IAtk>(atk);
         Register<IKeyboard>(keyboard);
         Register<IKeyboardBacklight>(keyboardBacklight);
@@ -141,6 +149,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         Register<IMicrophone>(microphone);
         Register<IPerformanceService>(performanceService);
         Register<IHardwareFeatures>(this);
+        Register<INotebookModeService>(notebookModeService);
 
         powerManagement.PowerEvent
            .Where(x => x == PowerEvent.Suspend)

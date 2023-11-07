@@ -81,6 +81,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         DisplayRefreshRateCommand = commandService.ResolveNotNull<DisplayRefreshRateCommand>();
         GpuCommand = commandService.ResolveNotNull<GpuCommand>();
         TouchPadCommand = commandService.ResolveNotNull<TouchPadCommand>();
+        NotebookModeCommand = commandService.ResolveNotNull<NotebookModeCommand>();
 
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
     }
@@ -123,6 +124,11 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         get => powerModeImage;
         set => SetProperty(ref powerModeImage, value);
+    }
+
+    public string NotebookModeImage
+    {
+        get => Common.IsElevated() ? ImageResources.Hardware.Notebook : ImageResources.Hardware.NotebookShield;
     }
 
     public bool ShowBatteryChargeRate
@@ -215,6 +221,8 @@ public class MainViewModel : ViewModelBase, IDisposable
     public CommandBase GpuCommand { get; }
 
     public CommandBase TouchPadCommand { get; }
+
+    public CommandBase NotebookModeCommand { get; }
 
     public CommandBase ConfigCommand { get; }
 

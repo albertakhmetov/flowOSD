@@ -62,9 +62,16 @@ public partial class App : Application
     private OsdNotificationService osdNotificationService;
 
     private NotifyIconService notifyIconService;
+    private ServiceWatcher serviceWatcher;
 
     public App()
     {
+        if (AppHelpers.ProcessCommandLineArgs())
+        {
+            Exit();
+            return;
+        }
+
 #if !DEBUG
         instanceMutex = new Mutex(true, "com.albertakhmetov.flowosd", out bool isMutexCreated);
         if (!isMutexCreated)
@@ -74,6 +81,8 @@ public partial class App : Application
             instanceMutex.Dispose();
             instanceMutex = null;
             Exit();
+
+            return;
         }
 #endif
 
@@ -82,6 +91,8 @@ public partial class App : Application
         try
         {
             disposable = new CompositeDisposable();
+
+            serviceWatcher = new ServiceWatcher().DisposeWith(disposable);
 
             configService = new ConfigService().DisposeWith(disposable);
             notificationService = new NotificationService(configService).DisposeWith(disposable);
@@ -104,7 +115,8 @@ public partial class App : Application
                     configService,
                     notificationService,
                     messageQueue,
-                    keysSender).DisposeWith(disposable);
+                    keysSender,
+                    serviceWatcher).DisposeWith(disposable);
             }
 
             osdNotificationService = new OsdNotificationService(

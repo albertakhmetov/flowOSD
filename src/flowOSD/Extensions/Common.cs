@@ -20,6 +20,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 
 namespace flowOSD.Extensions;
 
@@ -102,5 +103,12 @@ static class Common
         Trace.WriteLine(ex ?? (object)"ex is NULL");
         Trace.Unindent();
         Trace.Flush();
+    }
+
+    public static bool IsElevated()
+    {
+        var identity = WindowsIdentity.GetCurrent();
+        var principal = new WindowsPrincipal(identity);
+        return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
 }
