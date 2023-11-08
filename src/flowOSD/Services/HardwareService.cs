@@ -131,6 +131,11 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         amd = new AmdGpu();
 
         notebookModeService = new NotebookModeService(serviceWatcher);
+        notebookModeService.State
+           .Throttle(TimeSpan.FromSeconds(5))
+           .ObserveOn(SynchronizationContext.Current!)
+           .Subscribe(UpdateSlateState)
+           .DisposeWith(disposable);
 
         Register<IAtk>(atk);
         Register<IKeyboard>(keyboard);
@@ -319,5 +324,19 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
     private void UpdateVariBrightState()
     {
         amd.SetVariBright(!config.Common.DisableVariBright);
+    }
+
+    private void UpdateSlateState(DeviceState notebookModeState)
+    {
+        if (notebookModeState == DeviceState.Disabled || !Common.IsElevated())
+        {
+            return;
+        }
+
+        const string KEY = "SYSTEM\\CurrentControlSet\\Control\\PriorityControl";
+        const string PROPERTY = "ConvertibleSlateMode";
+
+        using var key = Registry.LocalMachine.OpenSubKey(KEY, true);
+        key?.SetValue(PROPERTY, 1);
     }
 }
