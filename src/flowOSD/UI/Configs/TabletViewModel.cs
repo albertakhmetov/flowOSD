@@ -103,12 +103,12 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
 
         Config.Performance.PropertyChanged
             .Where(x => x == nameof(PerformanceConfig.TabletProfile))
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 
         Config.Common.PropertyChanged
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 

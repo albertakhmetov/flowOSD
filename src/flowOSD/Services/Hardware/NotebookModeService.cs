@@ -26,18 +26,28 @@ using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
+using Microsoft.Win32;
 
 sealed class NotebookModeService : IDisposable, INotebookModeService
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     public const string SENSOR_MONITORING_SERVICE = "SensrSvc", SENSOR_SERVICE = "SensorService";
+    public const string SLATE_KEY = "SYSTEM\\CurrentControlSet\\Control\\PriorityControl";
+    public const string SLATE_PROPERTY = "ConvertibleSlateMode";
+
+    private IElevatedService elevatedService;
+    private INotificationService notificationService;
+
     private bool isMonitoringServiceStarted, isSensorServiceStarted;
 
     private BehaviorSubject<DeviceState> state;
 
-    public NotebookModeService(IServiceWatcher serviceWatcher)
+    public NotebookModeService(IServiceWatcher serviceWatcher, IElevatedService elevatedService, INotificationService notificationService)
     {
+        this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
+        this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+
         if (serviceWatcher == null)
         {
             throw new ArgumentNullException(nameof(serviceWatcher));
@@ -50,6 +60,12 @@ sealed class NotebookModeService : IDisposable, INotebookModeService
         state = new BehaviorSubject<DeviceState>(deviceState);
 
         State = state.AsObservable();
+        State
+           .Distinct()
+           .Throttle(TimeSpan.FromSeconds(2))
+           .ObserveOn(SynchronizationContext.Current!)
+           .Subscribe(UpdateSlateState)
+           .DisposeWith(disposable);
 
         serviceWatcher.Subscribe(SENSOR_MONITORING_SERVICE, OnServiceStateChanged).DisposeWith(disposable);
         serviceWatcher.Subscribe(SENSOR_SERVICE, OnServiceStateChanged).DisposeWith(disposable);
@@ -91,5 +107,28 @@ sealed class NotebookModeService : IDisposable, INotebookModeService
     private DeviceState GetDeviceState()
     {
         return isMonitoringServiceStarted == false && isSensorServiceStarted == false ? DeviceState.Enabled : DeviceState.Disabled;
+    }
+
+    private void UpdateSlateState(DeviceState notebookModeState)
+    {
+        if (notebookModeState == DeviceState.Disabled)
+        {
+            return;
+        }
+
+        using var key = Registry.LocalMachine.OpenSubKey(SLATE_KEY, false);
+        if (key?.GetValue(SLATE_PROPERTY) is int slateMode == false || slateMode == 1)
+        {
+            return;
+        }
+
+        if (elevatedService.IsElevated)
+        {
+            elevatedService.DisableSlateMode();
+        }
+        else
+        {
+            notificationService.ShowWarning(Core.Configs.WarningType.SlateMode);
+        }
     }
 }

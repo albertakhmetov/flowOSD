@@ -39,6 +39,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     private IBattery battery;
     private IAtk atk;
     private IHardwareFeatures hardwareFeatures;
+    private IElevatedService elevatedService;
 
     private string performanceProfileText, performanceProfileImage;
 
@@ -52,8 +53,10 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     private uint capacity, fullChargedCapacity, estimatedTime;
 
-    public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService)
+    public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService, IElevatedService elevatedService)
     {
+        this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
+
         if (commandService == null)
         {
             throw new ArgumentNullException(nameof(commandService));
@@ -128,7 +131,7 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public string NotebookModeImage
     {
-        get => Common.IsElevated() ? ImageResources.Hardware.Notebook : ImageResources.Hardware.NotebookShield;
+        get => elevatedService.IsElevated ? ImageResources.Hardware.Notebook : ImageResources.Hardware.NotebookShield;
     }
 
     public bool ShowBatteryChargeRate
@@ -272,13 +275,13 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         config.Common.PropertyChanged
             .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature) || propertyName == nameof(ControlDisplayRefreshRate))
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 
         config.Common.PropertyChanged
             .Where(propertyName => propertyName == nameof(config.Common.ShowFanSpeed))
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(_ =>
             {
                 OnPropertyChanged(nameof(ShowFanSpeed));

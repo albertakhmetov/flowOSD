@@ -41,7 +41,7 @@ sealed class BatteryChargeService : IDisposable
         config.Common.PropertyChanged
             .Where(name => name == nameof(CommonConfig.UseBatteryChargeLimit) || name == nameof(CommonConfig.BatteryChargeLimit))
             .Throttle(TimeSpan.FromSeconds(5))
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(x => Update())
             .DisposeWith(disposable);
 

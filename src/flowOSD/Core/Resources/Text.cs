@@ -24,7 +24,7 @@ using flowOSD.Core.Hardware;
 
 public sealed class Text
 {
-    public readonly static Text Instance = new Text();
+    public readonly static Text Instance = new();
 
     private Text()
     {
@@ -83,7 +83,7 @@ public sealed class Text
     {
         public string BatterySaver => "Battery Saver is on";
 
-        public string BestPowerEfficiency => "Power Effeciency";
+        public string BestPowerEfficiency => "Power Efficiency";
 
         public string Balanced => "Balanced";
 
@@ -121,7 +121,7 @@ public sealed class Text
     {
         public string CpuBoost => "CPU Boost";
 
-        public string HighRefreshRate => "High Refesh Rate";
+        public string HighRefreshRate => "High Refresh Rate";
 
         public string Gpu => "dGPU";
 
@@ -312,7 +312,7 @@ public sealed class Text
 
         public sealed class TabletSection
         {
-            public string Title = "Tablet";
+            public string Title => "Tablet";
 
             public string DisableTouchPadInTabletMode => "Disable TouchPad in tablet mode";
 
@@ -323,7 +323,7 @@ public sealed class Text
 
         public sealed class BatterySection
         {
-            public string Title = "Battery";
+            public string Title => "Battery";
 
             public string PluggedIn => "Plugged-in";
 
@@ -374,7 +374,7 @@ public sealed class Text
 
     public sealed class ErrorsSection
     {
-        public string Title = "Error";
+        public string Title => "Error";
 
         public string CriticalTitle => "Critical Error";
 
@@ -392,43 +392,51 @@ public sealed class Text
 
         public string MicToggle => "Error is occurred while toggling microphone state.";
 
-        public string DisplayRefreshRateIsNotSupported = "Selected refresh rate ({0}) isn't supported.";
+        public string DisplayRefreshRateIsNotSupported => "Selected refresh rate ({0}) isn't supported.";
 
-        public string RestartIsRequired = "Restart is required.";
+        public string RestartIsRequired => "Restart is required.";
 
-        public string CanNotChangeDisplayRefreshRate = "Can't change display refresh rate. Error code: {0:X}.";
+        public string CanNotChangeDisplayRefreshRate => "Can't change display refresh rate. Error code: {0:X}.";
 
-        public string CanNotConnectToBattery = "Can't connect to battery device.";
+        public string CanNotConnectToBattery => "Can't connect to battery device.";
 
-        public string CanNotConnectToAcpi = "Can't connect to ACPI.";
+        public string CanNotConnectToAcpi => "Can't connect to ACPI.";
 
-        public string CanNotFoundAsusOptimizationKey = "Registry Key for ASUS Optimization was not found.";
+        public string CanNotFoundAsusOptimizationKey => "Registry Key for ASUS Optimization was not found.";
 
-        public string CanNotReadAsusOptimizationBacklight = "Can't read the keyboard backlight value from Registry.";
+        public string CanNotReadAsusOptimizationBacklight => "Can't read the keyboard backlight value from Registry.";
 
-        public string ConfigIsCorrupted = "Config file is corrupted";
+        public string ConfigIsCorrupted => "Config file is corrupted";
 
-        public string CanNotWriteStartupKey = "Can't write to Windows registry";
+        public string CanNotWriteStartupKey => "Can't write to Windows registry";
 
-        public string CanNotRetriveAppPath = "Can't retrive app exe path";
+        public string CanNotRetriveAppPath => "Can't retrieve app exe path";
 
-        public string ProductNameIsNotSet = "Product Name isn't set";
+        public string ProductNameIsNotSet => "Product Name isn't set";
 
-        public string ProductVersionIsNotSet = "Product Version isn't set";
+        public string ProductVersionIsNotSet => "Product Version isn't set";
 
-        public string CanNotConnectToHid = "Can't connect to HID";
+        public string CanNotConnectToHid => "Can't connect to HID";
 
-        public string CanNotResolve = "Can't resolve {0}";
+        public string CanNotResolve => "Can't resolve {0}";
     }
 
     public sealed class WarningsSection
     {
-        public string Title = "Warning";
+        public string Title => "Warning";
+
+        public string NotebookMode_Disable => "Disable Notebook Mode";
+
+        public string NotebookMode_DisableSlate => "Disable Touch UI";
+
+        public string NotebookMode_Title => "Notebook Mode";
+
+        public string NotebookMode_Text => "Notebook Mode is turned on, but UI is optimized to touch input.";
     }
 
     public sealed class ConfirmationsSection
     {
-        public string Title = "Confirmation";
+        public string Title => "Confirmation";
 
         public string NewVersion => "New version is available. Show details?";
     }
@@ -441,11 +449,13 @@ public sealed class Text
 
         public string CpuBoost => "CPU Boost";
 
-        public string HighRefreshRate => "High Refesh Rate";
+        public string HighRefreshRate => "High Refresh Rate";
 
         public string Gpu => "dGPU";
 
         public string TouchPad => "Touchpad";
+
+        public string NotebookMode => "Notebook Mode";
     }
 
     public sealed class UpdateSection

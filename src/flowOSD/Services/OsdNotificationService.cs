@@ -52,6 +52,7 @@ sealed class OsdNotificationService : IDisposable
     private IMicrophone microphone;
     private IBattery battery;
     private IPerformanceService performanceService;
+    private INotebookModeService notebookModeService;
 
     private IHardwareFeatures hardwareFeatures;
 
@@ -75,6 +76,7 @@ sealed class OsdNotificationService : IDisposable
         microphone = hardwareService.ResolveNotNull<IMicrophone>();
         battery = hardwareService.ResolveNotNull<IBattery>();
         performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
+        notebookModeService = hardwareService.ResolveNotNull<INotebookModeService>();
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
 
@@ -164,6 +166,14 @@ sealed class OsdNotificationService : IDisposable
             .Throttle(TimeSpan.FromMilliseconds(50))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowPerformanceProfileNotification)
+            .DisposeWith(disposable);
+
+        notebookModeService.State
+            .DistinctUntilChanged()
+            .Skip(1)
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowNotebookModeNotification)
             .DisposeWith(disposable);
     }
 
@@ -311,5 +321,10 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", Images.Instance.Hardware.Gpu));
+    }
+
+    private void ShowNotebookModeNotification(DeviceState state)
+    {
+        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off", Images.Instance.Hardware.Notebook));
     }
 }

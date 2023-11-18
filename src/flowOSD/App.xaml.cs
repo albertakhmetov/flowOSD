@@ -41,6 +41,7 @@ public partial class App : Application
 {
     private int WM_HELLO_FLOWOSD = User32.RegisterWindowMessage("Hello, it's me! #flowOSD");
 
+    private ElevatedService elevatedService;
     private Mutex? instanceMutex;
 
     private CompositeDisposable? disposable;
@@ -66,7 +67,8 @@ public partial class App : Application
 
     public App()
     {
-        if (AppHelpers.ProcessCommandLineArgs())
+        elevatedService = new ElevatedService();
+        if (elevatedService.IsElevatedRequest())
         {
             Exit();
             return;
@@ -95,7 +97,7 @@ public partial class App : Application
             serviceWatcher = new ServiceWatcher().DisposeWith(disposable);
 
             configService = new ConfigService().DisposeWith(disposable);
-            notificationService = new NotificationService(configService).DisposeWith(disposable);
+            notificationService = new NotificationService(configService, elevatedService).DisposeWith(disposable);
             updateService = new UpdateService(configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
@@ -116,7 +118,8 @@ public partial class App : Application
                     notificationService,
                     messageQueue,
                     keysSender,
-                    serviceWatcher).DisposeWith(disposable);
+                    serviceWatcher,
+                    elevatedService).DisposeWith(disposable);
             }
 
             osdNotificationService = new OsdNotificationService(
@@ -131,7 +134,8 @@ public partial class App : Application
                 systemEvents,
                 updateService,
                 osd,
-                notificationService).DisposeWith(disposable);
+                notificationService,
+                elevatedService).DisposeWith(disposable);
 
             hotKeyService = new HotKeysService(
                 configService,

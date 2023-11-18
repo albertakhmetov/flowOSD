@@ -81,7 +81,7 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 
         Config.Common.PropertyChanged
             .Where(propertyName => propertyName == nameof(ShowBatteryChargeRate) || propertyName == nameof(ShowCpuTemperature))
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 

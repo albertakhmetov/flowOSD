@@ -28,15 +28,24 @@ using flowOSD.Extensions;
 
 sealed class NotebookModeCommand : CommandBase
 {
+    private IAtk atk;
     private INotebookModeService notebookModeService;
+    private IElevatedService elevatedService;
 
-    public NotebookModeCommand(INotebookModeService notebookModeService)
+    public NotebookModeCommand(IAtk atk, INotebookModeService notebookModeService, IElevatedService elevatedService)
     {
+        this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.notebookModeService = notebookModeService ?? throw new ArgumentNullException(nameof(notebookModeService));
+        this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
         Text = TextResources.Commands.NotebookMode.Description;
         Description = TextResources.Commands.NotebookMode.Description;
         Enabled = true;
+
+        atk.TabletMode
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(x => Enabled = x == TabletMode.Notebook)
+            .DisposeWith(Disposable!);
 
         notebookModeService.State
             .ObserveOn(SynchronizationContext.Current!)
@@ -48,21 +57,28 @@ sealed class NotebookModeCommand : CommandBase
 
     public override async void Execute(object? parameter = null)
     {
+        if (!Enabled)
+        {
+            return;
+        }
+
         Enabled = false;
 
         var state = await notebookModeService.State.FirstAsync();
 
         await Task.Factory.StartNew(() =>
         {
-            if (Common.IsElevated())
+            if (state == DeviceState.Disabled)
             {
-                AppHelpers.SetNotebookMode(state == DeviceState.Disabled ? DeviceState.Enabled : DeviceState.Disabled);
+                elevatedService.EnableNotebookMode();
             }
             else
             {
-                AppHelpers.RunElevated(state == DeviceState.Disabled ? AppHelpers.NOTEBOOK_MODE_ENABLE : AppHelpers.NOTEBOOK_MODE_DISABLE);
+                elevatedService.DisableNotebookMode();
             }
         });
+
+        await notebookModeService.State.FirstAsync(x => x != state);
 
         Enabled = true;
     }

@@ -104,11 +104,4 @@ static class Common
         Trace.Unindent();
         Trace.Flush();
     }
-
-    public static bool IsElevated()
-    {
-        var identity = WindowsIdentity.GetCurrent();
-        var principal = new WindowsPrincipal(identity);
-        return principal.IsInRole(WindowsBuiltInRole.Administrator);
-    }
 }

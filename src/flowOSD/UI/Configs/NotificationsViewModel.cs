@@ -96,7 +96,7 @@ public class NotificationsViewModel : ConfigViewModelBase, IDisposable
         disposable = new CompositeDisposable();
 
         Config.Notifications.ValueChanged
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(notificationType => OnPropertyChanged(Enum.GetName(notificationType)))
             .DisposeWith(disposable);
 

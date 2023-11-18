@@ -489,14 +489,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
             case AK_TABLET_STATE:
                 if (Get(DEVID_TABLET, out var tabletMode))
                 {
-                    // Ignore rotated mode:
-                    // - it reasonable in tablet mode (no touchpad manipulation is required)
-                    // - it annoying when notebook mode (when device is tilted)
-
-                    if ((TabletMode)tabletMode != Core.Hardware.TabletMode.Rotated)
-                    {
-                        tabletModeSubject.OnNext((TabletMode)tabletMode);
-                    }
+                    tabletModeSubject.OnNext((TabletMode)tabletMode);
                 }
                 else
                 {

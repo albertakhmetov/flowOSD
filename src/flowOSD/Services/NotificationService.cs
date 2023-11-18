@@ -19,22 +19,29 @@
 
 namespace flowOSD.Services;
 
+using System.Diagnostics;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Resources;
 using flowOSD.Native;
 using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 
 internal sealed class NotificationService : IDisposable, INotificationService
 {
+    private const string ACTION = nameof(ACTION);
+
+    private AppNotificationManager notificationManager;
     private bool isRegisted;
     private IConfig config;
+    private IElevatedService elevatedService;
 
-    public NotificationService(IConfig config)
+    public NotificationService(IConfig config, IElevatedService elevatedService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
+        this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
-        AppNotificationManager notificationManager = AppNotificationManager.Default;
+        notificationManager = AppNotificationManager.Default;
 
         notificationManager.NotificationInvoked += OnNotificationInvoked;
 
@@ -47,6 +54,8 @@ internal sealed class NotificationService : IDisposable, INotificationService
         Dispose(disposing: false);
     }
 
+    public Text TextResources => Text.Instance;
+
     public void ShowError(string message, Exception exception)
     {
         ShowError(message, exception?.Message);
@@ -54,12 +63,34 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     public void ShowError(string message, string? details = null)
     {
-        Comctl32.Error($"{config.ProductName}: {Text.Instance.Errors.Title}", message, details ?? string.Empty);
+        Comctl32.Error($"{config.ProductName}: {TextResources.Errors.Title}", message, details ?? string.Empty);
     }
 
     public void ShowWarning(WarningType warningType)
     {
-       // Comctl32.Warning($"{config.ProductName}: {Text.Instance.Warnings.Title}", message, details ?? string.Empty);
+        AppNotification notification;
+
+        switch (warningType)
+        {
+            case WarningType.SlateMode:
+                notification = new AppNotificationBuilder()
+                    .AddText(TextResources.Warnings.NotebookMode_Title)
+                    .AddText(TextResources.Warnings.NotebookMode_Text)
+                    .AddArgument(ACTION, nameof(MoreDetailsAboutSlateMode))
+                    .AddButton(
+                        new AppNotificationButton(TextResources.Warnings.NotebookMode_Disable)
+                            .AddArgument(ACTION, nameof(DisableNotebookMode)))
+                    .AddButton(
+                        new AppNotificationButton(TextResources.Warnings.NotebookMode_DisableSlate)
+                            .AddArgument(ACTION, nameof(DisableSlateMode)))
+                    .BuildNotification();
+                break;
+
+            default:
+                return;
+        }
+
+        notificationManager.Show(notification);
     }
 
     public bool ShowConfirmation(string message, string? details = null)
@@ -75,8 +106,10 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     private void Dispose(bool disposing)
     {
-        if (!isRegisted)
+        if (isRegisted)
         {
+            AppNotificationManager.Default.RemoveAllAsync().AsTask().Wait();
+
             AppNotificationManager.Default.Unregister();
             isRegisted = false;
         }
@@ -84,6 +117,42 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     private void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
     {
-        throw new NotImplementedException();
+        if (args.Arguments.ContainsKey(ACTION))
+        {
+            switch(args.Arguments[ACTION])
+            {
+                case nameof(MoreDetailsAboutSlateMode):
+                    MoreDetailsAboutSlateMode();
+                    break;
+
+                case nameof(DisableNotebookMode):
+                    DisableNotebookMode();
+                    break;
+
+                case nameof(DisableSlateMode):
+                    DisableSlateMode();
+                    break;
+            }
+        }
+    }
+
+    private void MoreDetailsAboutSlateMode()
+    {
+        OpenUrl(Urls.Instance.NotebookMode);
+    }
+
+    private void DisableNotebookMode()
+    {
+        elevatedService.DisableNotebookMode();
+    }
+
+    private void DisableSlateMode()
+    {
+        elevatedService.DisableSlateMode();
+    }
+
+    private void OpenUrl(string url)
+    {
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 }

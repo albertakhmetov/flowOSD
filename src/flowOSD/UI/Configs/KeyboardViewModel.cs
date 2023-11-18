@@ -176,7 +176,7 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
         disposable = new CompositeDisposable();
 
         Config.Common.PropertyChanged
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 

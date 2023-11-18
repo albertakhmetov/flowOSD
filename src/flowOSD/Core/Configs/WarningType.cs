@@ -22,4 +22,5 @@ namespace flowOSD.Core.Configs;
 public enum WarningType
 {
     LowPowerCharger,
+    SlateMode,
 }

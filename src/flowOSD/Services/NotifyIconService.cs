@@ -153,7 +153,7 @@ sealed partial class NotifyIconService : IDisposable
 
     private void UpdateNotifyIcon(TabletMode tabletMode, bool isDarkMode, int dpi)
     {
-        var iconName = tabletMode == TabletMode.Tablet || tabletMode == TabletMode.Tent ? "tablet" : "notebook";
+        var iconName = tabletMode != TabletMode.Notebook ? "tablet" : "notebook";
         if (isDarkMode)
         {
             iconName += "-white";

@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.Services;
 
 using System;
@@ -33,6 +34,7 @@ sealed class CommandService : ICommandService, IDisposable
     private IKeysSender keysSender;
     private IUpdateService updateService;
     private INotificationService notificationService;
+    private IElevatedService elevatedService;
 
     private Dictionary<string, Lazy<CommandBase>> instances = new Dictionary<string, Lazy<CommandBase>>();
 
@@ -43,13 +45,15 @@ sealed class CommandService : ICommandService, IDisposable
         ISystemEvents systemEvents,
         IUpdateService updateService,
         IOsd osd,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IElevatedService elevatedService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+        this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
         Register(() => new ToggleBoostCommand(hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new PerformanceCommand(
@@ -71,14 +75,17 @@ sealed class CommandService : ICommandService, IDisposable
         Register(() => new SuspendCommand());
 
         Register(() => new ConfigCommand(config, systemEvents, this, hardwareService, updateService));
-        Register(() => new MainUICommand(this.config, systemEvents, this, hardwareService));
+        Register(() => new MainUICommand(this.config, systemEvents, this, hardwareService, elevatedService));
         Register(() => new NotifyMenuCommand(this.config, systemEvents, this));
         Register(() => new UpdateCommand(this.updateService));
 
         Register(() => new DisplayBrightnessCommand(config, osd, hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(config, osd, hardwareService));
 
-        Register(() => new NotebookModeCommand(hardwareService.ResolveNotNull<INotebookModeService>()));
+        Register(() => new NotebookModeCommand(
+            hardwareService.ResolveNotNull<IAtk>(),
+            hardwareService.ResolveNotNull<INotebookModeService>(), 
+            elevatedService));
     }
 
     public void Dispose()

@@ -17,21 +17,17 @@
  *
  */
 
-namespace flowOSD.Core.Resources;
+namespace flowOSD.Core;
 
-public sealed class Urls
+using System;
+
+public interface IElevatedService
 {
-    public static readonly Urls Instance = new Urls();
+    bool IsElevated { get; }
 
-    public string HomePage => "https://github.com/albertakhmetov/flowOSD";
+    void EnableNotebookMode();
 
-    public string License => "https://raw.githubusercontent.com/albertakhmetov/flowOSD/main/LICENSE";
+    void DisableNotebookMode();
 
-    public string Optimization => "https://github.com/albertakhmetov/flowOSD/wiki/ASUS-Optimization";
-
-    public string CustomFanCurves => "https://github.com/albertakhmetov/flowOSD/wiki/Custom-Fan-Curves";
-
-    public string GitLatest => "https://github.com/albertakhmetov/flowOSD/releases/latest";
-
-    public string NotebookMode => "https://github.com/albertakhmetov/flowOSD/wiki/Notebook-Mode";
+    void DisableSlateMode();
 }

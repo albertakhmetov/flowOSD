@@ -67,7 +67,7 @@ public sealed class AboutViewModel : ConfigViewModelBase
         ModelName = config.ModelName;
 
         updateSubscription = updateService.State
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(state => InfoCount = state == UpdateServiceState.ReadyToDownload ? 1 : 0);
     }
 
@@ -121,7 +121,7 @@ public sealed class AboutViewModel : ConfigViewModelBase
         disposable = new CompositeDisposable();
 
         Config.Common.PropertyChanged
-            .SubscribeOn(SynchronizationContext.Current!)
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
             .DisposeWith(disposable);
 

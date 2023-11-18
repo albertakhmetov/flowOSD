@@ -42,6 +42,7 @@ sealed class MainUICommand : CommandBase
     private ISystemEvents systemEvents;
     private ICommandService commandService;
     private IHardwareService hardwareService;
+    private IElevatedService elevatedService;
     private MainWindow? window;
 
     private uint deactivateTime;
@@ -51,12 +52,14 @@ sealed class MainUICommand : CommandBase
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
-        IHardwareService hardwareService)
+        IHardwareService hardwareService,
+        IElevatedService elevatedService)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
+        this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
         isWindowVisibleSubject = new BehaviorSubject<bool>(false);
 
@@ -144,7 +147,7 @@ sealed class MainUICommand : CommandBase
             config,
             this.systemEvents,
            hardwareService,
-            new MainViewModel(config, commandService, hardwareService).DisposeWith(Disposable!));
+            new MainViewModel(config, commandService, hardwareService, elevatedService).DisposeWith(Disposable!));
         window.Activated += OnWindowActivated;
 
         var presenter = OverlappedPresenter.CreateForDialog();
