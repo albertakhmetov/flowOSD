@@ -97,9 +97,9 @@ sealed class OsdNotificationService : IDisposable
     private void Init(CompositeDisposable disposable)
     {
         powerManagement.PowerMode
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowPowerModeNotification)
             .DisposeWith(disposable);
@@ -107,9 +107,9 @@ sealed class OsdNotificationService : IDisposable
         if (hardwareFeatures.Charger)
         {
             atk.Charger
-                .DistinctUntilChanged()
                 .Skip(1)
                 .Throttle(TimeSpan.FromSeconds(2))
+                .DistinctUntilChanged()
                 .ObserveOn(SynchronizationContext.Current!)
                 .Subscribe(ShowPowerSourceNotification)
                 .DisposeWith(disposable);
@@ -117,26 +117,26 @@ sealed class OsdNotificationService : IDisposable
         else
         {
             powerManagement.PowerSource
-                .DistinctUntilChanged()
                 .Skip(1)
                 .Throttle(TimeSpan.FromSeconds(2))
+                .DistinctUntilChanged()
                 .ObserveOn(SynchronizationContext.Current!)
                 .Subscribe(ShowPowerSourceNotification)
                 .DisposeWith(disposable);
         }
 
         touchPad.State.Throttle(TimeSpan.FromSeconds(1))
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowTouchPadNotification)
             .DisposeWith(disposable);
 
         powerManagement.IsBoost
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowBoostNotification)
             .DisposeWith(disposable);
@@ -145,33 +145,33 @@ sealed class OsdNotificationService : IDisposable
             .CombineLatest(display.State, (refreshRate, displayState) => new { refreshRate, displayState })
             .Where(x => x.displayState == DeviceState.Enabled)
             .Select(x => x.refreshRate)
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowDisplayRefreshRateNotification)
             .DisposeWith(disposable);
 
         atk.GpuMode
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowGpuNotification)
             .DisposeWith(disposable);
 
         performanceService.ActiveProfile
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowPerformanceProfileNotification)
             .DisposeWith(disposable);
 
         notebookModeService.State
-            .DistinctUntilChanged()
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowNotebookModeNotification)
             .DisposeWith(disposable);
