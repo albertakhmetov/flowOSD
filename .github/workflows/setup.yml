@@ -2,9 +2,9 @@ name: Build flowOSD version
 
 on:
   push:
-    tags:        
-      - '*'
-    branches: [ "main" ]
+  push:
+    tags: ['v[0-9].[0-9]+.[0-9]+']
+    branches: [main]
 
 jobs:
   build:
