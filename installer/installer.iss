@@ -1,10 +1,12 @@
+#define AppName 'flowOSD'
+
 [Setup]
-AppName=flowOSD
-AppVersion=3.3.0
-AppVerName=flowOSD 3.3.0
+AppName={#AppName}
+AppVersion={#AppVersion}
+AppVerName={#AppName} {#AppVersion}
 AppCopyright=© 2021-2023, Albert Akhmetov
 WizardStyle=modern
-DefaultDirName={autopf}\flowOSD
+DefaultDirName={autopf}\{#AppName}
 UninstallDisplayIcon={app}\flowOSD.exe
 Compression=lzma2/max
 SolidCompression=yes
@@ -18,11 +20,11 @@ AppPublisherURL=https://albertakhmetov.com
 
 AppSupportURL=https://github.com/albertakhmetov/flowOSD
 
-VersionInfoVersion=3.3.0
-VersionInfoProductName=flowOSD
+VersionInfoVersion={#AppVersion}
+VersionInfoProductName={#AppName}
 
 DisableProgramGroupPage=yes
-OutputBaseFilename=flowOSD-3.3.0
+OutputBaseFilename={#AppName}-{#AppVersion}
 
 [Files]
 Source: "..\output\publish\*.*"; DestDir: "{app}"; Flags: recursesubdirs
@@ -34,4 +36,4 @@ Name: "{autostartmenu}\flowOSD"; Filename: "{app}\flowOSD.exe"
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "flowOSD"; ValueData: "{app}\flowOSD.exe"; Flags: uninsdeletevalue
 
 [Run]
-Filename: "{app}\flowOSD.exe"; Description: "Run flowOSD"; Flags: postinstall shellexec
+Filename: "{app}\flowOSD.exe"; Description: "Run {#AppName}"; Flags: postinstall shellexec
