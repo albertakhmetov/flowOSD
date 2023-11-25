@@ -458,4 +458,4 @@ output/*
 !output/.gitkeep
 /redist/WindowsAppRuntimeInstall.exe
 
-./tools
+/tools/*
