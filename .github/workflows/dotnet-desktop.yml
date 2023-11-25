@@ -2,8 +2,8 @@ name: Build flowOSD version
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
+    tags:        
+      - '*'
     branches: [ "main" ]
 
 jobs:
