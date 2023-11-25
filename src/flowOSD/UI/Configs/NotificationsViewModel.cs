@@ -86,6 +86,12 @@ public class NotificationsViewModel : ConfigViewModelBase, IDisposable
         set => Config.Notifications[NotificationType.Gpu] = value;
     }
 
+    public bool NotebookMode
+    {
+        get => Config.Notifications[NotificationType.NotebookMode];
+        set => Config.Notifications[NotificationType.NotebookMode] = value;
+    }
+
     public void Dispose()
     {
         OnDeactivated();

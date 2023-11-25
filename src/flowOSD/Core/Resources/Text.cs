@@ -199,6 +199,8 @@ public sealed class Text
 
             public string Gpu => "dGPU notifications";
 
+            public string NotebookMode => "Notebook Mode notifications";
+
             public string From(NotificationType notificationType)
             {
                 switch (notificationType)

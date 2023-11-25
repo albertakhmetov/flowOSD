@@ -196,6 +196,8 @@ public sealed class Images
 
         public string Gpu => root.Hardware.Gpu;
 
+        public string NotebookMode => root.Hardware.Notebook;
+
         public string From(NotificationType notificationType)
         {
             switch (notificationType)

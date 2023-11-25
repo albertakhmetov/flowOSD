@@ -29,4 +29,5 @@ public enum NotificationType
     DisplayRefreshRate,
     Mic,
     Gpu,
+    NotebookMode,
 }

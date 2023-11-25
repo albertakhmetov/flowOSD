@@ -324,6 +324,18 @@
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
                         </Border>
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding NotebookMode, Mode=TwoWay}">
+                                <ToggleSwitch.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{Binding ImageResources.Notification.NotebookMode}"/>
+                                        <TextBlock Text="{Binding TextResources.Config.Notifications.NotebookMode}"/>
+                                    </StackPanel>
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
+                        </Border>
                     </StackPanel>
 
                     <!-- Keyboard -->

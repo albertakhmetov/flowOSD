@@ -325,6 +325,11 @@ sealed class OsdNotificationService : IDisposable
 
     private void ShowNotebookModeNotification(DeviceState state)
     {
+        if (!config.Notifications[NotificationType.NotebookMode])
+        {
+            return;
+        }
+
         osd.Show(new OsdMessage(state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off", Images.Instance.Hardware.Notebook));
     }
 }
