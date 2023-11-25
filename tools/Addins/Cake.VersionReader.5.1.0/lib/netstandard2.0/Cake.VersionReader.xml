@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Cake.VersionReader</name>
+    </assembly>
+    <members>
+        <member name="T:Cake.VersionReader.VersionReaderAliases">
+            <summary>
+            Contains functionality for retrieving version numbers from assemblies
+            </summary>
+        </member>
+        <member name="M:Cake.VersionReader.VersionReaderAliases.GetVersionNumber(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Get the version number from an assembly in SemVer format.
+            </summary>
+            <param name="context">The context</param>
+            <param name="file">The binary to read from</param>
+            <returns>Version number in the format '0.0.0'</returns>
+        </member>
+        <member name="M:Cake.VersionReader.VersionReaderAliases.GetFullVersionNumber(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Get the version number from an assembly in 4-digit format.
+            </summary>
+            <param name="context">The context</param>
+            <param name="file">The binary to read from</param>
+            <returns>Version number in the format '0.0.0.0'</returns>
+        </member>
+        <member name="M:Cake.VersionReader.VersionReaderAliases.GetVersionNumberWithContinuesIntegrationNumberAppended(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,System.Int32)">
+            <summary>
+            Get the version number with the current build number appended.
+            This is based on the article found here: http://www.xavierdecoster.com/semantic-versioning-auto-incremented-nuget-package-versions
+            </summary>
+            <param name="context">The context</param>
+            <param name="file">The binary to read from</param>
+            <param name="buildNumber">The build number as provided by the build server</param>
+            <returns>Version number in the format '0.0.0-CI00000'</returns>
+        </member>
+        <member name="M:Cake.VersionReader.VersionReaderAliases.GetFullVersionNumberWithContinuesIntegrationNumberAppended(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,System.Int32)">
+            <summary>
+            Get the version number from an assembly in 4-digit format with the current build number appended.
+            </summary>
+            <param name="context">The context</param>
+            <param name="file">The binary to read from</param>
+            <param name="buildNumber">The build number as provided by the build server</param>
+            <returns>Version number in the format '0.0.0.0-CI00000</returns>
+        </member>
+        <member name="M:Cake.VersionReader.VersionReaderAliases.GetVersionFromFile(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Retrieve version information from a binary
+            </summary>
+            <param name="context">The context</param>
+            <param name="file">The binary to read from</param>
+            <returns>Version</returns>
+        </member>
+    </members>
+</doc>

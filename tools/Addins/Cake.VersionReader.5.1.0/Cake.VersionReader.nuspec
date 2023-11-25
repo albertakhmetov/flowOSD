@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Cake.VersionReader</id>
+    <version>5.1.0</version>
+    <title>Cake.VersionReader</title>
+    <authors>NineTail Labs</authors>
+    <owners>NineTail Labs</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://raw.githubusercontent.com/NinetailLabs/Cake.VersionReader/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/NinetailLabs/Cake.VersionReader</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/cake-contrib/graphics/png/cake-contrib-medium.png</iconUrl>
+    <description>Cake Build addon to assist with reading version numbers from an assembly.</description>
+    <summary>Cake Build addon to assist with reading version numbers from an assembly.</summary>
+    <releaseNotes>Updated Cake version
+      Updated icon to use the Cake Contrib icon
+      Fixed nuspec to place binaries in the correct folder</releaseNotes>
+    <copyright>Copyright (c) NineTail Labs 2018</copyright>
+    <tags>Cake Script Build</tags>
+    <dependencies>
+      <dependency id="Cake.Core" version="0.33.0" />
+    </dependencies>
+  </metadata>
+</package>
