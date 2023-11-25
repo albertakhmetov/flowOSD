@@ -42,11 +42,6 @@ sealed class NotebookModeCommand : CommandBase
         Description = TextResources.Commands.NotebookMode.Description;
         Enabled = true;
 
-        atk.TabletMode
-            .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(x => Enabled = x == TabletMode.Notebook)
-            .DisposeWith(Disposable!);
-
         notebookModeService.State
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(x => IsChecked = x == DeviceState.Enabled)
