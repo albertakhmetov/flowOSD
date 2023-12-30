@@ -71,9 +71,9 @@ public sealed class AboutViewModel : ConfigViewModelBase
         Runtime = $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}";
 
         HomePage = TextResources["Config.About.HomePage"];
-        HomePageUrl = Urls.Instance.HomePage;
+        HomePageUrl = TextResources["Links.HomePage"];
 
-        LicenseUrl = Urls.Instance.License;
+        LicenseUrl = TextResources["Links.License"];
 
         ModelName = config.ModelName;
 

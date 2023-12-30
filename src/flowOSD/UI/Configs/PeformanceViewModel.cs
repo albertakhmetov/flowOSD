@@ -99,7 +99,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         IsFanCurvesWarningVisible = !config.Common.ForceCustomFanCurves;
     }
 
-    public string CustomFanCurvesPageUrl => Urls.Instance.CustomFanCurves;
+    public string CustomFanCurvesPageUrl => TextResources["Links.CustomFanCurves"];
 
     public bool IsFanCurvesWarningVisible { get; }
 

@@ -120,6 +120,13 @@ internal class TextResources : ITextResources
 
     private void Load(string locale = "en")
     {
+        resources["Links.HomePage"] = "https://github.com/albertakhmetov/flowOSD";
+        resources["Links.License"] = "https://raw.githubusercontent.com/albertakhmetov/flowOSD/main/LICENSE";
+        resources["Links.Optimization"] = "https://github.com/albertakhmetov/flowOSD/wiki/ASUS-Optimization";
+        resources["Links.CustomFanCurves"] = "https://github.com/albertakhmetov/flowOSD/wiki/Custom-Fan-Curves";
+        resources["Links.GitLatest"] = "https://github.com/albertakhmetov/flowOSD/releases/latest";
+        resources["Links.NotebookMode"] = "https://github.com/albertakhmetov/flowOSD/wiki/Notebook-Mode";
+
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"flowOSD.Resources.Text.{locale}.json");
 
         if (stream == null)

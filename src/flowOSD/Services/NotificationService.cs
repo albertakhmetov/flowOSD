@@ -142,7 +142,7 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     private void MoreDetailsAboutSlateMode()
     {
-        OpenUrl(Urls.Instance.NotebookMode);
+        OpenUrl(textResources["Links.NotebookMode"]);
     }
 
     private void DisableNotebookMode()

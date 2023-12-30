@@ -72,7 +72,7 @@ public sealed class UpdateCommand : CommandBase
         set => SetProperty(ref updateState, value);
     }
 
-    public string ReleaseNotesUrl => Urls.Instance.GitLatest;
+    public string ReleaseNotesUrl => TextResources["Links.GitLatest"];
 
     public override void Dispose()
     {

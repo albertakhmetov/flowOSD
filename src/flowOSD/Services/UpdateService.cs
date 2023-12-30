@@ -31,6 +31,7 @@ using static flowOSD.Extensions.Common;
 
 sealed class UpdateService : IUpdateService
 {
+    private ITextResources textResources;
     private IConfig config;
 
     private DateTime? lastCheckTime;
@@ -38,8 +39,11 @@ sealed class UpdateService : IUpdateService
     private BehaviorSubject<Version> latestVersionSubject;
     private BehaviorSubject<UpdateServiceState> stateSubject;
 
-    public UpdateService(IConfig config)
+    public UpdateService(
+        ITextResources textResources,
+        IConfig config)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
 
         latestVersionSubject = new BehaviorSubject<Version>(config.FileVersion);
@@ -68,7 +72,7 @@ sealed class UpdateService : IUpdateService
 
             using var client = new HttpClient();
 
-            var i = await client.GetAsync(Urls.Instance.GitLatest);
+            var i = await client.GetAsync(textResources["Links.GitLatest"]);
             if (i.IsSuccessStatusCode)
             {
                 var v = i.RequestMessage?.RequestUri?.Segments.LastOrDefault();
@@ -118,7 +122,7 @@ sealed class UpdateService : IUpdateService
             using var client = new HttpClient();
 
             var response = await client.GetAsync(
-                Urls.Instance.GitLatest + $"/download/{installerFileName}",
+                textResources["Links.GitLatest"] + $"/download/{installerFileName}",
                 HttpCompletionOption.ResponseHeadersRead);
 
             if (!response.IsSuccessStatusCode || response.Content.Headers.ContentLength == null)

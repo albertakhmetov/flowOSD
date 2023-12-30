@@ -107,7 +107,9 @@ public partial class App : Application
                 textResources,
                 configService,
                 elevatedService).DisposeWith(disposable);
-            updateService = new UpdateService(configService);
+            updateService = new UpdateService(
+                textResources,
+                configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
 

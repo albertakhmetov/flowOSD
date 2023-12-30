@@ -57,7 +57,7 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 
     public bool VariBrightControlEnabled => hardwareFeatures.AmdIntegratedGpu;
 
-    public string OptimizationPageUrl => Urls.Instance.Optimization;
+    public string OptimizationPageUrl => TextResources["Links.Optimization"];
 
     public bool RunAtStartup
     {
