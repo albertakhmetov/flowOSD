@@ -40,14 +40,16 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 
     public KeyboardViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ICommandService commandService, 
         IHardwareService hardwareService)
         : base(
             textResources,
+            imageResources,
             config, 
             "Config.Keyboard.Title",
-            Images.Instance.Common.KeyboardSettings)
+            "Common.KeyboardSettings")
     {
         if (config == null)
         {
@@ -70,28 +72,28 @@ public class KeyboardViewModel : ConfigViewModelBase, IDisposable
 
         var hotkeys = new List<KeyboardHotKeyViewModel>()
         {
-            new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Copy, commands),
-            new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Paste, commands),
-            new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Rog, commands),
+            new KeyboardHotKeyViewModel(TextResources,ImageResources, config.HotKeys, commandService, AtkKey.Copy, commands),
+            new KeyboardHotKeyViewModel(TextResources,ImageResources, config.HotKeys, commandService, AtkKey.Paste, commands),
+            new KeyboardHotKeyViewModel(TextResources,ImageResources, config.HotKeys, commandService, AtkKey.Rog, commands),
         };
 
         if (!hardwareFeatures.OptimizationService)
         {
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Mic, commands));
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.BacklightDown, commands));
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.BacklightUp, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.Mic, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.BacklightDown, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.BacklightUp, commands));
         }
 
-        hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Aura, commands));
-        hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Fan, commands));
+        hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.Aura, commands));
+        hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.Fan, commands));
 
         if (!hardwareFeatures.OptimizationService)
         {
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.BrightnessDown, commands));
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.BrightnessUp, commands));
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.TouchPad, commands));
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Sleep, commands));
-            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, config.HotKeys, commandService, AtkKey.Wireless, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.BrightnessDown, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.BrightnessUp, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.TouchPad, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.Sleep, commands));
+            hotkeys.Add(new KeyboardHotKeyViewModel(TextResources, ImageResources, config.HotKeys, commandService, AtkKey.Wireless, commands));
         }
 
         HotKeys = new ReadOnlyCollection<KeyboardHotKeyViewModel>(hotkeys);

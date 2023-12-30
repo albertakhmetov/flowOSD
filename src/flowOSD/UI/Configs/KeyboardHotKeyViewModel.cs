@@ -43,10 +43,14 @@ public class KeyboardHotKeyViewModel : ViewModelBase, IDisposable
 
     public KeyboardHotKeyViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         HotKeysConfig hotKeysConfig,
         ICommandService commandService,
         AtkKey key,
-        IReadOnlyCollection<CommandBase> commands) : base(textResources)
+        IReadOnlyCollection<CommandBase> commands) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.hotKeysConfig = hotKeysConfig ?? throw new ArgumentNullException(nameof(hotKeysConfig));
         this.commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));

@@ -36,9 +36,13 @@ sealed class DisplayRefreshRateCommand : CommandBase
 
     public DisplayRefreshRateCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IPowerManagement powerManagement,
         IDisplay display,
-        CommonConfig userConfig) : base(textResources)
+        CommonConfig userConfig) 
+        : base(
+            textResources, 
+            imageResources)
     {
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
         this.display = display ?? throw new ArgumentNullException(nameof(display));

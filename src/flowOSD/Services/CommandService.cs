@@ -31,6 +31,7 @@ using flowOSD.UI.Commands;
 sealed class CommandService : ICommandService, IDisposable
 {
     private ITextResources textResources;
+    private IImageResources imageResources;
     private IConfig config;
     private IHardwareService hardwareService;
     private IKeysSender keysSender;
@@ -42,6 +43,7 @@ sealed class CommandService : ICommandService, IDisposable
 
     public CommandService(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IHardwareService hardwareService,
         IKeysSender keysSender,
@@ -61,40 +63,56 @@ sealed class CommandService : ICommandService, IDisposable
 
         Register(() => new ToggleBoostCommand(
             textResources,
+            imageResources,
             hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new PerformanceCommand(
             textResources,
+            imageResources, 
             config,
             hardwareService.ResolveNotNull<IAtk>(),
             hardwareService.ResolveNotNull<IPowerManagement>(),
             hardwareService.ResolveNotNull<IPerformanceService>()));
         Register(() => new PowerModeCommand(
             textResources,
+            imageResources, 
             hardwareService.ResolveNotNull<IPowerManagement>()));
-        Register(() => new GpuCommand(textResources,
+        Register(() => new GpuCommand(
+            textResources,
+            imageResources, 
             config, 
             hardwareService.ResolveNotNull<IAtk>(), 
             notificationService));
-        Register(() => new TouchPadCommand(textResources,
+        Register(() => new TouchPadCommand(
+            textResources,
+            imageResources, 
             hardwareService.ResolveNotNull<ITouchPad>()));
-        Register(() => new MicrophoneCommand(textResources,
+        Register(() => new MicrophoneCommand(
+            textResources,
+            imageResources, 
             config,
             osd,
             hardwareService.ResolveNotNull<IMicrophone>()));
         Register(() => new DisplayRefreshRateCommand(
             textResources,
+            imageResources, 
             hardwareService.ResolveNotNull<IPowerManagement>(),
             hardwareService.ResolveNotNull<IDisplay>(),
             config.Common));
 
-        Register(() => new ExitCommand(textResources));
+        Register(() => new ExitCommand(
+            textResources,
+            imageResources));
         Register(() => new RestartAppCommand(
             textResources,
+            imageResources,
             notificationService));
-        Register(() => new SuspendCommand(textResources));
+        Register(() => new SuspendCommand(
+            textResources,
+            imageResources));
 
         Register(() => new ConfigCommand(
             textResources,
+            imageResources, 
             config, 
             systemEvents, 
             this,
@@ -102,6 +120,7 @@ sealed class CommandService : ICommandService, IDisposable
             updateService));
         Register(() => new MainUICommand(
             textResources,
+            imageResources, 
             config, 
             systemEvents, 
             this, 
@@ -109,26 +128,31 @@ sealed class CommandService : ICommandService, IDisposable
             elevatedService));
         Register(() => new NotifyMenuCommand(
             textResources,
-            this.config, 
+            imageResources, 
+            config, 
             systemEvents, 
             this));
         Register(() => new UpdateCommand(
             textResources,
-            this.updateService));
+            imageResources, 
+            updateService));
 
         Register(() => new DisplayBrightnessCommand(
             textResources,
+            imageResources, 
             config, 
             osd,
             hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(
             textResources,
+            imageResources, 
             config, 
             osd,
             hardwareService));
 
         Register(() => new NotebookModeCommand(
             textResources,
+            imageResources, 
             config,
             hardwareService.ResolveNotNull<IAtk>(),
             hardwareService.ResolveNotNull<INotebookModeService>(), 

@@ -31,16 +31,20 @@ public abstract class ConfigViewModelBase : ViewModelBase
 
     protected ConfigViewModelBase(
         ITextResources textResources,
-        IConfig config, 
-        string titleKey, 
-        string? icon,
-        bool isFooterItem = false) : base(textResources)
+        IImageResources imageResources,
+        IConfig config,
+        string titleKey,
+        string? iconKey,
+        bool isFooterItem = false)
+        : base(
+            textResources,
+            imageResources)
     {
         Config = config ?? throw new ArgumentNullException(nameof(config));
 
         IsFooterItem = isFooterItem;
-        Title = titleKey == null ? string.Empty: TextResources[titleKey];
-        Icon = icon ?? string.Empty;
+        Title = titleKey == null ? string.Empty : TextResources[titleKey];
+        Icon = iconKey == null ? string.Empty : ImageResources[iconKey];
         InfoCount = 0;
     }
 

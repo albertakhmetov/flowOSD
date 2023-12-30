@@ -28,6 +28,7 @@ using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using flowOSD.Services;
+using flowOSD.Services.Resources;
 using flowOSD.UI;
 using flowOSD.UI.Commands;
 using flowOSD.UI.Configs;
@@ -48,6 +49,7 @@ public partial class App : Application
     private IDisposable? helloMessageSubsciption;
 
     private TextResources textResources;
+    private ImageResources imageResources;
 
     private IUpdateService updateService;
 
@@ -90,7 +92,7 @@ public partial class App : Application
         }
 #endif
         textResources = new TextResources();
-
+        imageResources = new ImageResources();
 
         InitializeComponent();
 
@@ -110,7 +112,11 @@ public partial class App : Application
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
 
             keysSender = new KeysSender();
-            osd = new Osd(textResources, configService, systemEvents);
+            osd = new Osd(
+                textResources,
+                imageResources,
+                configService,
+                systemEvents);
 
             if (configService.Common.UseMockMode)
             {
@@ -133,12 +139,14 @@ public partial class App : Application
 
             osdNotificationService = new OsdNotificationService(
                 textResources,
+                imageResources,
                 configService,
                 osd,
                 hardwareService).DisposeWith(disposable);
 
             commandService = new CommandService(
                 textResources,
+                imageResources,
                 configService,
                 hardwareService,
                 keysSender,

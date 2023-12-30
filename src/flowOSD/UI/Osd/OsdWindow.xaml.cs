@@ -47,13 +47,14 @@ public sealed partial class OsdWindow : Window, IDisposable
 
     public OsdWindow(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config, 
         ISystemEvents systemEvents)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
-        ViewModel = new OsdViewModel(textResources);
+        ViewModel = new OsdViewModel(textResources, imageResources);
 
         InitializeComponent();
         if (Content is FrameworkElement element)

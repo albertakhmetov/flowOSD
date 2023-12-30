@@ -17,7 +17,7 @@
  *
  */
 
-namespace flowOSD.Services;
+namespace flowOSD.Services.Resources;
 
 using System.Reflection;
 using System.Text.Json;
@@ -25,22 +25,20 @@ using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Core.Resources;
 
-internal sealed class TextResources : ITextResources
+internal class TextResources : ITextResources
 {
-    private readonly Dictionary<string, string> resources;
+    protected readonly Dictionary<string, string> resources = new Dictionary<string, string>();
 
     public TextResources()
     {
-        resources = new Dictionary<string, string>();
-
         Load();
     }
 
-    public string this[string resourceName]
+    public string this[string resourceKey]
     {
         get
         {
-            if (resources.TryGetValue(resourceName, out var value))
+            if (resources.TryGetValue(resourceKey, out var value))
             {
                 return value;
             }

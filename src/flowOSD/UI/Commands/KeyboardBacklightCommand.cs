@@ -45,9 +45,13 @@ sealed class KeyboardBacklightCommand : CommandBase
 
     public KeyboardBacklightCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IOsd osd,
-        IHardwareService hardwareService) : base(textResources)
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            imageResources)
     {
         if (parameters == null)
         {
@@ -106,8 +110,8 @@ sealed class KeyboardBacklightCommand : CommandBase
         var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
 
         var icon = direction == UP
-            ? Images.Instance.Hardware.KeyboardLightUp
-            : Images.Instance.Hardware.KeyboardLightDown;
+            ? ImageResources["Hardware.KeyboardLightUp"]
+            : ImageResources["Hardware.KeyboardLightDown"];
 
         osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
     }

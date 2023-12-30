@@ -39,9 +39,13 @@ sealed class GpuCommand : CommandBase
 
     public GpuCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IAtk atk,
-        INotificationService notificationService) : base(textResources)
+        INotificationService notificationService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.config = config ?? throw new ArgumentNullException(nameof(config));

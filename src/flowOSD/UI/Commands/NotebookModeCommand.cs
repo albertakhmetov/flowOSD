@@ -37,10 +37,14 @@ sealed class NotebookModeCommand : CommandBase
 
     public NotebookModeCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IAtk atk, 
         INotebookModeService notebookModeService,
-        IElevatedService elevatedService) : base(textResources)
+        IElevatedService elevatedService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));

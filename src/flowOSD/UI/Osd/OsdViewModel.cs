@@ -29,7 +29,12 @@ public sealed class OsdViewModel : ViewModelBase
     private double value;
     private bool showCaution;
 
-    public OsdViewModel(ITextResources textResources) : base(textResources)
+    public OsdViewModel(
+        ITextResources textResources,
+        IImageResources imageResources)
+        : base(
+            textResources,
+            imageResources)
     {
     }
 

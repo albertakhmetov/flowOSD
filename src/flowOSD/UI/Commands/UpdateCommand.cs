@@ -41,7 +41,11 @@ public sealed class UpdateCommand : CommandBase
 
     public UpdateCommand(
         ITextResources textResources,
-        IUpdateService updateService) : base(textResources)
+        IImageResources imageResources,
+        IUpdateService updateService) 
+        : base(
+            textResources, 
+            imageResources)
     {
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 

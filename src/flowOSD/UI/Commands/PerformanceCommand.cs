@@ -37,10 +37,14 @@ public class PerformanceCommand : CommandBase
 
     public PerformanceCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IAtk atk,
         IPowerManagement powerManagement,
-        IPerformanceService performanceService) : base(textResources)
+        IPerformanceService performanceService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));

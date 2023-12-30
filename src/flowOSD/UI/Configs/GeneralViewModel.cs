@@ -35,13 +35,15 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 
     public GeneralViewModel(
         ITextResources textResources,
+        IImageResources imageResources, 
         IConfig config,
         IHardwareService hardwareService)
         : base(
             textResources,
+            imageResources,
             config,
             "Config.General.Title",
-            Images.Instance.Common.Home)
+            "Common.Home")
     {
         if (hardwareService == null)
         {

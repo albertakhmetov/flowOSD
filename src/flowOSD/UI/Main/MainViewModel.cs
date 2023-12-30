@@ -55,10 +55,14 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public MainViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IElevatedService elevatedService) : base(textResources)
+        IElevatedService elevatedService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
@@ -93,8 +97,6 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
     }
-
-    public Images ImageResources => Images.Instance;
 
     public CommandBase BoostCommand { get; }
 
@@ -134,7 +136,7 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public string NotebookModeImage
     {
-        get => elevatedService.IsElevated ? ImageResources.Hardware.Notebook : ImageResources.Hardware.NotebookShield;
+        get => elevatedService.IsElevated ? ImageResources["Hardware.Notebook"] : ImageResources["Hardware.NotebookShield"];
     }
 
     public bool ShowBatteryChargeRate
@@ -245,19 +247,19 @@ public class MainViewModel : ViewModelBase, IDisposable
 
                 if (profile.Id == PerformanceProfile.DefaultId)
                 {
-                    PerformanceProfileImage = Images.Instance.PerformanceMode.Performance;
+                    PerformanceProfileImage = ImageResources["PerformanceMode.Performance"];
                 }
                 else if (profile.Id == PerformanceProfile.TurboId)
                 {
-                    PerformanceProfileImage = Images.Instance.PerformanceMode.Turbo;
+                    PerformanceProfileImage = ImageResources["PerformanceMode.Turbo"];
                 }
                 else if (profile.Id == PerformanceProfile.SilentId)
                 {
-                    PerformanceProfileImage = Images.Instance.PerformanceMode.Silent;
+                    PerformanceProfileImage = ImageResources["PerformanceMode.Silent"];
                 }
                 else
                 {
-                    PerformanceProfileImage = Images.Instance.PerformanceMode.User;
+                    PerformanceProfileImage = ImageResources["PerformanceMode.User"];
                 }
             })
             .DisposeWith(disposable);
@@ -267,7 +269,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             .Subscribe(powerMode =>
             {
                 PowerModeText = TextResources.For(powerMode);
-                PowerModeImage = Images.Instance.PowerMode.From(powerMode);
+                PowerModeImage = ImageResources.For(powerMode);
             })
             .DisposeWith(disposable);
 
@@ -358,6 +360,6 @@ public class MainViewModel : ViewModelBase, IDisposable
         FullChargedCapacity = battery.FullChargedCapacity;
         EstimatedTime = estimatedTime;
 
-        BatteryImage = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
+        BatteryImage = ImageResources.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
     }
 }

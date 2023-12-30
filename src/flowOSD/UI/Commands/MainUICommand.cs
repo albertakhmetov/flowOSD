@@ -51,11 +51,15 @@ sealed class MainUICommand : CommandBase
 
     public MainUICommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IElevatedService elevatedService) : base(textResources)
+        IElevatedService elevatedService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -151,6 +155,7 @@ sealed class MainUICommand : CommandBase
             hardwareService,
             new MainViewModel(
                 TextResources, 
+                ImageResources,
                 config, 
                 commandService, 
                 hardwareService,

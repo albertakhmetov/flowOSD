@@ -32,7 +32,9 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
     private string text, description;
     private bool enabled, isChecked;
 
-    protected CommandBase(ITextResources textResources)
+    protected CommandBase(
+        ITextResources textResources,
+        IImageResources imageResources)
     {
         text = GetType().Name;
         description = string.Empty;
@@ -40,6 +42,7 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
         if (this is EmptyCommand == false)
         {
             TextResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+            ImageResources = imageResources ?? throw new ArgumentNullException(nameof(imageResources));
         }
     }
 
@@ -97,6 +100,8 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
 
     protected ITextResources TextResources { get; }
 
+    protected IImageResources ImageResources { get; }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler? CanExecuteChanged;
@@ -128,7 +133,7 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
 
     private sealed class EmptyCommand : CommandBase
     {
-        public EmptyCommand() : base(null)
+        public EmptyCommand() : base(null, null)
         {
             Description = "Not Set";
         }

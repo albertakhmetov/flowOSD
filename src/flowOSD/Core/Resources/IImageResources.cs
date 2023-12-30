@@ -22,15 +22,7 @@ namespace flowOSD.Core.Resources;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
-public interface IImagesResources
+public interface IImageResources : ITextResources
 {
-    string this[string resourceKey] { get; }
-
-    string For(PerformanceMode performanceMode);
-
-    string For(PowerMode powerMode);
-
-    string For(NotificationType notificationType);
-
     string GetBatteryIcon(uint capacity, uint fullChargedCapacity, BatteryPowerState powerState);
 }

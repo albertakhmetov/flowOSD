@@ -37,7 +37,12 @@ sealed class SuspendCommand : CommandBase
     //    new CommandParameterInfo(HIBERNATE, Core.Resources.Text.Instance.Commands.Suspend.Hibernate),
     //    new CommandParameterInfo(SLEEP, Core.Resources.Text.Instance.Commands.Suspend.Sleep));
 
-    public SuspendCommand(ITextResources textResources) : base(textResources)
+    public SuspendCommand(
+        ITextResources textResources,
+        IImageResources imageResources)
+        : base(
+            textResources,
+            imageResources)
     {
         Text = TextResources["Commands.Suspend.Description"];
         Description = Text;

@@ -42,13 +42,15 @@ public sealed class BatteryViewModel : ConfigViewModelBase
 
     public BatteryViewModel(
         ITextResources textResources,
+        IImageResources imageResources, 
         IConfig config, 
         IHardwareService hardwareService)
         : base(
             textResources,
+            imageResources,
             config, 
             "Config.Battery.Title",
-            Images.Instance.Hardware.Battery)
+            "Hardware.Battery")
     {
         if (hardwareService == null)
         {
@@ -169,7 +171,7 @@ public sealed class BatteryViewModel : ConfigViewModelBase
 
     private void UpdateBattery(int rate, uint capacity, BatteryPowerState powerState)
     {
-        StatusImage = Images.Instance.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
+        StatusImage = ImageResources.GetBatteryIcon(capacity, battery.FullChargedCapacity, powerState);
         Percentage = Convert.ToInt32(Math.Round(100f * capacity / battery.FullChargedCapacity));
         Rate = Math.Abs(rate) > 100 ? rate : 0;
         Capacity = capacity;

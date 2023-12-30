@@ -41,9 +41,13 @@ sealed class DisplayBrightnessCommand : CommandBase
 
     public DisplayBrightnessCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IOsd osd,
-        IDisplayBrightness displayBrightness) : base(textResources)
+        IDisplayBrightness displayBrightness)
+        : base(
+            textResources,
+            imageResources)
     {
         if (parameters == null)
         {
@@ -51,11 +55,11 @@ sealed class DisplayBrightnessCommand : CommandBase
             new CommandParameterInfo(
                 DOWN,
                 TextResources["Commands.DisplayBrightness.Down"],
-                Images.Instance.Hardware.BrightnessDown),
+                ImageResources["Hardware.BrightnessDown"]),
             new CommandParameterInfo(
                 UP,
-                TextResources["Commands.DisplayBrightness.Up"], 
-                Images.Instance.Hardware.BrightnessUp));
+                TextResources["Commands.DisplayBrightness.Up"],
+                ImageResources["Hardware.BrightnessUp"]));
         }
 
         this.config = config ?? throw new ArgumentNullException(nameof(config));
@@ -96,8 +100,8 @@ sealed class DisplayBrightnessCommand : CommandBase
         // fail back:
 
         var icon = direction == DOWN
-            ? Images.Instance.Hardware.BrightnessDown
-            : Images.Instance.Hardware.BrightnessUp;
+            ? ImageResources["Hardware.BrightnessDown"]
+            : ImageResources["Hardware.BrightnessUp"];
 
         osd.Show(new OsdValue(displayBrightness.GetLevel(), icon));
     }

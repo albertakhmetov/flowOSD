@@ -34,7 +34,11 @@ sealed class TouchPadCommand : CommandBase
 
     public TouchPadCommand(
         ITextResources textResources,
-        ITouchPad touchPad) : base(textResources)
+        IImageResources imageResources,
+        ITouchPad touchPad) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.touchPad = touchPad ?? throw new ArgumentNullException(nameof(touchPad));
 

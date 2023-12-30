@@ -44,11 +44,15 @@ sealed class ConfigCommand : CommandBase, IDisposable
 
     public ConfigCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IUpdateService updateService) : base(textResources)
+        IUpdateService updateService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -70,14 +74,14 @@ sealed class ConfigCommand : CommandBase, IDisposable
         {
             var viewModels = new ConfigViewModelBase[]
             {
-                new GeneralViewModel(TextResources, config, hardwareService),
-                new NotificationsViewModel(TextResources, config),
-                new KeyboardViewModel(TextResources, config, commandService, hardwareService),
-                new MonitoringViewModel(TextResources, config, hardwareService),
-                new PerformanceViewModel(TextResources, config, hardwareService),
-                new TabletViewModel(TextResources, config, hardwareService),
-                new BatteryViewModel(TextResources, config, hardwareService),
-                new AboutViewModel(TextResources, config, commandService, updateService)
+                new GeneralViewModel(TextResources, ImageResources, config, hardwareService),
+                new NotificationsViewModel(TextResources, ImageResources, config),
+                new KeyboardViewModel(TextResources, ImageResources, config, commandService, hardwareService),
+                new MonitoringViewModel(TextResources, ImageResources, config, hardwareService),
+                new PerformanceViewModel(TextResources, ImageResources, config, hardwareService),
+                new TabletViewModel(TextResources, ImageResources, config, hardwareService),
+                new BatteryViewModel(TextResources, ImageResources, config, hardwareService),
+                new AboutViewModel(TextResources, ImageResources, config, commandService, updateService)
             };
 
             window = new ConfigWindow(TextResources, systemEvents, viewModels);

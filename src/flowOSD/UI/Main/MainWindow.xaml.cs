@@ -105,7 +105,7 @@ public sealed partial class MainWindow : Window, IDisposable
             {
                 Command = ViewModel.PerformanceCommand,
                 CommandParameter = PerformanceProfile.DefaultId,
-                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Performance },
+                Icon = new FontIcon { Glyph = ViewModel.ImageResources["PerformanceMode.Performance"] },
                 Text = ViewModel.TextResources["PerformanceMode.Performance"]
             });
 
@@ -113,7 +113,7 @@ public sealed partial class MainWindow : Window, IDisposable
             {
                 Command = ViewModel.PerformanceCommand,
                 CommandParameter = PerformanceProfile.TurboId,
-                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Turbo },
+                Icon = new FontIcon { Glyph = ViewModel.ImageResources["PerformanceMode.Turbo"] },
                 Text = ViewModel.TextResources["PerformanceMode.Turbo"]
             });
 
@@ -121,7 +121,7 @@ public sealed partial class MainWindow : Window, IDisposable
             {
                 Command = ViewModel.PerformanceCommand,
                 CommandParameter = PerformanceProfile.SilentId,
-                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Silent },
+                Icon = new FontIcon { Glyph = ViewModel.ImageResources["PerformanceMode.Silent"] },
                 Text = ViewModel.TextResources["PerformanceMode.Silent"]
             });
         }
@@ -188,7 +188,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PowerModeCommand,
             CommandParameter = PowerMode.BestPowerEfficiency,
-            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.BestPowerEfficiency },
+            Icon = new FontIcon { Glyph = ViewModel.ImageResources["PowerMode.BestPowerEfficiency"] },
             Text = ViewModel.TextResources["PowerMode.BestPowerEfficiency"]
         });
 
@@ -196,7 +196,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PowerModeCommand,
             CommandParameter = PowerMode.Balanced,
-            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.Balanced },
+            Icon = new FontIcon { Glyph = ViewModel.ImageResources["PowerMode.Balanced"] },
             Text = ViewModel.TextResources["PowerMode.Balanced"]
         });
 
@@ -204,7 +204,7 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PowerModeCommand,
             CommandParameter = PowerMode.BestPerformance,
-            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.BestPerformance },
+            Icon = new FontIcon { Glyph = ViewModel.ImageResources["PowerMode.BestPerformance"] },
             Text = ViewModel.TextResources["PowerMode.BestPerformance"]
         });
     }

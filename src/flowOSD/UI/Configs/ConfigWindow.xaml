@@ -234,7 +234,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.PerformanceMode}"/>
+                                            Glyph="{Binding ImageResources[Notifications.PerformanceMode], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.PerformanceMode], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -246,7 +246,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.PowerMode}"/>
+                                            Glyph="{Binding ImageResources[Notifications.PowerMode], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.PowerMode], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -258,7 +258,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.PowerSource}"/>
+                                            Glyph="{Binding ImageResources[Notifications.PowerSource], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.PowerSource], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -270,7 +270,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.Boost}"/>
+                                            Glyph="{Binding ImageResources[Notifications.Boost], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.Boost], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -282,7 +282,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.TouchPad}"/>
+                                            Glyph="{Binding ImageResources[Notifications.TouchPad], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.TouchPad], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -294,7 +294,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.DisplayRefreshRate}"/>
+                                            Glyph="{Binding ImageResources[Notifications.DisplayRefreshRate], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.DisplayRefreshRate], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -306,7 +306,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.Mic}"/>
+                                            Glyph="{Binding ImageResources[Notifications.Mic], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.Mic], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -318,7 +318,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.Gpu}"/>
+                                            Glyph="{Binding ImageResources[Notifications.Gpu], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.Gpu], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -330,7 +330,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Notification.NotebookMode}"/>
+                                            Glyph="{Binding ImageResources[Notifications.NotebookMode], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Notifications.NotebookMode], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -496,7 +496,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Hardware.AC}"/>
+                                            Glyph="{Binding ImageResources[Hardware.AC], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding TextResources[Config.Monitoring.ShowBatteryChargeRate], Mode=OneTime}"/>
                                     </StackPanel>
                                 </ToggleSwitch.Header>
@@ -512,7 +512,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Common.Temperature}"/>
+                                            Glyph="{Binding ImageResources[Common.Temperature], Mode=OneTime}"/>
 
                                         <TextBlock Text="{Binding TextResources[Config.Monitoring.ShowCpuTemperature], Mode=OneTime}"/>
                                     </StackPanel>
@@ -529,7 +529,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon 
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                            Glyph="{Binding ImageResources.Common.Diagnostic}"/>
+                                            Glyph="{Binding ImageResources[Common.Diagnostic], Mode=OneTime}"/>
 
                                         <TextBlock Text="{Binding TextResources[Config.Monitoring.ShowFanSpeed], Mode=OneTime}"/>
                                     </StackPanel>
@@ -1047,7 +1047,7 @@
                                     <FontIcon 
                                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                         Margin="0,0,0,0"                                    
-                                        Glyph="{Binding ImageResources.Common.Updater}"/>
+                                        Glyph="{Binding ImageResources[Common.Updater], Mode=OneTime}"/>
 
                                     <FontIcon 
                                         Visibility="{Binding UpdateCommand.UpdateState, ConverterParameter='Updated', Converter={StaticResource VisibilityConverter}}"
@@ -1126,7 +1126,7 @@
                                             FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                             Margin="0,0,10,0"
                                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" 
-                                            Glyph="{Binding ImageResources.Common.Shield}"/>
+                                            Glyph="{Binding ImageResources[Common.Shield], Mode=OneTime}"/>
                                         <TextBlock Text="{Binding UpdateCommand.Text}"/>
                                     </StackPanel>
                                 </Button>

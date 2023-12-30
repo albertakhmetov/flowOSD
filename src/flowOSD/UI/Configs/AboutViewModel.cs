@@ -43,14 +43,16 @@ public sealed class AboutViewModel : ConfigViewModelBase
 
     public AboutViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ICommandService commandService,
         IUpdateService updateService)
         : base(
             textResources,
+            imageResources,
             config,
             "Config.About.Title",
-            Images.Instance.Common.Info, 
+            "Common.Info", 
             isFooterItem: true)
     {
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
@@ -79,8 +81,6 @@ public sealed class AboutViewModel : ConfigViewModelBase
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(state => InfoCount = state == UpdateServiceState.ReadyToDownload ? 1 : 0);
     }
-
-    public Images ImageResources => Images.Instance;
 
     public string ProductName { get; }
 

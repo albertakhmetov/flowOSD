@@ -40,6 +40,7 @@ sealed class OsdNotificationService : IDisposable
     private CompositeDisposable? disposable = new CompositeDisposable();
 
     private ITextResources textResources;
+    private IImageResources imageResources;
     private IConfig config;
     private IOsd osd;
 
@@ -59,11 +60,13 @@ sealed class OsdNotificationService : IDisposable
 
     public OsdNotificationService(
         ITextResources textResources,
-        IConfig config, 
-        IOsd osd, 
+        IImageResources imageResources,
+        IConfig config,
+        IOsd osd,
         IHardwareService hardwareService)
     {
         this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+        this.imageResources = imageResources ?? throw new ArgumentNullException(nameof(imageResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
 
@@ -204,7 +207,7 @@ sealed class OsdNotificationService : IDisposable
         var isMuted = microphone.IsMicMuted();
         osd.Show(new OsdMessage(
             isMuted ? textResources["Notifications.MicOff"] : textResources["Notifications.MicOn"],
-            isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
+            isMuted ? imageResources["Hardware.MicMuted"] : imageResources["Hardware.Mic"]));
     }
 
     private async void ShowKeyboardBacklightNotification(AtkKey key)
@@ -212,8 +215,8 @@ sealed class OsdNotificationService : IDisposable
         var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
 
         var icon = key == AtkKey.BacklightUp
-            ? Images.Instance.Hardware.KeyboardLightUp
-            : Images.Instance.Hardware.KeyboardLightDown;
+            ? imageResources["Hardware.KeyboardLightUp"]
+            : imageResources["Hardware.KeyboardLightDown"];
 
         osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
     }
@@ -227,7 +230,7 @@ sealed class OsdNotificationService : IDisposable
 
         osd.Show(new OsdMessage(
             performanceProfile.Name,
-            Images.Instance.PerformanceMode.From(performanceProfile.PerformanceMode)));
+            imageResources.For(performanceProfile.PerformanceMode)));
     }
 
     private void ShowPowerModeNotification(PowerMode powerMode)
@@ -239,7 +242,7 @@ sealed class OsdNotificationService : IDisposable
 
         osd.Show(new OsdMessage(
             $"{textResources.For(powerMode)} power mode",
-            Images.Instance.PowerMode.From(powerMode)));
+            imageResources.For(powerMode)));
     }
 
     private void ShowPowerSourceNotification(PowerSource powerSource)
@@ -251,7 +254,7 @@ sealed class OsdNotificationService : IDisposable
 
         osd.Show(new OsdMessage(
             powerSource == PowerSource.Battery ? textResources["Charger.Battery"] : textResources["Charger.Connected"],
-            powerSource == PowerSource.Battery ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
+            powerSource == PowerSource.Battery ? imageResources["Hardware.DC"] : imageResources["Hardware.AC"]));
     }
 
     private async void ShowPowerSourceNotification(ChargerTypes chargerTypes)
@@ -270,17 +273,17 @@ sealed class OsdNotificationService : IDisposable
         if ((chargerTypes & ChargerTypes.LowPower) == ChargerTypes.LowPower)
         {
             text = textResources["Charger.LowPower"];
-            image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
+            image = imageResources.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
         }
         else if ((chargerTypes & ChargerTypes.Connected) == ChargerTypes.Connected)
         {
             text = textResources["Charger.Connected"];
-            image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
+            image = imageResources.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
         }
         else
         {
             text = textResources["Charger.Battery"];
-            image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.Discharging);
+            image = imageResources.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.Discharging);
         }
 
         osd.Show(new OsdMessage(
@@ -296,7 +299,9 @@ sealed class OsdNotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate", Images.Instance.Hardware.Screen));
+        osd.Show(new OsdMessage(
+            DisplayRefreshRates.IsHigh(refreshRate) ? "High Refresh Rate" : "Low Refresh Rate",
+            imageResources["Hardware.Screen"]));
     }
 
     private void ShowBoostNotification(bool isEnabled)
@@ -306,7 +311,9 @@ sealed class OsdNotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(isEnabled ? "Boost Mode is on" : "Boost Mode is off", Images.Instance.Hardware.Cpu));
+        osd.Show(new OsdMessage(
+            isEnabled ? "Boost Mode is on" : "Boost Mode is off", 
+            imageResources["Hardware.Cpu"]));
     }
 
     private void ShowTouchPadNotification(DeviceState state)
@@ -316,7 +323,9 @@ sealed class OsdNotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", Images.Instance.Hardware.TouchPad));
+        osd.Show(new OsdMessage(
+            state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", 
+            imageResources["Hardware.TouchPad"]));
     }
 
     private void ShowGpuNotification(GpuMode gpuMode)
@@ -326,7 +335,9 @@ sealed class OsdNotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", Images.Instance.Hardware.Gpu));
+        osd.Show(new OsdMessage(
+            gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", 
+            imageResources["Hardware.Gpu"]));
     }
 
     private void ShowNotebookModeNotification(DeviceState state)
@@ -336,6 +347,8 @@ sealed class OsdNotificationService : IDisposable
             return;
         }
 
-        osd.Show(new OsdMessage(state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off", Images.Instance.Hardware.Notebook));
+        osd.Show(new OsdMessage(
+            state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off", 
+            imageResources["Hardware.Notebook"]));
     }
 }

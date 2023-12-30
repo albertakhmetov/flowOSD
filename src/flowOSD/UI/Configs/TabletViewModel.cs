@@ -39,13 +39,15 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
 
     public TabletViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IHardwareService hardwareService)
         : base(
             textResources,
+            imageResources,
             config, 
             "Config.Tablet.Title",
-            Images.Instance.Hardware.Tablet)
+            "Hardware.Tablet")
     {
         if (hardwareService == null)
         {

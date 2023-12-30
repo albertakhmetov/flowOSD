@@ -155,6 +155,5 @@
 
 	<ItemGroup>
 	  <Folder Include="Resources\Text\" />
-	  <Folder Include="Services\Resources\" />
 	</ItemGroup>
 </Project>

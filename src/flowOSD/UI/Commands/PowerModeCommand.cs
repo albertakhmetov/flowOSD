@@ -33,7 +33,11 @@ sealed class PowerModeCommand : CommandBase
 
     public PowerModeCommand(
         ITextResources textResources,
-        IPowerManagement powerManagement) : base(textResources)
+        IImageResources imageResources,
+        IPowerManagement powerManagement) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
 

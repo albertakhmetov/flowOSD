@@ -55,13 +55,15 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
 
     public PerformanceViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IHardwareService hardwareService)
         : base(
             textResources,
+            imageResources,
             config,
             "Config.Performance.Title",
-            Images.Instance.PerformanceMode.Performance)
+            "PerformanceMode.Performance")
     {
         if (hardwareService == null)
         {

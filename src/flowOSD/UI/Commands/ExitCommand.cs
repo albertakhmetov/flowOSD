@@ -26,7 +26,13 @@ using flowOSD.Core.Resources;
 
 sealed class ExitCommand : CommandBase
 {
-    public ExitCommand(ITextResources textResources) : base(textResources)
+    public ExitCommand(
+        ITextResources textResources, 
+        IImageResources imageResources
+        ) 
+        : base(
+            textResources, 
+            imageResources)
     {
         Text = TextResources["Commands.Exit.Description"];
         Enabled = true;

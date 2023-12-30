@@ -31,7 +31,11 @@ internal class RestartAppCommand : CommandBase
 
     public RestartAppCommand(
         ITextResources textResources,
-        INotificationService notificationService) : base(textResources)
+        IImageResources imageResources,
+        INotificationService notificationService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 

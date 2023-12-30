@@ -34,7 +34,11 @@ sealed class ToggleBoostCommand : CommandBase
 
     public ToggleBoostCommand(
         ITextResources textResources,
-        IPowerManagement powerManagement) : base(textResources)
+        IImageResources imageResources,
+        IPowerManagement powerManagement) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.powerManagement = powerManagement;
 

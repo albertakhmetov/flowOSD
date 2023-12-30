@@ -48,9 +48,13 @@ sealed class NotifyMenuCommand : CommandBase
 
     public NotifyMenuCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ISystemEvents systemEvents,
-        ICommandService commandService) :base(textResources)
+        ICommandService commandService)
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -152,7 +156,7 @@ sealed class NotifyMenuCommand : CommandBase
 
         if (window.Content is FrameworkElement element)
         {
-            element.DataContext = new NotifyMenuViewModel(TextResources, commandService);
+            element.DataContext = new NotifyMenuViewModel(TextResources, ImageResources, commandService);
         }
 
         var presenter = OverlappedPresenter.CreateForContextMenu();

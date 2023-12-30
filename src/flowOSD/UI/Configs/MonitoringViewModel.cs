@@ -35,13 +35,15 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 
     public MonitoringViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config, 
         IHardwareService hardwareService)
         : base(
             textResources,
+            imageResources,
             config, 
             "Config.Monitoring.Title",
-            Images.Instance.Common.Diagnostic)
+            "Common.Diagnostic")
     {
         if(hardwareService == null)
         {
@@ -50,8 +52,6 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
     }
-
-    public Images ImageResources => Images.Instance;
 
     public bool IsCpuTemperatureVisible => hardwareFeatures.CpuTemperature;
 

@@ -32,16 +32,16 @@ public class NotificationsViewModel : ConfigViewModelBase, IDisposable
 
     public NotificationsViewModel(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config)
         : base(
             textResources,
+            imageResources,
             config, 
             "Config.Notifications.Title",
-            Images.Instance.Common.Notification)
+            "Common.Notification")
     {
     }
-
-    public Images ImageResources => Images.Instance;
 
     public bool PerformanceMode
     {

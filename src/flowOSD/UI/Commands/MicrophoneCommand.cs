@@ -36,9 +36,13 @@ sealed class MicrophoneCommand : CommandBase
 
     public MicrophoneCommand(
         ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IOsd osd,
-        IMicrophone microphone) : base(textResources)
+        IMicrophone microphone) 
+        : base(
+            textResources,            
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
@@ -67,7 +71,7 @@ sealed class MicrophoneCommand : CommandBase
             var isMuted = microphone.IsMicMuted();
             osd.Show(new OsdMessage(
                 isMuted ? TextResources["Notifications.MicOff"] : TextResources["Notifications.MicOn"],
-                isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
+                isMuted ? ImageResources["Hardware.MicMuted"] : ImageResources["Hardware.Mic"]));
         }
         catch (Exception ex)
         {
