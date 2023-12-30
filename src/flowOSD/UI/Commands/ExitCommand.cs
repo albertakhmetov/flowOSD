@@ -22,7 +22,7 @@ namespace flowOSD.UI.Commands;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Core;
+using flowOSD.Core.Resources;
 
 sealed class ExitCommand : CommandBase
 {

@@ -25,6 +25,7 @@ using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.UI.Commands;
 
 sealed class CommandService : ICommandService, IDisposable

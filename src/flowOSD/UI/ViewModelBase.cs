@@ -26,10 +26,18 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using flowOSD.Core.Resources;
 using Microsoft.UI.Xaml;
 
 public abstract class ViewModelBase : INotifyPropertyChanged
 {
+    protected ViewModelBase(ITextResources textResources)
+    {
+        TextResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+    }
+
+    public ITextResources TextResources { get; }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public static Visibility BoolToVisiblity(bool value)

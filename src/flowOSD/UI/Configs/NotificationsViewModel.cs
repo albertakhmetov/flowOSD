@@ -30,12 +30,16 @@ public class NotificationsViewModel : ConfigViewModelBase, IDisposable
 {
     private CompositeDisposable? disposable = null;
 
-    public NotificationsViewModel(IConfig config)
-        : base(config, Text.Instance.Config.Notifications.Title, Images.Instance.Common.Notification)
+    public NotificationsViewModel(
+        ITextResources textResources,
+        IConfig config)
+        : base(
+            textResources,
+            config, 
+            "Config.Notifications.Title",
+            Images.Instance.Common.Notification)
     {
     }
-
-    public Text TextResources => Text.Instance;
 
     public Images ImageResources => Images.Instance;
 

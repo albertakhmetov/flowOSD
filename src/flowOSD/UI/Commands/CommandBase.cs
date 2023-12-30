@@ -23,7 +23,7 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using flowOSD.Core;
+using flowOSD.Core.Resources;
 
 public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChanged
 {

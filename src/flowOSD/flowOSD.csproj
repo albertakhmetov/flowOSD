@@ -28,7 +28,7 @@
 	<PropertyGroup>
 		<OutputPath>.\bin\$(Configuration)\</OutputPath>
 	  	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<LangVersion>10</LangVersion>
+		<LangVersion>12</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
@@ -155,5 +155,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Resources\Text\" />
+	  <Folder Include="Services\Resources\" />
 	</ItemGroup>
 </Project>

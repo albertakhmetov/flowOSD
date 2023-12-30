@@ -23,6 +23,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using flowOSD.UI.Main;
@@ -147,8 +148,13 @@ sealed class MainUICommand : CommandBase
         window = new MainWindow(
             config,
             this.systemEvents,
-           hardwareService,
-            new MainViewModel(config, commandService, hardwareService, elevatedService).DisposeWith(Disposable!));
+            hardwareService,
+            new MainViewModel(
+                TextResources, 
+                config, 
+                commandService, 
+                hardwareService,
+                elevatedService).DisposeWith(Disposable!));
         window.Activated += OnWindowActivated;
 
         var presenter = OverlappedPresenter.CreateForDialog();

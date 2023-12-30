@@ -25,6 +25,7 @@ using System.Reactive.Linq;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 
 sealed class NotebookModeCommand : CommandBase

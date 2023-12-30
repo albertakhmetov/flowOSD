@@ -26,12 +26,14 @@ using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 
 sealed class PerformanceService : IDisposable, IPerformanceService
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private ITextResources textResources;
     private IConfig config;
     private INotificationService notificationService;
     private IAtk atk;
@@ -40,16 +42,34 @@ sealed class PerformanceService : IDisposable, IPerformanceService
     private BehaviorSubject<PerformanceProfile> activeProfileSubject;
 
     public PerformanceService(
+        ITextResources textResources,
         IConfig config,
         INotificationService notificationService,
-        IAtk atk, 
+        IAtk atk,
         IPowerManagement powerManagement)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
+        this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
 
-        activeProfileSubject = new BehaviorSubject<PerformanceProfile>(PerformanceProfile.Performance);
+        DefaultProfile = new PerformanceProfile(
+            PerformanceProfile.DefaultId,
+            textResources["PerformanceMode.Performance"],
+            PerformanceMode.Performance);
+
+        TurboProfile = new PerformanceProfile(
+            PerformanceProfile.TurboId,
+            textResources["PerformanceMode.Turbo"],
+            PerformanceMode.Turbo);
+
+        SilentProfile = new PerformanceProfile(
+            PerformanceProfile.SilentId,
+            textResources["PerformanceMode.Silent"],
+            PerformanceMode.Silent);
+
+        activeProfileSubject = new BehaviorSubject<PerformanceProfile>(DefaultProfile);
         activeProfileSubject
             .Skip(1)
             .ObserveOn(SynchronizationContext.Current!)
@@ -86,6 +106,12 @@ sealed class PerformanceService : IDisposable, IPerformanceService
             .DisposeWith(disposable);
     }
 
+    public PerformanceProfile DefaultProfile { get; }
+
+    public PerformanceProfile TurboProfile { get; }
+
+    public PerformanceProfile SilentProfile { get; }
+
     public IObservable<PerformanceProfile> ActiveProfile { get; }
 
     public void Dispose()
@@ -106,21 +132,21 @@ sealed class PerformanceService : IDisposable, IPerformanceService
 
     public PerformanceProfile GetProfile(Guid id)
     {
-        if (id == PerformanceProfile.Performance.Id)
+        if (id == DefaultProfile.Id)
         {
-            return PerformanceProfile.Performance;
+            return DefaultProfile;
         }
-        else if (id == PerformanceProfile.Turbo.Id)
+        else if (id == TurboProfile.Id)
         {
-            return PerformanceProfile.Turbo;
+            return TurboProfile;
         }
-        else if (id == PerformanceProfile.Silent.Id)
+        else if (id == SilentProfile.Id)
         {
-            return PerformanceProfile.Silent;
+            return SilentProfile;
         }
         else
         {
-            return config.Performance[id] ?? PerformanceProfile.Performance;
+            return config.Performance[id] ?? DefaultProfile;
         }
     }
 
@@ -181,7 +207,7 @@ sealed class PerformanceService : IDisposable, IPerformanceService
         {
             Common.TraceWarning("Can't set custom profile");
 
-            activeProfileSubject.OnNext(PerformanceProfile.Performance);
+            activeProfileSubject.OnNext(DefaultProfile);
         }
     }
 

@@ -35,9 +35,7 @@ sealed class KeyboardBacklightCommand : CommandBase
     public const string UP = "up";
     public const string DOWN = "down";
 
-    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(DOWN, Core.Resources.Text.Instance.Commands.KeyboardBacklight.Down),
-        new CommandParameterInfo(UP, Core.Resources.Text.Instance.Commands.KeyboardBacklight.Up));
+    private static IList<CommandParameterInfo>? parameters;
 
     private IConfig config;
     private IOsd osd;
@@ -51,6 +49,17 @@ sealed class KeyboardBacklightCommand : CommandBase
         IOsd osd,
         IHardwareService hardwareService) : base(textResources)
     {
+        if (parameters == null)
+        {
+            parameters = CommandParameterInfo.Create(
+                new CommandParameterInfo(
+                    DOWN, 
+                    TextResources["Commands.KeyboardBacklight.Down"]),
+                new CommandParameterInfo(
+                    UP, 
+                    TextResources["Commands.KeyboardBacklight.Up"]));
+        }
+
         if (hardwareService == null)
         {
             throw new ArgumentNullException(nameof(hardwareService));
@@ -70,7 +79,7 @@ sealed class KeyboardBacklightCommand : CommandBase
 
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<CommandParameterInfo> Parameters => parameters;
+    public override IList<CommandParameterInfo> Parameters => parameters!;
 
     public override async void Execute(object? parameter = null)
     {

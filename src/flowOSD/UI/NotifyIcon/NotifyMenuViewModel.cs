@@ -11,7 +11,9 @@ namespace flowOSD.UI.NotifyIcon;
 
 public sealed class NotifyMenuViewModel : ViewModelBase
 {
-    public NotifyMenuViewModel(ICommandService commandService)
+    public NotifyMenuViewModel(
+        ITextResources textResources,
+        ICommandService commandService) : base(textResources)
     {
         if (commandService == null)
         {
@@ -23,8 +25,6 @@ public sealed class NotifyMenuViewModel : ViewModelBase
         RestartAppCommand = commandService.ResolveNotNull<RestartAppCommand>();
         ExitCommand = commandService.ResolveNotNull<ExitCommand>();
     }
-
-    public Text TextResources => Text.Instance;
 
     public CommandBase MainUICommand { get; }
 

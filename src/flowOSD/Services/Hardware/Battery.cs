@@ -47,6 +47,8 @@ sealed partial class Battery : IDisposable, IBattery
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private readonly ITextResources textResources;
+
     private SafeFileHandle? batteryHandle;
     private uint batteryTag;
 
@@ -57,8 +59,10 @@ sealed partial class Battery : IDisposable, IBattery
 
     private IDisposable? updateSubscription;
 
-    public Battery()
+    public Battery(ITextResources textResources)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+
         batteryHandle = Init();
 
         var batteryStatus = GetBatteryStatus(batteryHandle!, batteryTag);
@@ -170,7 +174,7 @@ sealed partial class Battery : IDisposable, IBattery
 
         if (batteryHandle.IsInvalid)
         {
-            throw new AppException(Text.Instance.Errors.CanNotConnectToBattery);
+            throw new AppException(textResources["Errors.CanNotConnectToBattery"]);
         }
     }
 
@@ -179,7 +183,7 @@ sealed partial class Battery : IDisposable, IBattery
         var disHandle = SetupDiGetClassDevs(ref GUID_DEVICE_BATTERY, IntPtr.Zero, IntPtr.Zero, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
         if (disHandle == -1)
         {
-            throw new AppException(Text.Instance.Errors.CanNotConnectToBattery);
+            throw new AppException(textResources["Errors.CanNotConnectToBattery"]);
         }
 
         try
@@ -235,7 +239,7 @@ sealed partial class Battery : IDisposable, IBattery
             SetupDiDestroyDeviceInfoList(disHandle);
         }
 
-        throw new AppException(Text.Instance.Errors.CanNotConnectToBattery);
+        throw new AppException(textResources["Errors.CanNotConnectToBattery"]);
     }
 
     private SP_DEVICE_INTERFACE_DATA? GetDeviceInterfaceData(IntPtr hdev, uint index)

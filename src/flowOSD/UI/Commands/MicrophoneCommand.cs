@@ -66,7 +66,7 @@ sealed class MicrophoneCommand : CommandBase
 
             var isMuted = microphone.IsMicMuted();
             osd.Show(new OsdMessage(
-                isMuted ? Core.Resources.Text.Instance.Notifications.MicOff : Core.Resources.Text.Instance.Notifications.MicOn,
+                isMuted ? TextResources["Notifications.MicOff"] : TextResources["Notifications.MicOn"],
                 isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
         }
         catch (Exception ex)

@@ -151,10 +151,12 @@
     },
     "Warnings": {
         "Title": "Warning",
-        "NotebookMode_Disable": "Disable Notebook Mode",
-        "NotebookMode_DisableSlate": "Disable Touch UI",
-        "NotebookMode_Title": "Notebook Mode",
-        "NotebookMode_Text": "Notebook Mode is turned on, but UI is optimized to touch input."
+        "NotebookMode" : {
+            "Disable": "Disable Notebook Mode",
+            "DisableSlate": "Disable Touch UI",
+            "Title": "Notebook Mode",
+            "Text": "Notebook Mode is turned on, but UI is optimized to touch input."
+        }
     },
     "Confirmations": {
         "Title": "Confirmation",

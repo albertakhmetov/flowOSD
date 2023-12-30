@@ -35,6 +35,7 @@ using System.Runtime.InteropServices;
 using System.Reactive.Linq;
 using Microsoft.UI.Xaml;
 using System.Reactive.Subjects;
+using flowOSD.Core.Resources;
 
 sealed class NotifyMenuCommand : CommandBase
 {
@@ -151,7 +152,7 @@ sealed class NotifyMenuCommand : CommandBase
 
         if (window.Content is FrameworkElement element)
         {
-            element.DataContext = new NotifyMenuViewModel(commandService);
+            element.DataContext = new NotifyMenuViewModel(TextResources, commandService);
         }
 
         var presenter = OverlappedPresenter.CreateForContextMenu();

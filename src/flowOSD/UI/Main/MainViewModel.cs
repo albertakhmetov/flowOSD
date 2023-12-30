@@ -53,7 +53,12 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     private uint capacity, fullChargedCapacity, estimatedTime;
 
-    public MainViewModel(IConfig config, ICommandService commandService, IHardwareService hardwareService, IElevatedService elevatedService)
+    public MainViewModel(
+        ITextResources textResources,
+        IConfig config,
+        ICommandService commandService,
+        IHardwareService hardwareService,
+        IElevatedService elevatedService) : base(textResources)
     {
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
@@ -88,8 +93,6 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
     }
-
-    public Text TextResources => Text.Instance;
 
     public Images ImageResources => Images.Instance;
 
@@ -240,15 +243,15 @@ public class MainViewModel : ViewModelBase, IDisposable
             {
                 PerformanceProfileText = profile.Name;
 
-                if (profile.Id == PerformanceProfile.Performance.Id)
+                if (profile.Id == PerformanceProfile.DefaultId)
                 {
                     PerformanceProfileImage = Images.Instance.PerformanceMode.Performance;
                 }
-                else if (profile.Id == PerformanceProfile.Turbo.Id)
+                else if (profile.Id == PerformanceProfile.TurboId)
                 {
                     PerformanceProfileImage = Images.Instance.PerformanceMode.Turbo;
                 }
-                else if (profile.Id == PerformanceProfile.Silent.Id)
+                else if (profile.Id == PerformanceProfile.SilentId)
                 {
                     PerformanceProfileImage = Images.Instance.PerformanceMode.Silent;
                 }
@@ -263,7 +266,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(powerMode =>
             {
-                PowerModeText = Text.Instance.PowerMode.From(powerMode);
+                PowerModeText = TextResources.For(powerMode);
                 PowerModeImage = Images.Instance.PowerMode.From(powerMode);
             })
             .DisposeWith(disposable);

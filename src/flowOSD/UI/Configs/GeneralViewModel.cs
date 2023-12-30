@@ -33,8 +33,15 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 
     private IHardwareFeatures hardwareFeatures;
 
-    public GeneralViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.General.Title, Images.Instance.Common.Home)
+    public GeneralViewModel(
+        ITextResources textResources,
+        IConfig config,
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            config,
+            "Config.General.Title",
+            Images.Instance.Common.Home)
     {
         if (hardwareService == null)
         {
@@ -43,8 +50,6 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
     }
-
-    public Text TextResources => Text.Instance;
 
     public bool IsOptimizationInfoVisible => hardwareFeatures.OptimizationService;
 

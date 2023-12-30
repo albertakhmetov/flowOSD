@@ -21,6 +21,7 @@ namespace flowOSD.UI.Commands;
 
 using System;
 using flowOSD.Core;
+using flowOSD.Core.Resources;
 using Microsoft.Windows.AppLifecycle;
 using Windows.ApplicationModel.Core;
 

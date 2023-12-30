@@ -25,6 +25,7 @@ using System.Runtime.CompilerServices;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.UI.Configs;
 using Microsoft.UI.Windowing;
@@ -69,17 +70,17 @@ sealed class ConfigCommand : CommandBase, IDisposable
         {
             var viewModels = new ConfigViewModelBase[]
             {
-                new GeneralViewModel(config, hardwareService),
-                new NotificationsViewModel(config),
-                new KeyboardViewModel(config, commandService, hardwareService),
-                new MonitoringViewModel(config, hardwareService),
-                new PerformanceViewModel(config, hardwareService),
-                new TabletViewModel(config, hardwareService),
-                new BatteryViewModel(config, hardwareService),
-                new AboutViewModel(config, commandService, updateService)
+                new GeneralViewModel(TextResources, config, hardwareService),
+                new NotificationsViewModel(TextResources, config),
+                new KeyboardViewModel(TextResources, config, commandService, hardwareService),
+                new MonitoringViewModel(TextResources, config, hardwareService),
+                new PerformanceViewModel(TextResources, config, hardwareService),
+                new TabletViewModel(TextResources, config, hardwareService),
+                new BatteryViewModel(TextResources, config, hardwareService),
+                new AboutViewModel(TextResources, config, commandService, updateService)
             };
 
-            window = new ConfigWindow(systemEvents, viewModels);
+            window = new ConfigWindow(TextResources, systemEvents, viewModels);
             window.AppWindow.Closing += OnWindowClosing;
 
             var scale = GetDpiForWindow(window.GetHandle()) / 96f;

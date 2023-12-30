@@ -33,8 +33,15 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 
     private IHardwareFeatures hardwareFeatures;
 
-    public MonitoringViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.Monitoring.Title, Images.Instance.Common.Diagnostic)
+    public MonitoringViewModel(
+        ITextResources textResources,
+        IConfig config, 
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            config, 
+            "Config.Monitoring.Title",
+            Images.Instance.Common.Diagnostic)
     {
         if(hardwareService == null)
         {
@@ -43,8 +50,6 @@ public class MonitoringViewModel : ConfigViewModelBase, IDisposable
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
     }
-
-    public Text TextResources => Text.Instance;
 
     public Images ImageResources => Images.Instance;
 

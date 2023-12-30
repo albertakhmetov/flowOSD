@@ -39,6 +39,7 @@ sealed class OsdNotificationService : IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private ITextResources textResources;
     private IConfig config;
     private IOsd osd;
 
@@ -56,8 +57,13 @@ sealed class OsdNotificationService : IDisposable
 
     private IHardwareFeatures hardwareFeatures;
 
-    public OsdNotificationService(IConfig config, IOsd osd, IHardwareService hardwareService)
+    public OsdNotificationService(
+        ITextResources textResources,
+        IConfig config, 
+        IOsd osd, 
+        IHardwareService hardwareService)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
 
@@ -197,7 +203,7 @@ sealed class OsdNotificationService : IDisposable
     {
         var isMuted = microphone.IsMicMuted();
         osd.Show(new OsdMessage(
-            isMuted ? Text.Instance.Notifications.MicOff : Text.Instance.Notifications.MicOn,
+            isMuted ? textResources["Notifications.MicOff"] : textResources["Notifications.MicOn"],
             isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
     }
 
@@ -232,7 +238,7 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            $"{Text.Instance.PowerMode.From(powerMode)} power mode",
+            $"{textResources.For(powerMode)} power mode",
             Images.Instance.PowerMode.From(powerMode)));
     }
 
@@ -244,7 +250,7 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            powerSource == PowerSource.Battery ? Text.Instance.Charger.Battery : Text.Instance.Charger.Connected,
+            powerSource == PowerSource.Battery ? textResources["Charger.Battery"] : textResources["Charger.Connected"],
             powerSource == PowerSource.Battery ? Images.Instance.Hardware.DC : Images.Instance.Hardware.AC));
     }
 
@@ -263,17 +269,17 @@ sealed class OsdNotificationService : IDisposable
 
         if ((chargerTypes & ChargerTypes.LowPower) == ChargerTypes.LowPower)
         {
-            text = Text.Instance.Charger.LowPower;
+            text = textResources["Charger.LowPower"];
             image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
         }
         else if ((chargerTypes & ChargerTypes.Connected) == ChargerTypes.Connected)
         {
-            text = Text.Instance.Charger.Connected;
+            text = textResources["Charger.Connected"];
             image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.PowerOnLine);
         }
         else
         {
-            text = Text.Instance.Charger.Battery;
+            text = textResources["Charger.Battery"];
             image = Images.Instance.GetBatteryIcon(capacity, fullChargedCapacity, BatteryPowerState.Discharging);
         }
 

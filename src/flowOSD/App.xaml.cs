@@ -47,6 +47,8 @@ public partial class App : Application
     private CompositeDisposable? disposable;
     private IDisposable? helloMessageSubsciption;
 
+    private TextResources textResources;
+
     private IUpdateService updateService;
 
     private ConfigService configService;
@@ -87,7 +89,7 @@ public partial class App : Application
             return;
         }
 #endif
-        ITextResources textResources = new TextResources();
+        textResources = new TextResources();
 
 
         InitializeComponent();
@@ -98,24 +100,29 @@ public partial class App : Application
 
             serviceWatcher = new ServiceWatcher().DisposeWith(disposable);
 
-            configService = new ConfigService().DisposeWith(disposable);
-            notificationService = new NotificationService(configService, elevatedService).DisposeWith(disposable);
+            configService = new ConfigService(textResources).DisposeWith(disposable);
+            notificationService = new NotificationService(
+                textResources,
+                configService,
+                elevatedService).DisposeWith(disposable);
             updateService = new UpdateService(configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
 
             keysSender = new KeysSender();
-            osd = new Osd(configService, systemEvents);
+            osd = new Osd(textResources, configService, systemEvents);
 
             if (configService.Common.UseMockMode)
             {
                 hardwareService = new MockHardwareService(
+                    textResources,
                     configService,
                     notificationService);
             }
             else
             {
                 hardwareService = new HardwareService(
+                    textResources,
                     configService,
                     notificationService,
                     messageQueue,
@@ -125,6 +132,7 @@ public partial class App : Application
             }
 
             osdNotificationService = new OsdNotificationService(
+                textResources,
                 configService,
                 osd,
                 hardwareService).DisposeWith(disposable);
@@ -187,8 +195,8 @@ public partial class App : Application
                    }
 
                    var showUpdate = notificationService.ShowConfirmation(
-                       Text.Instance.Config.About.Update,
-                       Text.Instance.Confirmations.NewVersion);
+                       textResources["Config.About.Update"],
+                       textResources["Confirmations.NewVersion"]);
 
                    if (showUpdate)
                    {
@@ -210,8 +218,8 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Common.TraceException(ex, Text.Instance.Errors.Initialization);
-            Comctl32.Error(Text.Instance.Errors.CriticalTitle, Text.Instance.Errors.Initialization, ex.Message);
+            Common.TraceException(ex, textResources["Errors.Initialization"]);
+            Comctl32.Error(textResources["Errors.CriticalTitle"], textResources["Errors.Initialization"], ex.Message);
 
             Exit();
         }
@@ -258,9 +266,9 @@ public partial class App : Application
             return;
         }
 
-        Common.TraceException(ex, Text.Instance.Errors.Unhandled);
+        Common.TraceException(ex, textResources["Errors.Unhandled"]);
 
-        notificationService.ShowError(Text.Instance.Errors.Unhandled, ex);
+        notificationService.ShowError(textResources["Errors.Unhandled"], ex);
     }
 
     private void OnSuspend()

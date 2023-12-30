@@ -23,9 +23,9 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 
 public class PerformanceCommand : CommandBase
@@ -49,7 +49,7 @@ public class PerformanceCommand : CommandBase
 
         this.performanceService.ActiveProfile
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.Performance.Id)
+            .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.DefaultId)
             .DisposeWith(Disposable!);
 
         Description = TextResources["Commands.Performance.Description"];
@@ -97,17 +97,17 @@ public class PerformanceCommand : CommandBase
     private async Task<Guid> GetNextProfileId()
     {
         var profile = await performanceService.ActiveProfile.FirstAsync();
-        if (profile.Id == PerformanceProfile.Performance.Id)
+        if (profile.Id == PerformanceProfile.DefaultId)
         {
-            return PerformanceProfile.Turbo.Id;
+            return PerformanceProfile.TurboId;
         }
-        else if (profile.Id == PerformanceProfile.Turbo.Id)
+        else if (profile.Id == PerformanceProfile.TurboId)
         {
-            return PerformanceProfile.Silent.Id;
+            return PerformanceProfile.SilentId;
         }
         else
         {
-            return PerformanceProfile.Performance.Id;
+            return PerformanceProfile.DefaultId;
         }
     }
 }

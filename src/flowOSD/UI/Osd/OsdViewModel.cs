@@ -21,12 +21,17 @@ namespace flowOSD.UI.Osd;
 
 using System;
 using flowOSD.Core;
+using flowOSD.Core.Resources;
 
 public sealed class OsdViewModel : ViewModelBase
 {
     private string? text, icon;
     private double value;
     private bool showCaution;
+
+    public OsdViewModel(ITextResources textResources) : base(textResources)
+    {
+    }
 
     public string? Icon
     {

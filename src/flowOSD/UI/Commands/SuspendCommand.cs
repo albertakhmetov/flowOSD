@@ -23,7 +23,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using flowOSD.Core;
+using flowOSD.Core.Resources;
 using flowOSD.Native;
 
 sealed class SuspendCommand : CommandBase

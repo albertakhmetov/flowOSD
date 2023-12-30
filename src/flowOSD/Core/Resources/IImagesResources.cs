@@ -17,19 +17,20 @@
  *
  */
 
-namespace flowOSD.Core.Hardware;
+namespace flowOSD.Core.Resources;
 
-public interface IPerformanceService
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+
+public interface IImagesResources
 {
-    PerformanceProfile DefaultProfile { get; }
+    string this[string resourceKey] { get; }
 
-    PerformanceProfile TurboProfile { get; }
+    string For(PerformanceMode performanceMode);
 
-    PerformanceProfile SilentProfile { get; }
+    string For(PowerMode powerMode);
 
-    IObservable<PerformanceProfile> ActiveProfile { get; }
+    string For(NotificationType notificationType);
 
-    void SetActiveProfile(Guid id);
-
-    PerformanceProfile GetProfile(Guid id);
+    string GetBatteryIcon(uint capacity, uint fullChargedCapacity, BatteryPowerState powerState);
 }

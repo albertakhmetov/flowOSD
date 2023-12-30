@@ -93,7 +93,7 @@
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="0" 
-                Text="{Binding TextResources.Main.CpuBoost}" 
+                Text="{Binding TextResources[Main.CpuBoost], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <DropDownButton 
@@ -152,7 +152,7 @@
             <TextBlock 
                 Grid.Row="1" 
                 Grid.Column="2" 
-                Text="{Binding TextResources.PowerMode.BatterySaver}" 
+                Text="{Binding TextResources[PowerMode.BatterySaver], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"
                 Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
 
@@ -178,7 +178,7 @@
             <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="0" 
-                Text="{Binding TextResources.Main.HighRefreshRate}" 
+                Text="{Binding TextResources[Main.HighRefreshRate], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <controls:CxToggleButton 
@@ -195,7 +195,7 @@
             <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="1" 
-                Text="{Binding TextResources.Main.Gpu}" 
+                Text="{Binding TextResources[Main.Gpu], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <controls:CxToggleButton
@@ -212,7 +212,7 @@
             <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="2" 
-                Text="{Binding TextResources.Main.TouchPad}" 
+                Text="{Binding TextResources[Main.TouchPad], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <controls:CxToggleButton
@@ -229,7 +229,7 @@
             <TextBlock 
                 Grid.Row="5" 
                 Grid.Column="0" 
-                Text="{Binding TextResources.Main.NotebookMode}" 
+                Text="{Binding TextResources[Main.NotebookMode], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
         </Grid>

@@ -17,14 +17,14 @@
  *
  */
 
-namespace flowOSD.Core;
+namespace flowOSD.Core.Resources;
 
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
 public interface ITextResources
 {
-    string this[string resourceName] { get; }
+    string this[string resourceKey] { get; }
 
     string For(PerformanceMode performanceMode);
 

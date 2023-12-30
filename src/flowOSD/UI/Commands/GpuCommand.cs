@@ -26,6 +26,7 @@ using System.Runtime.CompilerServices;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using Microsoft.UI.Xaml.Controls;
 using static flowOSD.Extensions.Common;

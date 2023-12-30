@@ -22,18 +22,24 @@ namespace flowOSD.UI.Configs;
 using System;
 using System.Collections.ObjectModel;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Resources;
 
 public abstract class ConfigViewModelBase : ViewModelBase
 {
     private bool isSelected;
     private int infoCount;
 
-    protected ConfigViewModelBase(IConfig config, string title, string? icon, bool isFooterItem = false)
+    protected ConfigViewModelBase(
+        ITextResources textResources,
+        IConfig config, 
+        string titleKey, 
+        string? icon,
+        bool isFooterItem = false) : base(textResources)
     {
         Config = config ?? throw new ArgumentNullException(nameof(config));
 
         IsFooterItem = isFooterItem;
-        Title = title ?? string.Empty;
+        Title = titleKey == null ? string.Empty: TextResources[titleKey];
         Icon = icon ?? string.Empty;
         InfoCount = 0;
     }

@@ -21,9 +21,9 @@ namespace flowOSD.Services;
 
 using System.Reflection;
 using System.Text.Json;
-using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 
 internal sealed class TextResources : ITextResources
 {
