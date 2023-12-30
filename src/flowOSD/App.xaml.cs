@@ -87,6 +87,8 @@ public partial class App : Application
             return;
         }
 #endif
+        ITextResource textResources = new TextResources();
+
 
         InitializeComponent();
 
