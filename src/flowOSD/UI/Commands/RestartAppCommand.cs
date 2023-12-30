@@ -28,11 +28,13 @@ internal class RestartAppCommand : CommandBase
 {
     private INotificationService notificationService;
 
-    public RestartAppCommand(INotificationService notificationService)
+    public RestartAppCommand(
+        ITextResources textResources,
+        INotificationService notificationService) : base(textResources)
     {
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
-        Text = TextResources.Commands.Restart.Description;
+        Text = TextResources["Commands.Restart.Description"];
         Enabled = true;
     }
 
@@ -42,7 +44,7 @@ internal class RestartAppCommand : CommandBase
     {
         if (AppInstance.Restart(string.Empty) != AppRestartFailureReason.RestartPending)
         {
-            notificationService.ShowError(TextResources.Commands.Restart.ErrorText);
+            notificationService.ShowError(TextResources["Commands.Restart.ErrorText"]);
         }
     }
 }

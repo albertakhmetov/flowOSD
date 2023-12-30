@@ -87,7 +87,7 @@ public partial class App : Application
             return;
         }
 #endif
-        ITextResource textResources = new TextResources();
+        ITextResources textResources = new TextResources();
 
 
         InitializeComponent();
@@ -130,6 +130,7 @@ public partial class App : Application
                 hardwareService).DisposeWith(disposable);
 
             commandService = new CommandService(
+                textResources,
                 configService,
                 hardwareService,
                 keysSender,

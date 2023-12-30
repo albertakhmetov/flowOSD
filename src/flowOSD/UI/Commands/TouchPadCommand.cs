@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
@@ -31,7 +32,9 @@ sealed class TouchPadCommand : CommandBase
 {
     private ITouchPad touchPad;
 
-    public TouchPadCommand(ITouchPad touchPad)
+    public TouchPadCommand(
+        ITextResources textResources,
+        ITouchPad touchPad) : base(textResources)
     {
         this.touchPad = touchPad ?? throw new ArgumentNullException(nameof(touchPad));
 
@@ -40,7 +43,7 @@ sealed class TouchPadCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.TouchPad.Description;
+        Description = TextResources["Commands.TouchPad.Description"];
         Enabled = true;
     }
 
@@ -52,13 +55,13 @@ sealed class TouchPadCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, TextResources.Errors.TouchPadToggleUI);
+            TraceException(ex, TextResources["Errors.TouchPadToggleUI"]);
         }
     }
 
     private void Update(DeviceState state)
     {
         IsChecked = state == DeviceState.Enabled;
-        Text = IsChecked ? TextResources.Commands.TouchPad.Disable : TextResources.Commands.TouchPad.Enable;
+        Text = IsChecked ? TextResources["Commands.TouchPad.Disable"] : TextResources["Commands.TouchPad.Enable"];
     }
 }

@@ -22,12 +22,13 @@ namespace flowOSD.UI.Commands;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
+using flowOSD.Core;
 
 sealed class ExitCommand : CommandBase
 {
-    public ExitCommand()
+    public ExitCommand(ITextResources textResources) : base(textResources)
     {
-        Text = TextResources.Commands.Exit.Description;
+        Text = TextResources["Commands.Exit.Description"];
         Enabled = true;
     }
 

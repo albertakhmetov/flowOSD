@@ -41,13 +41,17 @@ sealed class DisplayBrightnessCommand : CommandBase
     private IOsd osd;
     private IDisplayBrightness displayBrightness;
 
-    public DisplayBrightnessCommand(IConfig config, IOsd osd, IDisplayBrightness displayBrightness)
+    public DisplayBrightnessCommand(
+        ITextResources textResources,
+        IConfig config,
+        IOsd osd,
+        IDisplayBrightness displayBrightness) : base(textResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
         this.displayBrightness = displayBrightness ?? throw new ArgumentNullException(nameof(displayBrightness));
 
-        Text = TextResources.Commands.DisplayBrightness.Description;
+        Text = TextResources["Commands.DisplayBrightness.Description"];
         Description = Text;
         Enabled = true;
     }

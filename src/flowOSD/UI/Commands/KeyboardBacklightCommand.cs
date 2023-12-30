@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.Collections.Generic;
@@ -44,7 +45,11 @@ sealed class KeyboardBacklightCommand : CommandBase
     private IKeyboardBacklightControl? keyboardBacklightControl;
     private IDisplay display;
 
-    public KeyboardBacklightCommand(IConfig config, IOsd osd, IHardwareService hardwareService)
+    public KeyboardBacklightCommand(
+        ITextResources textResources,
+        IConfig config,
+        IOsd osd,
+        IHardwareService hardwareService) : base(textResources)
     {
         if (hardwareService == null)
         {
@@ -58,7 +63,7 @@ sealed class KeyboardBacklightCommand : CommandBase
         keyboardBacklightControl = hardwareService.Resolve<IKeyboardBacklightControl>();
         display = hardwareService.ResolveNotNull<IDisplay>();
 
-        Text = TextResources.Commands.KeyboardBacklight.Description;
+        Text = TextResources["Commands.KeyboardBacklight.Description"];
         Description = Text;
         Enabled = true;
     }

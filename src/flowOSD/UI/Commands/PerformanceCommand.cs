@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
@@ -35,10 +36,11 @@ public class PerformanceCommand : CommandBase
     private IPerformanceService performanceService;
 
     public PerformanceCommand(
+        ITextResources textResources,
         IConfig config,
         IAtk atk,
         IPowerManagement powerManagement,
-        IPerformanceService performanceService)
+        IPerformanceService performanceService) : base(textResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
@@ -50,7 +52,7 @@ public class PerformanceCommand : CommandBase
             .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.Performance.Id)
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.Performance.Description;
+        Description = TextResources["Commands.Performance.Description"];
         Enabled = true;
     }
 

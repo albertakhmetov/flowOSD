@@ -22,7 +22,7 @@ namespace flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
-public interface ITextResource
+public interface ITextResources
 {
     string this[string resourceName] { get; }
 

@@ -25,7 +25,7 @@ using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 
-internal sealed class TextResources : ITextResource
+internal sealed class TextResources : ITextResources
 {
     private readonly Dictionary<string, string> resources;
 

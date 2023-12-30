@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
@@ -44,7 +45,11 @@ sealed class NotifyMenuCommand : CommandBase
 
     private BehaviorSubject<bool> isWindowVisibleSubject;
 
-    public NotifyMenuCommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService)
+    public NotifyMenuCommand(
+        ITextResources textResources,
+        IConfig config,
+        ISystemEvents systemEvents,
+        ICommandService commandService) :base(textResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -54,7 +59,7 @@ sealed class NotifyMenuCommand : CommandBase
 
         CreateWindow();
 
-        Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
+        Text = string.Format(TextResources["Main.ShowApp"], this.config.ProductName);
         Description = Text;
         Enabled = true;
         IsWindowVisible = isWindowVisibleSubject.AsObservable();

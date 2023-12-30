@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using flowOSD.Core;
 
 public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChanged
 {
@@ -31,10 +32,15 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
     private string text, description;
     private bool enabled, isChecked;
 
-    protected CommandBase()
+    protected CommandBase(ITextResources textResources)
     {
         text = GetType().Name;
         description = string.Empty;
+
+        if (this is EmptyCommand == false)
+        {
+            TextResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+        }
     }
 
     public string Name => GetType().Name;
@@ -89,7 +95,7 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
 
     protected CompositeDisposable? Disposable { get; private set; } = new CompositeDisposable();
 
-    protected Core.Resources.Text TextResources => Core.Resources.Text.Instance;
+    protected ITextResources TextResources { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -122,7 +128,7 @@ public abstract class CommandBase : ICommand, IDisposable, INotifyPropertyChange
 
     private sealed class EmptyCommand : CommandBase
     {
-        public EmptyCommand()
+        public EmptyCommand() : base(null)
         {
             Description = "Not Set";
         }

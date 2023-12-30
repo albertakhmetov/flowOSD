@@ -49,11 +49,12 @@ sealed class MainUICommand : CommandBase
     private BehaviorSubject<bool> isWindowVisibleSubject;
 
     public MainUICommand(
+        ITextResources textResources,
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IElevatedService elevatedService)
+        IElevatedService elevatedService) : base(textResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -63,7 +64,7 @@ sealed class MainUICommand : CommandBase
 
         isWindowVisibleSubject = new BehaviorSubject<bool>(false);
 
-        Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
+        Text = string.Format(TextResources["Main.ShowApp"], this.config.ProductName);
         Description = Text;
         Enabled = true;
         IsWindowVisible = isWindowVisibleSubject.AsObservable();

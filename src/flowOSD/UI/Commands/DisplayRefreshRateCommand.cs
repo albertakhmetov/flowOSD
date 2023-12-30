@@ -34,7 +34,11 @@ sealed class DisplayRefreshRateCommand : CommandBase
     private IDisplay display;
     private CommonConfig userConfig;
 
-    public DisplayRefreshRateCommand(IPowerManagement powerManagement, IDisplay display, CommonConfig userConfig)
+    public DisplayRefreshRateCommand(
+        ITextResources textResources,
+        IPowerManagement powerManagement,
+        IDisplay display,
+        CommonConfig userConfig) : base(textResources)
     {
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
         this.display = display ?? throw new ArgumentNullException(nameof(display));
@@ -60,7 +64,7 @@ sealed class DisplayRefreshRateCommand : CommandBase
             .Subscribe(async _ => Enabled = UpdateState(await display.RefreshRates.FirstOrDefaultAsync(), await display.State.FirstOrDefaultAsync()))
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.DisplayRefreshRate.Description;
+        Description = TextResources["Commands.DisplayRefreshRate.Description"];
         Enabled = true;
     }
 
@@ -90,14 +94,14 @@ sealed class DisplayRefreshRateCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, TextResources.Errors.DisplayRefreshRateToggleUI);
+            TraceException(ex, TextResources["Errors.DisplayRefreshRateToggleUI"]);
         }
     }
 
     private void Update(uint refreshRate)
     {
         IsChecked = DisplayRefreshRates.IsHigh(refreshRate);
-        Text = IsChecked ? TextResources.Commands.DisplayRefreshRate.Disable : TextResources.Commands.DisplayRefreshRate.Enable;
+        Text = IsChecked ? TextResources["Commands.DisplayRefreshRate.Disable"] : TextResources["Commands.DisplayRefreshRate.Enable"];
     }
 
     private bool UpdateState(DisplayRefreshRates refreshRrates, DeviceState displayState)

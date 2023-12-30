@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
@@ -33,13 +34,17 @@ sealed class MicrophoneCommand : CommandBase
     private IOsd osd;
     private IMicrophone microphone;
 
-    public MicrophoneCommand(IConfig config, IOsd osd, IMicrophone microphone)
+    public MicrophoneCommand(
+        ITextResources textResources,
+        IConfig config,
+        IOsd osd,
+        IMicrophone microphone) : base(textResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
         this.microphone = microphone ?? throw new ArgumentNullException(nameof(microphone));
 
-        Text = TextResources.Commands.Microphone.Description;
+        Text = TextResources["Commands.Microphone.Description"];
         Description = Text;
         Enabled = true;
     }
@@ -66,7 +71,7 @@ sealed class MicrophoneCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, TextResources.Errors.MicToggle);
+            TraceException(ex, TextResources["Errors.MicToggle"]);
         }
     }
 }

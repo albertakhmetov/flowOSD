@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.Collections.ObjectModel;
@@ -36,9 +37,9 @@ sealed class SuspendCommand : CommandBase
     //    new CommandParameterInfo(HIBERNATE, Core.Resources.Text.Instance.Commands.Suspend.Hibernate),
     //    new CommandParameterInfo(SLEEP, Core.Resources.Text.Instance.Commands.Suspend.Sleep));
 
-    public SuspendCommand()
+    public SuspendCommand(ITextResources textResources) : base(textResources)
     {
-        Text = TextResources.Commands.Suspend.Description;
+        Text = TextResources["Commands.Suspend.Description"];
         Description = Text;
         Enabled = true;
     }

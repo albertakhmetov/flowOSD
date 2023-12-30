@@ -23,23 +23,31 @@ using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using flowOSD.Core;
+using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
 using flowOSD.Extensions;
 
 sealed class NotebookModeCommand : CommandBase
 {
+    private IConfig config;
     private IAtk atk;
     private INotebookModeService notebookModeService;
     private IElevatedService elevatedService;
 
-    public NotebookModeCommand(IAtk atk, INotebookModeService notebookModeService, IElevatedService elevatedService)
+    public NotebookModeCommand(
+        ITextResources textResources,
+        IConfig config,
+        IAtk atk, 
+        INotebookModeService notebookModeService,
+        IElevatedService elevatedService) : base(textResources)
     {
+        this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.notebookModeService = notebookModeService ?? throw new ArgumentNullException(nameof(notebookModeService));
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
-        Text = TextResources.Commands.NotebookMode.Description;
-        Description = TextResources.Commands.NotebookMode.Description;
+        Text = TextResources["Commands.NotebookMode.Description"];
+        Description = TextResources["Commands.NotebookMode.Description"];
         Enabled = true;
 
         notebookModeService.State

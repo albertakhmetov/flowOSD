@@ -42,11 +42,12 @@ sealed class ConfigCommand : CommandBase, IDisposable
     private ConfigWindow? window;
 
     public ConfigCommand(
+        ITextResources textResources,
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IUpdateService updateService)
+        IUpdateService updateService) : base(textResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -54,7 +55,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
-        Text = TextResources.Commands.Config.Description;
+        Text = TextResources["Commands.Config.Description"];
         Enabled = true;
     }
 
