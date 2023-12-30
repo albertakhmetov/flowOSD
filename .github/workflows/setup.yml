@@ -1,8 +1,8 @@
-name: Build flowOSD version
+name: Build flowOSD release
 
 on:
   push:
-    tags: ['v[0-9].[0-9]+.[0-9]+(-(alpha|beta|rc)[0-9]*)?']
+    tags: ['^v[0-9].[0-9]+.[0-9]+(\-(alpha|beta|rc)[0-9]*)?$']
 
 jobs:
   build:
