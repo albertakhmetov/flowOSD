@@ -26,20 +26,9 @@ using flowOSD.Core.Resources;
 
 public class PerformanceProfile
 {
-    public readonly static PerformanceProfile Performance = new PerformanceProfile(
-        Guid.Parse("{8ACA6E25-592B-49B7-8A9F-6612AD5B52C4}"),
-        Text.Instance.PerformanceMode.Performance,
-        PerformanceMode.Performance);
-
-    public readonly static PerformanceProfile Turbo = new PerformanceProfile(
-        Guid.Parse("{B0D2F613-FE12-4B77-9A51-1AB4CC9CE676}"),
-        Text.Instance.PerformanceMode.Turbo,
-        PerformanceMode.Turbo);
-
-    public readonly static PerformanceProfile Silent = new PerformanceProfile(
-        Guid.Parse("{908F1186-ECCD-42A1-B581-D5E7F02DC385}"),
-        Text.Instance.PerformanceMode.Silent,
-        PerformanceMode.Silent);
+    public static readonly Guid DefaultId = Guid.Parse("{8ACA6E25-592B-49B7-8A9F-6612AD5B52C4}");
+    public static readonly Guid TurboId = Guid.Parse("{B0D2F613-FE12-4B77-9A51-1AB4CC9CE676}");
+    public static readonly Guid SilentId = Guid.Parse("{908F1186-ECCD-42A1-B581-D5E7F02DC385}");
 
     public PerformanceProfile(
         Guid id,
@@ -60,7 +49,7 @@ public class PerformanceProfile
         GpuFanCurve = new ReadOnlyCollection<FanDataPoint>(gpuFanCurve);
     }
 
-    private PerformanceProfile(
+    internal PerformanceProfile(
         Guid id,
         string name,
         PerformanceMode performanceMode)

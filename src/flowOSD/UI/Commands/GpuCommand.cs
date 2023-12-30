@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
@@ -25,6 +26,7 @@ using System.Runtime.CompilerServices;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using Microsoft.UI.Xaml.Controls;
 using static flowOSD.Extensions.Common;
@@ -35,7 +37,15 @@ sealed class GpuCommand : CommandBase
     private IConfig config;
     private INotificationService notificationService;
 
-    public GpuCommand(IAtk atk, IConfig config, INotificationService notificationService)
+    public GpuCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        IAtk atk,
+        INotificationService notificationService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
@@ -46,7 +56,7 @@ sealed class GpuCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.Gpu.Description;
+        Description = TextResources["Commands.Gpu.Description"];
         Enabled = true;
     }
 
@@ -64,7 +74,7 @@ sealed class GpuCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, TextResources.Errors.GpuToggleUI);
+            TraceException(ex, TextResources["Errors.GpuToggleUI"]);
         }
     }
 
@@ -79,13 +89,13 @@ sealed class GpuCommand : CommandBase
         else
         {
             return notificationService.ShowConfirmation(
-                isGpuEnabled ? TextResources.Commands.Gpu.TurnOffConfirmation : TextResources.Commands.Gpu.TurnOnConfirmation);
+                isGpuEnabled ? TextResources["Commands.Gpu.TurnOffConfirmation"] : TextResources["Commands.Gpu.TurnOnConfirmation"]);
         }
     }
 
     private void Update(GpuMode gpuMode)
     {
         IsChecked = gpuMode == GpuMode.dGpu;
-        Text = IsChecked ? TextResources.Commands.Gpu.Disable : TextResources.Commands.Gpu.Enable;
+        Text = IsChecked ? TextResources["Commands.Gpu.Disable"] : TextResources["Commands.Gpu.Enable"];
     }
 }

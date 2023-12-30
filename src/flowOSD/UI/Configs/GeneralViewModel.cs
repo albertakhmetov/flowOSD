@@ -33,8 +33,17 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
 
     private IHardwareFeatures hardwareFeatures;
 
-    public GeneralViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.General.Title, Images.Instance.Common.Home)
+    public GeneralViewModel(
+        ITextResources textResources,
+        IImageResources imageResources, 
+        IConfig config,
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            imageResources,
+            config,
+            "Config.General.Title",
+            "Common.Home")
     {
         if (hardwareService == null)
         {
@@ -44,13 +53,11 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
     }
 
-    public Text TextResources => Text.Instance;
-
     public bool IsOptimizationInfoVisible => hardwareFeatures.OptimizationService;
 
     public bool VariBrightControlEnabled => hardwareFeatures.AmdIntegratedGpu;
 
-    public string OptimizationPageUrl => Urls.Instance.Optimization;
+    public string OptimizationPageUrl => TextResources["Links.Optimization"];
 
     public bool RunAtStartup
     {

@@ -33,28 +33,47 @@ sealed class DisplayBrightnessCommand : CommandBase
     public const string UP = "up";
     public const string DOWN = "down";
 
-    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(DOWN, Core.Resources.Text.Instance.Commands.DisplayBrightness.Down, Images.Instance.Hardware.BrightnessDown),
-        new CommandParameterInfo(UP, Core.Resources.Text.Instance.Commands.DisplayBrightness.Up, Images.Instance.Hardware.BrightnessUp));
+    private static IList<CommandParameterInfo>? parameters;
 
     private IConfig config;
     private IOsd osd;
     private IDisplayBrightness displayBrightness;
 
-    public DisplayBrightnessCommand(IConfig config, IOsd osd, IDisplayBrightness displayBrightness)
+    public DisplayBrightnessCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        IOsd osd,
+        IDisplayBrightness displayBrightness)
+        : base(
+            textResources,
+            imageResources)
     {
+        if (parameters == null)
+        {
+            parameters = CommandParameterInfo.Create(
+            new CommandParameterInfo(
+                DOWN,
+                TextResources["Commands.DisplayBrightness.Down"],
+                ImageResources["Hardware.BrightnessDown"]),
+            new CommandParameterInfo(
+                UP,
+                TextResources["Commands.DisplayBrightness.Up"],
+                ImageResources["Hardware.BrightnessUp"]));
+        }
+
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
         this.displayBrightness = displayBrightness ?? throw new ArgumentNullException(nameof(displayBrightness));
 
-        Text = TextResources.Commands.DisplayBrightness.Description;
+        Text = TextResources["Commands.DisplayBrightness.Description"];
         Description = Text;
         Enabled = true;
     }
 
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<CommandParameterInfo> Parameters => parameters;
+    public override IList<CommandParameterInfo> Parameters => parameters!;
 
     public override void Execute(object? parameter = null)
     {
@@ -81,8 +100,8 @@ sealed class DisplayBrightnessCommand : CommandBase
         // fail back:
 
         var icon = direction == DOWN
-            ? Images.Instance.Hardware.BrightnessDown
-            : Images.Instance.Hardware.BrightnessUp;
+            ? ImageResources["Hardware.BrightnessDown"]
+            : ImageResources["Hardware.BrightnessUp"];
 
         osd.Show(new OsdValue(displayBrightness.GetLevel(), icon));
     }

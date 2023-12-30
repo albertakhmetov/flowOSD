@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
@@ -33,13 +34,21 @@ sealed class MicrophoneCommand : CommandBase
     private IOsd osd;
     private IMicrophone microphone;
 
-    public MicrophoneCommand(IConfig config, IOsd osd, IMicrophone microphone)
+    public MicrophoneCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        IOsd osd,
+        IMicrophone microphone) 
+        : base(
+            textResources,            
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
         this.microphone = microphone ?? throw new ArgumentNullException(nameof(microphone));
 
-        Text = TextResources.Commands.Microphone.Description;
+        Text = TextResources["Commands.Microphone.Description"];
         Description = Text;
         Enabled = true;
     }
@@ -61,12 +70,12 @@ sealed class MicrophoneCommand : CommandBase
 
             var isMuted = microphone.IsMicMuted();
             osd.Show(new OsdMessage(
-                isMuted ? Core.Resources.Text.Instance.Notifications.MicOff : Core.Resources.Text.Instance.Notifications.MicOn,
-                isMuted ? Images.Instance.Hardware.MicMuted : Images.Instance.Hardware.Mic));
+                isMuted ? TextResources["Notifications.MicOff"] : TextResources["Notifications.MicOn"],
+                isMuted ? ImageResources["Hardware.MicMuted"] : ImageResources["Hardware.Mic"]));
         }
         catch (Exception ex)
         {
-            TraceException(ex, TextResources.Errors.MicToggle);
+            TraceException(ex, TextResources["Errors.MicToggle"]);
         }
     }
 }

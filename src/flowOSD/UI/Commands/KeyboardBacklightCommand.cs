@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.Collections.Generic;
@@ -34,9 +35,7 @@ sealed class KeyboardBacklightCommand : CommandBase
     public const string UP = "up";
     public const string DOWN = "down";
 
-    private static readonly IList<CommandParameterInfo> parameters = CommandParameterInfo.Create(
-        new CommandParameterInfo(DOWN, Core.Resources.Text.Instance.Commands.KeyboardBacklight.Down),
-        new CommandParameterInfo(UP, Core.Resources.Text.Instance.Commands.KeyboardBacklight.Up));
+    private static IList<CommandParameterInfo>? parameters;
 
     private IConfig config;
     private IOsd osd;
@@ -44,8 +43,27 @@ sealed class KeyboardBacklightCommand : CommandBase
     private IKeyboardBacklightControl? keyboardBacklightControl;
     private IDisplay display;
 
-    public KeyboardBacklightCommand(IConfig config, IOsd osd, IHardwareService hardwareService)
+    public KeyboardBacklightCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        IOsd osd,
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            imageResources)
     {
+        if (parameters == null)
+        {
+            parameters = CommandParameterInfo.Create(
+                new CommandParameterInfo(
+                    DOWN, 
+                    TextResources["Commands.KeyboardBacklight.Down"]),
+                new CommandParameterInfo(
+                    UP, 
+                    TextResources["Commands.KeyboardBacklight.Up"]));
+        }
+
         if (hardwareService == null)
         {
             throw new ArgumentNullException(nameof(hardwareService));
@@ -58,14 +76,14 @@ sealed class KeyboardBacklightCommand : CommandBase
         keyboardBacklightControl = hardwareService.Resolve<IKeyboardBacklightControl>();
         display = hardwareService.ResolveNotNull<IDisplay>();
 
-        Text = TextResources.Commands.KeyboardBacklight.Description;
+        Text = TextResources["Commands.KeyboardBacklight.Description"];
         Description = Text;
         Enabled = true;
     }
 
     public override bool CanExecuteWithHotKey => true;
 
-    public override IList<CommandParameterInfo> Parameters => parameters;
+    public override IList<CommandParameterInfo> Parameters => parameters!;
 
     public override async void Execute(object? parameter = null)
     {
@@ -92,8 +110,8 @@ sealed class KeyboardBacklightCommand : CommandBase
         var backlightLevel = await keyboardBacklight.Level.FirstOrDefaultAsync();
 
         var icon = direction == UP
-            ? Images.Instance.Hardware.KeyboardLightUp
-            : Images.Instance.Hardware.KeyboardLightDown;
+            ? ImageResources["Hardware.KeyboardLightUp"]
+            : ImageResources["Hardware.KeyboardLightDown"];
 
         osd.Show(new OsdValue((float)backlightLevel / (float)KeyboardBacklightLevel.High, icon));
     }

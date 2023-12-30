@@ -26,6 +26,7 @@ using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 
 internal class MockHardwareService : IHardwareService, IHardwareFeatures
 {
@@ -38,12 +39,17 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
     private Microphone microphone;
     private Battery battery;
 
+    private ITextResources textResources;
     private IConfig config;
     private INotificationService notificationService;
     private IPerformanceService performanceService;
 
-    public MockHardwareService(IConfig config, INotificationService notificationService)
+    public MockHardwareService(
+        ITextResources textResources,
+        IConfig config, 
+        INotificationService notificationService)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
@@ -56,6 +62,7 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
         battery = new Battery();
 
         performanceService = new Hardware.PerformanceService(
+            textResources,
             config,
             notificationService,
             atk,

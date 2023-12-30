@@ -25,6 +25,7 @@ using System.Runtime.CompilerServices;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.UI.Configs;
 using Microsoft.UI.Windowing;
@@ -42,11 +43,16 @@ sealed class ConfigCommand : CommandBase, IDisposable
     private ConfigWindow? window;
 
     public ConfigCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IUpdateService updateService)
+        IUpdateService updateService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -54,7 +60,7 @@ sealed class ConfigCommand : CommandBase, IDisposable
         this.hardwareService = hardwareService ?? throw new ArgumentNullException(nameof(hardwareService));
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
-        Text = TextResources.Commands.Config.Description;
+        Text = TextResources["Commands.Config.Description"];
         Enabled = true;
     }
 
@@ -68,17 +74,17 @@ sealed class ConfigCommand : CommandBase, IDisposable
         {
             var viewModels = new ConfigViewModelBase[]
             {
-                new GeneralViewModel(config, hardwareService),
-                new NotificationsViewModel(config),
-                new KeyboardViewModel(config, commandService, hardwareService),
-                new MonitoringViewModel(config, hardwareService),
-                new PerformanceViewModel(config, hardwareService),
-                new TabletViewModel(config, hardwareService),
-                new BatteryViewModel(config, hardwareService),
-                new AboutViewModel(config, commandService, updateService)
+                new GeneralViewModel(TextResources, ImageResources, config, hardwareService),
+                new NotificationsViewModel(TextResources, ImageResources, config),
+                new KeyboardViewModel(TextResources, ImageResources, config, commandService, hardwareService),
+                new MonitoringViewModel(TextResources, ImageResources, config, hardwareService),
+                new PerformanceViewModel(TextResources, ImageResources, config, hardwareService),
+                new TabletViewModel(TextResources, ImageResources, config, hardwareService),
+                new BatteryViewModel(TextResources, ImageResources, config, hardwareService),
+                new AboutViewModel(TextResources, ImageResources, config, commandService, updateService)
             };
 
-            window = new ConfigWindow(systemEvents, viewModels);
+            window = new ConfigWindow(TextResources, systemEvents, viewModels);
             window.AppWindow.Closing += OnWindowClosing;
 
             var scale = GetDpiForWindow(window.GetHandle()) / 96f;

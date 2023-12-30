@@ -23,6 +23,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using flowOSD.UI.Main;
@@ -49,11 +50,16 @@ sealed class MainUICommand : CommandBase
     private BehaviorSubject<bool> isWindowVisibleSubject;
 
     public MainUICommand(
+        ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         ISystemEvents systemEvents,
         ICommandService commandService,
         IHardwareService hardwareService,
-        IElevatedService elevatedService)
+        IElevatedService elevatedService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -63,7 +69,7 @@ sealed class MainUICommand : CommandBase
 
         isWindowVisibleSubject = new BehaviorSubject<bool>(false);
 
-        Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
+        Text = string.Format(TextResources["Main.ShowApp"], this.config.ProductName);
         Description = Text;
         Enabled = true;
         IsWindowVisible = isWindowVisibleSubject.AsObservable();
@@ -146,8 +152,14 @@ sealed class MainUICommand : CommandBase
         window = new MainWindow(
             config,
             this.systemEvents,
-           hardwareService,
-            new MainViewModel(config, commandService, hardwareService, elevatedService).DisposeWith(Disposable!));
+            hardwareService,
+            new MainViewModel(
+                TextResources, 
+                ImageResources,
+                config, 
+                commandService, 
+                hardwareService,
+                elevatedService).DisposeWith(Disposable!));
         window.Activated += OnWindowActivated;
 
         var presenter = OverlappedPresenter.CreateForDialog();

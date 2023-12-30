@@ -88,12 +88,12 @@
 
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                    Glyph="{Binding ImageResources.Hardware.Cpu}"/>
+                    Glyph="{Binding ImageResources[Hardware.Cpu], Mode=OneTime}"/>
             </controls:CxToggleButton>
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="0" 
-                Text="{Binding TextResources.Main.CpuBoost}" 
+                Text="{Binding TextResources[Main.CpuBoost], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <DropDownButton 
@@ -146,13 +146,13 @@
 
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                    Glyph="{Binding ImageResources.PowerMode.BatterySaver, Mode=OneWay}"/>
+                    Glyph="{Binding ImageResources[PowerMode.BatterySaver], Mode=OneTime}"/>
             </Button>
 
             <TextBlock 
                 Grid.Row="1" 
                 Grid.Column="2" 
-                Text="{Binding TextResources.PowerMode.BatterySaver}" 
+                Text="{Binding TextResources[PowerMode.BatterySaver], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"
                 Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
 
@@ -165,20 +165,20 @@
                 <Grid>
                     <FontIcon 
                         FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                        Glyph="{Binding ImageResources.Hardware.Screen}"/>
+                        Glyph="{Binding ImageResources[Hardware.Screen], Mode=OneTime}"/>
 
                     <FontIcon
                         Visibility="{Binding ControlDisplayRefreshRate, Converter={StaticResource VisibilityConverter}}"
                         Foreground="{ThemeResource SystemFillColorCautionBrush}"
                         Margin="5,5,0,0"
                         FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                        Glyph="{Binding ImageResources.Common.Locked}"/>
+                        Glyph="{Binding ImageResources[Common.Locked], Mode=OneTime}"/>
                 </Grid>
             </controls:CxToggleButton>
             <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="0" 
-                Text="{Binding TextResources.Main.HighRefreshRate}" 
+                Text="{Binding TextResources[Main.HighRefreshRate], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <controls:CxToggleButton 
@@ -190,12 +190,12 @@
 
                 <FontIcon
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                    Glyph="{Binding ImageResources.Hardware.Gpu}"/>
+                    Glyph="{Binding ImageResources[Hardware.Gpu], Mode=OneTime}"/>
             </controls:CxToggleButton>
             <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="1" 
-                Text="{Binding TextResources.Main.Gpu}" 
+                Text="{Binding TextResources[Main.Gpu], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <controls:CxToggleButton
@@ -207,12 +207,12 @@
 
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                    Glyph="{Binding ImageResources.Hardware.TouchPad}"/>
+                    Glyph="{Binding ImageResources[Hardware.TouchPad], Mode=OneTime}"/>
             </controls:CxToggleButton>
             <TextBlock 
                 Grid.Row="3" 
                 Grid.Column="2" 
-                Text="{Binding TextResources.Main.TouchPad}" 
+                Text="{Binding TextResources[Main.TouchPad], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
             <controls:CxToggleButton
@@ -229,7 +229,7 @@
             <TextBlock 
                 Grid.Row="5" 
                 Grid.Column="0" 
-                Text="{Binding TextResources.Main.NotebookMode}" 
+                Text="{Binding TextResources[Main.NotebookMode], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
         </Grid>
@@ -300,7 +300,7 @@
 
                     <FontIcon 
                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                        Glyph="{Binding ImageResources.Common.Temperature}"/>
+                        Glyph="{Binding ImageResources[Common.Temperature], Mode=OneTime}"/>
                     <TextBlock>
                         <Run Text="{Binding CpuTemperature}"/>
                         <Run Text="&#x2103;"/>
@@ -317,7 +317,7 @@
 
                     <FontIcon 
                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                        Glyph="{Binding ImageResources.Common.Diagnostic}"/>
+                        Glyph="{Binding ImageResources[Common.Diagnostic], Mode=OneTime}"/>
 
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                         <ProgressBar 
@@ -345,7 +345,7 @@
                 <FontIcon 
                     FontFamily="{ThemeResource SymbolThemeFontFamily}"
                     FontSize="16"
-                    Glyph="{Binding ImageResources.Common.Settings}"/>
+                    Glyph="{Binding ImageResources[Common.Settings], Mode=OneTime}"/>
             </Button>
         </Grid>
     </Grid>

@@ -41,8 +41,19 @@ public sealed class AboutViewModel : ConfigViewModelBase
 
     private IUpdateService updateService;
 
-    public AboutViewModel(IConfig config, ICommandService commandService, IUpdateService updateService)
-        : base(config, Text.Instance.Config.About.Title, Images.Instance.Common.Info, isFooterItem: true)
+    public AboutViewModel(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        ICommandService commandService,
+        IUpdateService updateService)
+        : base(
+            textResources,
+            imageResources,
+            config,
+            "Config.About.Title",
+            "Common.Info", 
+            isFooterItem: true)
     {
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
@@ -59,10 +70,10 @@ public sealed class AboutViewModel : ConfigViewModelBase
         Comments = config.AppFileInfo.Comments ?? string.Empty;
         Runtime = $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}";
 
-        HomePage = TextResources.Config.About.HomePage;
-        HomePageUrl = Urls.Instance.HomePage;
+        HomePage = TextResources["Config.About.HomePage"];
+        HomePageUrl = TextResources["Links.HomePage"];
 
-        LicenseUrl = Urls.Instance.License;
+        LicenseUrl = TextResources["Links.License"];
 
         ModelName = config.ModelName;
 
@@ -70,10 +81,6 @@ public sealed class AboutViewModel : ConfigViewModelBase
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(state => InfoCount = state == UpdateServiceState.ReadyToDownload ? 1 : 0);
     }
-
-    public Text TextResources => Text.Instance;
-
-    public Images ImageResources => Images.Instance;
 
     public string ProductName { get; }
 

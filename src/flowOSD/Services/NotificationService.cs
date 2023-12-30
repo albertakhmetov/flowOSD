@@ -33,11 +33,17 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     private AppNotificationManager notificationManager;
     private bool isRegisted;
+
+    private ITextResources textResources;
     private IConfig config;
     private IElevatedService elevatedService;
 
-    public NotificationService(IConfig config, IElevatedService elevatedService)
+    public NotificationService(
+        ITextResources textResources,
+        IConfig config, 
+        IElevatedService elevatedService)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
@@ -54,8 +60,6 @@ internal sealed class NotificationService : IDisposable, INotificationService
         Dispose(disposing: false);
     }
 
-    public Text TextResources => Text.Instance;
-
     public void ShowError(string message, Exception exception)
     {
         ShowError(message, exception?.Message);
@@ -63,7 +67,7 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     public void ShowError(string message, string? details = null)
     {
-        Comctl32.Error($"{config.ProductName}: {TextResources.Errors.Title}", message, details ?? string.Empty);
+        Comctl32.Error($"{config.ProductName}: {textResources["Errors.Title"]}", message, details ?? string.Empty);
     }
 
     public void ShowWarning(WarningType warningType)
@@ -74,14 +78,14 @@ internal sealed class NotificationService : IDisposable, INotificationService
         {
             case WarningType.SlateMode:
                 notification = new AppNotificationBuilder()
-                    .AddText(TextResources.Warnings.NotebookMode_Title)
-                    .AddText(TextResources.Warnings.NotebookMode_Text)
+                    .AddText(textResources["Warnings.NotebookMode.Title"])
+                    .AddText(textResources["Warnings.NotebookMode.Text"])
                     .AddArgument(ACTION, nameof(MoreDetailsAboutSlateMode))
                     .AddButton(
-                        new AppNotificationButton(TextResources.Warnings.NotebookMode_Disable)
+                        new AppNotificationButton(textResources["Warnings.NotebookMode.Disable"])
                             .AddArgument(ACTION, nameof(DisableNotebookMode)))
                     .AddButton(
-                        new AppNotificationButton(TextResources.Warnings.NotebookMode_DisableSlate)
+                        new AppNotificationButton(textResources["Warnings.NotebookMode.DisableSlate"])
                             .AddArgument(ACTION, nameof(DisableSlateMode)))
                     .BuildNotification();
                 break;
@@ -95,7 +99,7 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     public bool ShowConfirmation(string message, string? details = null)
     {
-        return Comctl32.Confirm($"{config.ProductName}: {Text.Instance.Confirmations.Title}", message, details ?? string.Empty);
+        return Comctl32.Confirm($"{config.ProductName}: {textResources["Confirmations.Title"]}", message, details ?? string.Empty);
     }
 
     public void Dispose()
@@ -138,7 +142,7 @@ internal sealed class NotificationService : IDisposable, INotificationService
 
     private void MoreDetailsAboutSlateMode()
     {
-        OpenUrl(Urls.Instance.NotebookMode);
+        OpenUrl(textResources["Links.NotebookMode"]);
     }
 
     private void DisableNotebookMode()

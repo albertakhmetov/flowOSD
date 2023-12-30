@@ -53,8 +53,17 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
     private uint cpuLimit;
     private bool useCustomFanCurves;
 
-    public PerformanceViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.Performance.Title, Images.Instance.PerformanceMode.Performance)
+    public PerformanceViewModel(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            imageResources,
+            config,
+            "Config.Performance.Title",
+            "PerformanceMode.Performance")
     {
         if (hardwareService == null)
         {
@@ -81,7 +90,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
             PerformanceMode.Silent,
         });
 
-       UpdateProfiles(Guid.Empty);
+        UpdateProfiles(Guid.Empty);
 
         MinPowerLimit = atk.MinPowerLimit;
         MaxPowerLimit = atk.MaxPowerLimit;
@@ -90,9 +99,7 @@ public class PerformanceViewModel : ConfigViewModelBase, IDisposable
         IsFanCurvesWarningVisible = !config.Common.ForceCustomFanCurves;
     }
 
-    public Text TextResources => Text.Instance;
-
-    public string CustomFanCurvesPageUrl => Urls.Instance.CustomFanCurves;
+    public string CustomFanCurvesPageUrl => TextResources["Links.CustomFanCurves"];
 
     public bool IsFanCurvesWarningVisible { get; }
 

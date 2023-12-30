@@ -30,6 +30,7 @@ using static flowOSD.Native.Dwmapi;
 using static Native.User32;
 using static flowOSD.Extensions.Common;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Resources;
 
 sealed partial class Osd : IOsd, IDisposable
 {
@@ -40,6 +41,8 @@ sealed partial class Osd : IOsd, IDisposable
     private CompositeDisposable? disposable = new CompositeDisposable();
     private CompositeDisposable? systemOsdDisposable;
 
+    private ITextResources textResources;
+    private IImageResources imageResources;
     private IConfig config;
     private ISystemEvents systemEvents;
 
@@ -49,8 +52,14 @@ sealed partial class Osd : IOsd, IDisposable
     private Subject<OsdMessage> messageSubject;
     private Subject<OsdValue> valueSubject;
 
-    public Osd(IConfig config, ISystemEvents systemEvents)
+    public Osd(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        ISystemEvents systemEvents)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+        this.imageResources = imageResources ?? throw new ArgumentNullException(nameof(imageResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
@@ -120,7 +129,7 @@ sealed partial class Osd : IOsd, IDisposable
 
     private void CreateWindow()
     {
-        window = new UI.Osd.OsdWindow(config, systemEvents);
+        window = new UI.Osd.OsdWindow(textResources, imageResources, config, systemEvents);
     }
 
     private void DisposeWindow()

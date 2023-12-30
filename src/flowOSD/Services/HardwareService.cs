@@ -37,6 +37,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private ITextResources textResources;
     private IConfig config;
     private IMessageQueue messageQueue;
     private IKeysSender keysSender;
@@ -65,6 +66,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
     private IElevatedService elevatedService;
 
     public HardwareService(
+        ITextResources textResources,
         IConfig config,
         INotificationService notificationService,
         IMessageQueue messageQueue,
@@ -72,6 +74,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         IServiceWatcher serviceWatcher,
         IElevatedService elevatedService)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
 
         if (serviceWatcher == null)
@@ -92,21 +95,23 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
         this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
 
-        atk = new Atk(PerformanceMode.Performance);
+        atk = new Atk(
+            textResources,
+            PerformanceMode.Performance);
 
         if (OptimizationService)
         {
             hidDevice = null;
 
             keyboard = (atk as IKeyboard)!;
-            keyboardBacklight = new Hardware.Optimization.KeyboardBacklight();
+            keyboardBacklight = new Hardware.Optimization.KeyboardBacklight(textResources);
             touchPad = new Hardware.Optimization.TouchPad(this.messageQueue, this.keysSender);
         }
         else
         {
             hidDevice = HidDevice.Devices
                 .Where(i => i.VendorId == 0xB05 && i.ReadFeatureData(out byte[] data, Keyboard.FEATURE_KBD_REPORT_ID))
-                .FirstOrDefault() ?? throw new AppException(Text.Instance.Errors.CanNotConnectToHid);
+                .FirstOrDefault() ?? throw new AppException(textResources["Errors.CanNotConnectToHid"]);
 
             InitHid();
 
@@ -118,15 +123,18 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
             touchPad = new Hardware.Hid.TouchPad(hidDevice);
         }
 
-        display = new Display(this.messageQueue);
+        display = new Display(
+            textResources,
+            this.messageQueue);
         displayBrightness = new DisplayBrightness();
 
-        battery = new Battery();
+        battery = new Battery(textResources);
         powerManagement = new PowerManagement();
 
         microphone = new Microphone();
 
         performanceService = new PerformanceService(
+            textResources,
             config,
             notificationService,
             atk,
@@ -242,7 +250,7 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     public T ResolveNotNull<T>() where T : class
     {
-        return Resolve<T>() ?? throw new InvalidOperationException(string.Format(Text.Instance.Errors.CanNotResolve, typeof(T).Name));
+        return Resolve<T>() ?? throw new InvalidOperationException(string.Format(textResources["Errors.CanNotResolve"], typeof(T).Name));
     }
 
     private void Register<T>(T instance) where T : class

@@ -39,12 +39,18 @@ public sealed class UpdateCommand : CommandBase
     private CancellationTokenSource? cts;
     private CompositeDisposable? disposable;
 
-    public UpdateCommand(IUpdateService updateService)
+    public UpdateCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IUpdateService updateService) 
+        : base(
+            textResources, 
+            imageResources)
     {
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
+        updateState = string.Empty;
         Text = string.Empty;
-        UpdateState = string.Empty;
 
         updateService.State
             .ObserveOn(SynchronizationContext.Current!)
@@ -66,7 +72,7 @@ public sealed class UpdateCommand : CommandBase
         set => SetProperty(ref updateState, value);
     }
 
-    public string ReleaseNotesUrl => Urls.Instance.GitLatest;
+    public string ReleaseNotesUrl => TextResources["Links.GitLatest"];
 
     public override void Dispose()
     {
@@ -122,19 +128,19 @@ public sealed class UpdateCommand : CommandBase
             case UpdateServiceState.None:
             case UpdateServiceState.Updated:
             case UpdateServiceState.Checking:
-                Text = Core.Resources.Text.Instance.Commands.Update.CheckForUpdate;
+                Text = TextResources["Commands.Update.CheckForUpdate"];
                 break;
 
             case UpdateServiceState.ReadyToDownload:
-                Text = Core.Resources.Text.Instance.Commands.Update.DownloadUpdate;
+                Text = TextResources["Commands.Update.DownloadUpdate"];
                 break;
 
             case UpdateServiceState.Downloading:
-                Text = Core.Resources.Text.Instance.Commands.Update.CancelDownload;
+                Text = TextResources["Commands.Update.CancelDownload"];
                 break;
 
             case UpdateServiceState.ReadyToInstall:
-                Text = Core.Resources.Text.Instance.Commands.Update.Install;
+                Text = TextResources["Commands.Update.Install"];
                 break;
         }
     }

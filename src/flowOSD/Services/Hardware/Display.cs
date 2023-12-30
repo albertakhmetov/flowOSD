@@ -39,12 +39,18 @@ sealed partial class Display : IDisposable, IDisplay
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private ITextResources textResources;
+
     private BehaviorSubject<DeviceState> isStateSubject;
     private BehaviorSubject<DisplayRefreshRates> refreshRatesSubject;
     private BehaviorSubject<uint> refreshRateSubject;
 
-    public Display(IMessageQueue messageQueue)
+    public Display(
+        ITextResources textResources,
+        IMessageQueue messageQueue)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+
         refreshRatesSubject = new BehaviorSubject<DisplayRefreshRates>(GetRefreshRates());
         isStateSubject = new BehaviorSubject<DeviceState>(GetDeviceState());
         refreshRateSubject = new BehaviorSubject<uint>(GetRefreshRate());
@@ -83,7 +89,7 @@ sealed partial class Display : IDisposable, IDisplay
 
         if (refreshRates.High != value && refreshRates.Low != value)
         {
-            throw new AppException(string.Format(Text.Instance.Errors.DisplayRefreshRateIsNotSupported, value));
+            throw new AppException(string.Format(textResources["Errors.DisplayRefreshRateIsNotSupported"], value));
         }
 
         var mode = new DEVMODE();
@@ -101,13 +107,13 @@ sealed partial class Display : IDisposable, IDisplay
                 return false;
 
             case DISP_CHANGE_RESTART:
-                throw new AppException(Text.Instance.Errors.RestartIsRequired, restartRequired: true);
+                throw new AppException(textResources["Errors.RestartIsRequired"], restartRequired: true);
 
             case DISP_CHANGE_BADMODE:
-                throw new AppException(string.Format(Text.Instance.Errors.DisplayRefreshRateIsNotSupported, value));
+                throw new AppException(string.Format(textResources["Errors.DisplayRefreshRateIsNotSupported"], value));
 
             default:
-                throw new AppException(string.Format(Text.Instance.Errors.CanNotChangeDisplayRefreshRate, result));
+                throw new AppException(string.Format(textResources["Errors.CanNotChangeDisplayRefreshRate"], result));
         }
     }
 

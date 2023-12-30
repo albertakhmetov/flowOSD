@@ -76,6 +76,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     private CompositeDisposable? disposable = new CompositeDisposable();
 
+    private readonly ITextResources textResources;
+
     private readonly BehaviorSubject<PerformanceMode> performanceModeSubject;
     private readonly BehaviorSubject<GpuMode> gpuModeSubject;
     private readonly CountableSubject<int> cpuTemperatureSubject;
@@ -93,8 +95,12 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     private readonly object ControlLocker = new object();
 
-    public Atk(PerformanceMode? performanceMode)
+    public Atk(
+        ITextResources textResources,
+        PerformanceMode? performanceMode)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+
         handle = CreateFile(
             @"\\.\\ATKACPI",
             FileAccess.ReadWrite,
@@ -107,7 +113,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
         if (handle.IsInvalid)
         {
-            throw new AppException(Text.Instance.Errors.CanNotConnectToAcpi);
+            throw new AppException(textResources["Errors.CanNotConnectToAcpi"]);
         }
 
         GpuSwitchSupported = Get(DEVID_GPU_ECO_MODE, out var gpuMode);

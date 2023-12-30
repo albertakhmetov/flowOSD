@@ -19,19 +19,10 @@
 
 namespace flowOSD.Core.Resources;
 
-public sealed class Urls
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+
+public interface IImageResources : ITextResources
 {
-    public static readonly Urls Instance = new Urls();
-
-    public string HomePage => "https://github.com/albertakhmetov/flowOSD";
-
-    public string License => "https://raw.githubusercontent.com/albertakhmetov/flowOSD/main/LICENSE";
-
-    public string Optimization => "https://github.com/albertakhmetov/flowOSD/wiki/ASUS-Optimization";
-
-    public string CustomFanCurves => "https://github.com/albertakhmetov/flowOSD/wiki/Custom-Fan-Curves";
-
-    public string GitLatest => "https://github.com/albertakhmetov/flowOSD/releases/latest";
-
-    public string NotebookMode => "https://github.com/albertakhmetov/flowOSD/wiki/Notebook-Mode";
+    string GetBatteryIcon(uint capacity, uint fullChargedCapacity, BatteryPowerState powerState);
 }

@@ -16,6 +16,7 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
@@ -34,6 +35,7 @@ using System.Runtime.InteropServices;
 using System.Reactive.Linq;
 using Microsoft.UI.Xaml;
 using System.Reactive.Subjects;
+using flowOSD.Core.Resources;
 
 sealed class NotifyMenuCommand : CommandBase
 {
@@ -44,7 +46,15 @@ sealed class NotifyMenuCommand : CommandBase
 
     private BehaviorSubject<bool> isWindowVisibleSubject;
 
-    public NotifyMenuCommand(IConfig config, ISystemEvents systemEvents, ICommandService commandService)
+    public NotifyMenuCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        ISystemEvents systemEvents,
+        ICommandService commandService)
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
@@ -54,7 +64,7 @@ sealed class NotifyMenuCommand : CommandBase
 
         CreateWindow();
 
-        Text = string.Format(TextResources.Main.ShowApp, this.config.ProductName);
+        Text = string.Format(TextResources["Main.ShowApp"], this.config.ProductName);
         Description = Text;
         Enabled = true;
         IsWindowVisible = isWindowVisibleSubject.AsObservable();
@@ -146,7 +156,7 @@ sealed class NotifyMenuCommand : CommandBase
 
         if (window.Content is FrameworkElement element)
         {
-            element.DataContext = new NotifyMenuViewModel(commandService);
+            element.DataContext = new NotifyMenuViewModel(TextResources, ImageResources, commandService);
         }
 
         var presenter = OverlappedPresenter.CreateForContextMenu();

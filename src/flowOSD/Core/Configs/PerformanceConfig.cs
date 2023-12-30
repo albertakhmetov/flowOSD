@@ -46,9 +46,9 @@ public sealed class PerformanceConfig : ConfigBase
         profileChangedSubject = new Subject<Guid>();
         ProfileChanged = profileChangedSubject.AsObservable();
 
-        chargerProfile = PerformanceProfile.Performance.Id;
-        batteryProfile = PerformanceProfile.Performance.Id;
-        tabletProfile = PerformanceProfile.Silent.Id;
+        chargerProfile = PerformanceProfile.DefaultId;
+        batteryProfile = PerformanceProfile.DefaultId;
+        tabletProfile = PerformanceProfile.SilentId;
     }
 
     public IObservable<Guid> ProfileChanged { get; }

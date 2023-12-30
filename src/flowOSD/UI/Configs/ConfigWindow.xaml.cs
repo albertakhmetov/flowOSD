@@ -38,8 +38,16 @@ public sealed partial class ConfigWindow : Window, IDisposable
 {
     private CompositeDisposable? disposable = new CompositeDisposable();
 
-    public ConfigWindow(ISystemEvents systemEvents, IList<ConfigViewModelBase> configViewModels)
+    public ConfigWindow(
+        ITextResources textResources,
+        ISystemEvents systemEvents, 
+        IList<ConfigViewModelBase> configViewModels)
     {
+        if (textResources == null)
+        {
+            throw new ArgumentNullException(nameof(textResources));
+        }
+
         if (systemEvents == null)
         {
             throw new ArgumentNullException(nameof(systemEvents));
@@ -71,9 +79,9 @@ public sealed partial class ConfigWindow : Window, IDisposable
         presenter.IsResizable = true;
         AppWindow.SetPresenter(presenter);
 
-        Title = Text.Instance.Config.Title;
-        cpuCurveTuner.Title = Text.Instance.Config.Performance.CpuFanCurve;
-        gpuCurveTuner.Title = Text.Instance.Config.Performance.GpuFanCurve;
+        Title = textResources["Config.Title"];
+        cpuCurveTuner.Title = textResources["Config.Performance.CpuFanCurve"];
+        gpuCurveTuner.Title = textResources["Config.Performance.GpuFanCurve"];
 
         AddExStyle(this.GetHandle(), WS_EX_DLGMODALFRAME);
 

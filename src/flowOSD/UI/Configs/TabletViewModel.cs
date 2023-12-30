@@ -37,8 +37,17 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
 
     private IReadOnlyCollection<PerformanceProfile>? profiles;
 
-    public TabletViewModel(IConfig config, IHardwareService hardwareService)
-        : base(config, Text.Instance.Config.Tablet.Title, Images.Instance.Hardware.Tablet)
+    public TabletViewModel(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config,
+        IHardwareService hardwareService)
+        : base(
+            textResources,
+            imageResources,
+            config, 
+            "Config.Tablet.Title",
+            "Hardware.Tablet")
     {
         if (hardwareService == null)
         {
@@ -47,8 +56,6 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
 
         performanceService = hardwareService.ResolveNotNull<IPerformanceService>();
     }
-
-    public Text TextResources => Text.Instance;
 
     public bool DisableTouchPadInTabletMode
     {
@@ -128,9 +135,9 @@ public class TabletViewModel : ConfigViewModelBase, IDisposable
         Profiles = new ReadOnlyCollection<PerformanceProfile>(
             new PerformanceProfile[]
             {
-                PerformanceProfile.Performance,
-                PerformanceProfile.Turbo,
-                PerformanceProfile.Silent
+                performanceService.DefaultProfile,
+                performanceService.TurboProfile,
+                performanceService.SilentProfile
             }.Union(Config.Performance.GetProfiles()).ToArray());
 
         if (changedProfileId == Guid.Empty || changedProfileId == TabletProfile.Id)

@@ -104,25 +104,25 @@ public sealed partial class MainWindow : Window, IDisposable
             performanceProfilesMenu.Items.Add(new MenuFlyoutItem
             {
                 Command = ViewModel.PerformanceCommand,
-                CommandParameter = PerformanceProfile.Performance.Id,
-                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Performance },
-                Text = Text.Instance.PerformanceMode.Performance,
+                CommandParameter = PerformanceProfile.DefaultId,
+                Icon = new FontIcon { Glyph = ViewModel.ImageResources["PerformanceMode.Performance"] },
+                Text = ViewModel.TextResources["PerformanceMode.Performance"]
             });
 
             performanceProfilesMenu.Items.Add(new MenuFlyoutItem
             {
                 Command = ViewModel.PerformanceCommand,
-                CommandParameter = PerformanceProfile.Turbo.Id,
-                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Turbo },
-                Text = Text.Instance.PerformanceMode.Turbo,
+                CommandParameter = PerformanceProfile.TurboId,
+                Icon = new FontIcon { Glyph = ViewModel.ImageResources["PerformanceMode.Turbo"] },
+                Text = ViewModel.TextResources["PerformanceMode.Turbo"]
             });
 
             performanceProfilesMenu.Items.Add(new MenuFlyoutItem
             {
                 Command = ViewModel.PerformanceCommand,
-                CommandParameter = PerformanceProfile.Silent.Id,
-                Icon = new FontIcon { Glyph = Images.Instance.PerformanceMode.Silent },
-                Text = Text.Instance.PerformanceMode.Silent
+                CommandParameter = PerformanceProfile.SilentId,
+                Icon = new FontIcon { Glyph = ViewModel.ImageResources["PerformanceMode.Silent"] },
+                Text = ViewModel.TextResources["PerformanceMode.Silent"]
             });
         }
 
@@ -188,24 +188,24 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             Command = ViewModel.PowerModeCommand,
             CommandParameter = PowerMode.BestPowerEfficiency,
-            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.BestPowerEfficiency },
-            Text = Text.Instance.PowerMode.BestPowerEfficiency
+            Icon = new FontIcon { Glyph = ViewModel.ImageResources["PowerMode.BestPowerEfficiency"] },
+            Text = ViewModel.TextResources["PowerMode.BestPowerEfficiency"]
         });
 
         powerModesMenu.Items.Add(new MenuFlyoutItem
         {
             Command = ViewModel.PowerModeCommand,
             CommandParameter = PowerMode.Balanced,
-            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.Balanced },
-            Text = Text.Instance.PowerMode.Balanced
+            Icon = new FontIcon { Glyph = ViewModel.ImageResources["PowerMode.Balanced"] },
+            Text = ViewModel.TextResources["PowerMode.Balanced"]
         });
 
         powerModesMenu.Items.Add(new MenuFlyoutItem
         {
             Command = ViewModel.PowerModeCommand,
             CommandParameter = PowerMode.BestPerformance,
-            Icon = new FontIcon { Glyph = Images.Instance.PowerMode.BestPerformance },
-            Text = Text.Instance.PowerMode.BestPerformance
+            Icon = new FontIcon { Glyph = ViewModel.ImageResources["PowerMode.BestPerformance"] },
+            Text = ViewModel.TextResources["PowerMode.BestPerformance"]
         });
     }
 
@@ -249,18 +249,18 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             var sb = new StringBuilder();
 
-            sb.Append($"{Text.Instance.Main.BatteryRemaining}: {100F * ViewModel.Capacity / ViewModel.FullChargedCapacity:N0}%");
+            sb.Append($"{ViewModel.TextResources["Main.BatteryRemaining"]}: {100F * ViewModel.Capacity / ViewModel.FullChargedCapacity:N0}%");
             if (ViewModel.Rate < 0)
             {
                 sb.AppendLine();
-                sb.Append($"{Text.Instance.Config.Battery.EstimatedTime}: {TimeSpan.FromSeconds(ViewModel.EstimatedTime).ToString(@"hh\:mm")}");
+                sb.Append($"{ViewModel.TextResources["Config.Battery.EstimatedTime"]}: {TimeSpan.FromSeconds(ViewModel.EstimatedTime).ToString(@"hh\:mm")}");
             }
 
             if (ViewModel.IsLowPower)
             {
                 sb.AppendLine();
                 sb.AppendLine();
-                sb.Append(Text.Instance.Charger.LowPower.ToUpper());
+                sb.Append(ViewModel.TextResources["Charger.LowPower"].ToUpper());
             }
 
             t.Content = sb.ToString();
@@ -273,8 +273,8 @@ public sealed partial class MainWindow : Window, IDisposable
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine($"{Text.Instance.Main.CpuFanSpeed}: {ViewModel.CpuFanSpeed}%");
-            sb.Append($"{Text.Instance.Main.GpuFanSpeed}: {ViewModel.GpuFanSpeed}%");
+            sb.AppendLine($"{ViewModel.TextResources["Main.CpuFanSpeed"]}: {ViewModel.CpuFanSpeed}%");
+            sb.Append($"{ViewModel.TextResources["Main.GpuFanSpeed"]}: {ViewModel.GpuFanSpeed}%");
 
             t.Content = sb.ToString();
         }

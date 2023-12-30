@@ -28,6 +28,7 @@ using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using flowOSD.Services;
+using flowOSD.Services.Resources;
 using flowOSD.UI;
 using flowOSD.UI.Commands;
 using flowOSD.UI.Configs;
@@ -46,6 +47,9 @@ public partial class App : Application
 
     private CompositeDisposable? disposable;
     private IDisposable? helloMessageSubsciption;
+
+    private TextResources textResources;
+    private ImageResources imageResources;
 
     private IUpdateService updateService;
 
@@ -87,6 +91,8 @@ public partial class App : Application
             return;
         }
 #endif
+        textResources = new TextResources();
+        imageResources = new ImageResources();
 
         InitializeComponent();
 
@@ -96,24 +102,35 @@ public partial class App : Application
 
             serviceWatcher = new ServiceWatcher().DisposeWith(disposable);
 
-            configService = new ConfigService().DisposeWith(disposable);
-            notificationService = new NotificationService(configService, elevatedService).DisposeWith(disposable);
-            updateService = new UpdateService(configService);
+            configService = new ConfigService(textResources).DisposeWith(disposable);
+            notificationService = new NotificationService(
+                textResources,
+                configService,
+                elevatedService).DisposeWith(disposable);
+            updateService = new UpdateService(
+                textResources,
+                configService);
             messageQueue = new MessageQueue().DisposeWith(disposable);
             systemEvents = new SystemEvents(messageQueue).DisposeWith(disposable);
 
             keysSender = new KeysSender();
-            osd = new Osd(configService, systemEvents);
+            osd = new Osd(
+                textResources,
+                imageResources,
+                configService,
+                systemEvents);
 
             if (configService.Common.UseMockMode)
             {
                 hardwareService = new MockHardwareService(
+                    textResources,
                     configService,
                     notificationService);
             }
             else
             {
                 hardwareService = new HardwareService(
+                    textResources,
                     configService,
                     notificationService,
                     messageQueue,
@@ -123,11 +140,15 @@ public partial class App : Application
             }
 
             osdNotificationService = new OsdNotificationService(
+                textResources,
+                imageResources,
                 configService,
                 osd,
                 hardwareService).DisposeWith(disposable);
 
             commandService = new CommandService(
+                textResources,
+                imageResources,
                 configService,
                 hardwareService,
                 keysSender,
@@ -184,8 +205,8 @@ public partial class App : Application
                    }
 
                    var showUpdate = notificationService.ShowConfirmation(
-                       Text.Instance.Config.About.Update,
-                       Text.Instance.Confirmations.NewVersion);
+                       textResources["Config.About.Update"],
+                       textResources["Confirmations.NewVersion"]);
 
                    if (showUpdate)
                    {
@@ -207,8 +228,8 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Common.TraceException(ex, Text.Instance.Errors.Initialization);
-            Comctl32.Error(Text.Instance.Errors.CriticalTitle, Text.Instance.Errors.Initialization, ex.Message);
+            Common.TraceException(ex, textResources["Errors.Initialization"]);
+            Comctl32.Error(textResources["Errors.CriticalTitle"], textResources["Errors.Initialization"], ex.Message);
 
             Exit();
         }
@@ -255,9 +276,9 @@ public partial class App : Application
             return;
         }
 
-        Common.TraceException(ex, Text.Instance.Errors.Unhandled);
+        Common.TraceException(ex, textResources["Errors.Unhandled"]);
 
-        notificationService.ShowError(Text.Instance.Errors.Unhandled, ex);
+        notificationService.ShowError(textResources["Errors.Unhandled"], ex);
     }
 
     private void OnSuspend()

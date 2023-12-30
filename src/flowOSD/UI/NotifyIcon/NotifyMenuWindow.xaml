@@ -40,7 +40,7 @@
             Click="OnMenuFlyoutItemClick"/>
         <MenuFlyoutItem
             Grid.Row="3"
-            Text="{Binding TextResources.Commands.Update.CheckForUpdate}"
+            Text="{Binding TextResources[Commands.Update.CheckForUpdate], Mode=OneTime}"
             Command="{Binding ConfigCommand, Mode=OneTime}"
             CommandParameter="AboutViewModel"
             Click="OnMenuFlyoutItemClick"/>

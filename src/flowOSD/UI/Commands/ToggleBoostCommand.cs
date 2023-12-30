@@ -16,14 +16,15 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Core;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using static flowOSD.Extensions.Common;
 
@@ -31,7 +32,13 @@ sealed class ToggleBoostCommand : CommandBase
 {
     private IPowerManagement powerManagement;
 
-    public ToggleBoostCommand(IPowerManagement powerManagement)
+    public ToggleBoostCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IPowerManagement powerManagement) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.powerManagement = powerManagement;
 
@@ -40,7 +47,7 @@ sealed class ToggleBoostCommand : CommandBase
             .Subscribe(Update)
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.Boost.Description;
+        Description = TextResources["Commands.Boost.Description"];
         Enabled = true;
     }
 
@@ -52,13 +59,13 @@ sealed class ToggleBoostCommand : CommandBase
         }
         catch (Exception ex)
         {
-            TraceException(ex, TextResources.Errors.BoostToggleUI);
+            TraceException(ex, TextResources["Errors.BoostToggleUI"]);
         }
     }
 
     private void Update(bool isEnabled)
     {
         IsChecked = isEnabled;
-        Text = IsChecked ? TextResources.Commands.Boost.Disable : TextResources.Commands.Boost.Enable;
+        Text = IsChecked ? TextResources["Commands.Boost.Disable"] : TextResources["Commands.Boost.Enable"];
     }
 }

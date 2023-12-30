@@ -17,19 +17,18 @@
  *
  */
 
-namespace flowOSD.Core.Hardware;
+namespace flowOSD.Core.Resources;
 
-public interface IPerformanceService
+using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
+
+public interface ITextResources
 {
-    PerformanceProfile DefaultProfile { get; }
+    string this[string resourceKey] { get; }
 
-    PerformanceProfile TurboProfile { get; }
+    string For(PerformanceMode performanceMode);
 
-    PerformanceProfile SilentProfile { get; }
+    string For(PowerMode powerMode);
 
-    IObservable<PerformanceProfile> ActiveProfile { get; }
-
-    void SetActiveProfile(Guid id);
-
-    PerformanceProfile GetProfile(Guid id);
+    string For(NotificationType notificationType);
 }

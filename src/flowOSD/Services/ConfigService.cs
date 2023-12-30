@@ -35,16 +35,20 @@ sealed class ConfigService : IConfig, IDisposable
 {
     private const string RUN_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
 
+    private ITextResources textResources;
+
     private CompositeDisposable? disposable = new CompositeDisposable();
     private FileInfo configFile;
 
-    public ConfigService()
+    public ConfigService(ITextResources textResources)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+
         AppFile = new FileInfo(typeof(ConfigService).Assembly.Location);
         AppFileInfo = FileVersionInfo.GetVersionInfo(AppFile.FullName);
 
-        ProductName = AppFileInfo.ProductName ?? throw new AppException(Text.Instance.Errors.ProductNameIsNotSet);
-        ProductVersion = AppFileInfo.ProductVersion ?? throw new AppException(Text.Instance.Errors.ProductVersionIsNotSet);
+        ProductName = AppFileInfo.ProductName ?? throw new AppException(textResources["Errors.ProductNameIsNotSet"]);
+        ProductVersion = AppFileInfo.ProductVersion ?? throw new AppException(textResources["Errors.ProductVersionIsNotSet"]);
         FileVersion = new Version(
             AppFileInfo.FileMajorPart,
             AppFileInfo.FileMinorPart,
@@ -156,9 +160,9 @@ sealed class ConfigService : IConfig, IDisposable
             using var stream = configFile.OpenRead();
 
             var options = new JsonSerializerOptions { WriteIndented = true };
-            options.Converters.Add(new EnumConfigConverter<NotificationType>());
-            options.Converters.Add(new EnumConfigConverter<WarningType>());
-            options.Converters.Add(new HotKeysConfigConverter());
+            options.Converters.Add(new EnumConfigConverter<NotificationType>(textResources));
+            options.Converters.Add(new EnumConfigConverter<WarningType>(textResources));
+            options.Converters.Add(new HotKeysConfigConverter(textResources));
 
             return JsonSerializer.Deserialize<POCO>(stream, options) ?? new POCO();
         }
@@ -174,9 +178,9 @@ sealed class ConfigService : IConfig, IDisposable
         using (var stream = tempFile.Create())
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
-            options.Converters.Add(new EnumConfigConverter<NotificationType>());
-            options.Converters.Add(new EnumConfigConverter<WarningType>());
-            options.Converters.Add(new HotKeysConfigConverter());
+            options.Converters.Add(new EnumConfigConverter<NotificationType>(textResources));
+            options.Converters.Add(new EnumConfigConverter<WarningType>(textResources));
+            options.Converters.Add(new HotKeysConfigConverter(textResources));
 
             var poco = new POCO
             {
@@ -219,13 +223,13 @@ sealed class ConfigService : IConfig, IDisposable
         using var key = Registry.CurrentUser.OpenSubKey(RUN_KEY, true);
         if (key == null)
         {
-            throw new AppException(Text.Instance.Errors.CanNotWriteStartupKey);
+            throw new AppException(textResources["Errors.CanNotWriteStartupKey"]);
         }
 
         var exe = Process.GetCurrentProcess().MainModule?.FileName;
         if (string.IsNullOrEmpty(exe) || !exe.EndsWith(".exe"))
         {
-            throw new AppException(Text.Instance.Errors.CanNotRetriveAppPath);
+            throw new AppException(textResources["Errors.CanNotRetriveAppPath"]);
         }
 
         if (runAtStartup)
@@ -279,13 +283,20 @@ sealed class ConfigService : IConfig, IDisposable
 
     private class EnumConfigConverter<T> : JsonConverter<EnumConfig<T>> where T : struct, Enum
     {
+        private ITextResources textResources;
+
+        public EnumConfigConverter(ITextResources textResources)
+        {
+            this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+        }
+
         public override EnumConfig<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var config = new EnumConfig<T>();
 
             if (reader.TokenType != JsonTokenType.StartArray)
             {
-                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
+                throw new AppException(textResources["Errors.ConfigIsCorrupted"]);
             }
 
             while (reader.Read() && reader.TokenType == JsonTokenType.String)
@@ -299,7 +310,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.EndArray)
             {
-                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
+                throw new AppException(textResources["Errors.ConfigIsCorrupted"]);
             }
 
             return config;
@@ -324,6 +335,12 @@ sealed class ConfigService : IConfig, IDisposable
     private class HotKeysConfigConverter : JsonConverter<HotKeysConfig>
     {
         private const string KEY = "Key";
+        private ITextResources textResources;
+
+        public HotKeysConfigConverter(ITextResources textResources)
+        {
+            this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+        }
 
         public override HotKeysConfig? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -331,7 +348,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.StartArray)
             {
-                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
+                throw new AppException(textResources["Errors.ConfigIsCorrupted"]);
             }
 
             var item = new Dictionary<string, string>();
@@ -352,7 +369,7 @@ sealed class ConfigService : IConfig, IDisposable
                     }
                     else
                     {
-                        throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
+                        throw new AppException(textResources["Errors.ConfigIsCorrupted"]);
                     }
                 }
 
@@ -367,7 +384,7 @@ sealed class ConfigService : IConfig, IDisposable
                     }
                     else
                     {
-                        throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
+                        throw new AppException(textResources["Errors.ConfigIsCorrupted"]);
                     }
 
                     item = new Dictionary<string, string>();
@@ -376,7 +393,7 @@ sealed class ConfigService : IConfig, IDisposable
 
             if (reader.TokenType != JsonTokenType.EndArray)
             {
-                throw new AppException(Text.Instance.Errors.ConfigIsCorrupted);
+                throw new AppException(textResources["Errors.ConfigIsCorrupted"]);
             }
 
             return config;

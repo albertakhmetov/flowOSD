@@ -28,7 +28,7 @@
 	<PropertyGroup>
 		<OutputPath>.\bin\$(Configuration)\</OutputPath>
 	  	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<LangVersion>10</LangVersion>
+		<LangVersion>12</LangVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
@@ -132,6 +132,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="resources\text\en.json" />
 	  <None Remove="UI\ConfigWindow.xaml" />
 	  <None Remove="UI\MainWindow.xaml" />
 	  <None Remove="UI\NotifyMenuWindow.xaml" />
@@ -150,5 +151,9 @@
 	  <None Include="..\..\LICENSE" Link="LICENSE">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Text\" />
 	</ItemGroup>
 </Project>

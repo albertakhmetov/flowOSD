@@ -31,13 +31,17 @@ sealed class KeyboardBacklight : IKeyboardBacklight, IDisposable
     private const string BACKLIGHT_KEY = @"SOFTWARE\ASUS\ASUS System Control Interface\AsusOptimization\ASUS Keyboard Hotkeys";
     private const string BACKLIGHT_VALUE = "HidKeybdLightLevel";
 
+    private ITextResources textResources;
+
     private BehaviorSubject<DeviceState> stateSubject;
     private BehaviorSubject<KeyboardBacklightLevel> levelSubject;
 
     private ManagementEventWatcher? watcher;
 
-    public KeyboardBacklight()
+    public KeyboardBacklight(ITextResources textResources)
     {
+        this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
+
         stateSubject = new BehaviorSubject<DeviceState>(DeviceState.Enabled);
         levelSubject = new BehaviorSubject<KeyboardBacklightLevel>(KeyboardBacklightLevel.Off);
 
@@ -82,12 +86,12 @@ sealed class KeyboardBacklight : IKeyboardBacklight, IDisposable
         {
             if (key == null)
             {
-                throw new AppException(Text.Instance.Errors.CanNotFoundAsusOptimizationKey);
+                throw new AppException(textResources["Errors.CanNotFoundAsusOptimizationKey"]);
             }
 
             if (key == null || !int.TryParse(key.GetValue(BACKLIGHT_VALUE)?.ToString(), out int value))
             {
-                throw new AppException(Text.Instance.Errors.CanNotReadAsusOptimizationBacklight);
+                throw new AppException(textResources["Errors.CanNotReadAsusOptimizationBacklight"]);
             }
 
             stateSubject.OnNext(value == 1 ? DeviceState.Disabled : DeviceState.Enabled);

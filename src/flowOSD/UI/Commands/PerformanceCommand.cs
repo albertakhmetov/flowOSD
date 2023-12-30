@@ -25,6 +25,7 @@ using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using flowOSD.Core.Configs;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 
 public class PerformanceCommand : CommandBase
@@ -35,10 +36,15 @@ public class PerformanceCommand : CommandBase
     private IPerformanceService performanceService;
 
     public PerformanceCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
         IConfig config,
         IAtk atk,
         IPowerManagement powerManagement,
-        IPerformanceService performanceService)
+        IPerformanceService performanceService) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.atk = atk ?? throw new ArgumentNullException(nameof(atk));
@@ -47,10 +53,10 @@ public class PerformanceCommand : CommandBase
 
         this.performanceService.ActiveProfile
             .ObserveOn(SynchronizationContext.Current!)
-            .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.Performance.Id)
+            .Subscribe(profile => IsChecked = profile.Id != PerformanceProfile.DefaultId)
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.Performance.Description;
+        Description = TextResources["Commands.Performance.Description"];
         Enabled = true;
     }
 
@@ -95,17 +101,17 @@ public class PerformanceCommand : CommandBase
     private async Task<Guid> GetNextProfileId()
     {
         var profile = await performanceService.ActiveProfile.FirstAsync();
-        if (profile.Id == PerformanceProfile.Performance.Id)
+        if (profile.Id == PerformanceProfile.DefaultId)
         {
-            return PerformanceProfile.Turbo.Id;
+            return PerformanceProfile.TurboId;
         }
-        else if (profile.Id == PerformanceProfile.Turbo.Id)
+        else if (profile.Id == PerformanceProfile.TurboId)
         {
-            return PerformanceProfile.Silent.Id;
+            return PerformanceProfile.SilentId;
         }
         else
         {
-            return PerformanceProfile.Performance.Id;
+            return PerformanceProfile.DefaultId;
         }
     }
 }

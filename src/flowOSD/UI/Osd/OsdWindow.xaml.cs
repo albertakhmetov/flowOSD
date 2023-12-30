@@ -24,6 +24,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 using flowOSD.Native;
 using Microsoft.UI.Windowing;
@@ -44,12 +45,16 @@ public sealed partial class OsdWindow : Window, IDisposable
 
     private IDisposable? hideTimer, animationTimer;
 
-    public OsdWindow(IConfig config, ISystemEvents systemEvents)
+    public OsdWindow(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IConfig config, 
+        ISystemEvents systemEvents)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.systemEvents = systemEvents ?? throw new ArgumentNullException(nameof(systemEvents));
 
-        ViewModel = new OsdViewModel();
+        ViewModel = new OsdViewModel(textResources, imageResources);
 
         InitializeComponent();
         if (Content is FrameworkElement element)

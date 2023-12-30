@@ -16,21 +16,28 @@
  *  along with flowOSD. If not, see <https://www.gnu.org/licenses/>.   
  *
  */
+
 namespace flowOSD.UI.Commands;
 
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using flowOSD.Core;
 using flowOSD.Core.Hardware;
+using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 
 sealed class PowerModeCommand : CommandBase
 {
     private IPowerManagement powerManagement;
 
-    public PowerModeCommand(IPowerManagement powerManagement)
+    public PowerModeCommand(
+        ITextResources textResources,
+        IImageResources imageResources,
+        IPowerManagement powerManagement) 
+        : base(
+            textResources,
+            imageResources)
     {
         this.powerManagement = powerManagement ?? throw new ArgumentNullException(nameof(powerManagement));
 
@@ -39,7 +46,7 @@ sealed class PowerModeCommand : CommandBase
             .Subscribe(isBatterySaver => Enabled = !isBatterySaver)
             .DisposeWith(Disposable!);
 
-        Description = TextResources.Commands.PowerMode.Description;
+        Description = TextResources["Commands.PowerMode.Description"];
         Enabled = true;
     }
 
