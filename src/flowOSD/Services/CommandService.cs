@@ -38,6 +38,7 @@ sealed class CommandService : ICommandService, IDisposable
     private IUpdateService updateService;
     private INotificationService notificationService;
     private IElevatedService elevatedService;
+    private IMessageQueue messageQueue;
 
     private Dictionary<string, Lazy<CommandBase>> instances = new Dictionary<string, Lazy<CommandBase>>();
 
@@ -51,7 +52,8 @@ sealed class CommandService : ICommandService, IDisposable
         IUpdateService updateService,
         IOsd osd,
         INotificationService notificationService,
-        IElevatedService elevatedService)
+        IElevatedService elevatedService,
+        IMessageQueue messageQueue)
     {
         this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
@@ -60,6 +62,7 @@ sealed class CommandService : ICommandService, IDisposable
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
+        this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
 
         Register(() => new ToggleBoostCommand(
             textResources,
@@ -157,6 +160,11 @@ sealed class CommandService : ICommandService, IDisposable
             hardwareService.ResolveNotNull<IAtk>(),
             hardwareService.ResolveNotNull<INotebookModeService>(), 
             elevatedService));
+
+        Register(() => new DisplayOffCommand(
+            textResources,
+            imageResources,
+            messageQueue));
     }
 
     public void Dispose()

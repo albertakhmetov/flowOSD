@@ -156,7 +156,8 @@ public partial class App : Application
                 updateService,
                 osd,
                 notificationService,
-                elevatedService).DisposeWith(disposable);
+                elevatedService,
+                messageQueue).DisposeWith(disposable);
 
             hotKeyService = new HotKeysService(
                 configService,

@@ -245,6 +245,9 @@
         },
         "NotebookMode": {
             "Description": "Toggle Notebook Mode"
+        },
+        "DisplayOff": {
+            "Description": "Turn Off Display"
         }
     }
 }
