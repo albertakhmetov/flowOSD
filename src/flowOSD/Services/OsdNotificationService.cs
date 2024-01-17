@@ -172,7 +172,7 @@ sealed class OsdNotificationService : IDisposable
         performanceService.ActiveProfile
             .Skip(1)
             .Throttle(TimeSpan.FromMilliseconds(50))
-            .DistinctUntilChanged()
+            .DistinctUntilChanged(x => x.Id)
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowPerformanceProfileNotification)
             .DisposeWith(disposable);
@@ -312,7 +312,7 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            isEnabled ? "Boost Mode is on" : "Boost Mode is off", 
+            isEnabled ? "Boost Mode is on" : "Boost Mode is off",
             imageResources["Hardware.Cpu"]));
     }
 
@@ -324,7 +324,7 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off", 
+            state == DeviceState.Enabled ? "TouchPad is on" : "TouchPad is off",
             imageResources["Hardware.TouchPad"]));
     }
 
@@ -336,7 +336,7 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off", 
+            gpuMode == GpuMode.dGpu ? "dGPU is on" : "dGPU is off",
             imageResources["Hardware.Gpu"]));
     }
 
@@ -348,7 +348,7 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off", 
+            state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off",
             imageResources["Hardware.Notebook"]));
     }
 }
