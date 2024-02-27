@@ -24,6 +24,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using flowOSD.Core;
 using flowOSD.Core.Configs;
+using flowOSD.Core.Hardware;
 using flowOSD.Core.Resources;
 using flowOSD.Extensions;
 
@@ -32,10 +33,13 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
     private CompositeDisposable? disposable = null;
 
     private IHardwareFeatures hardwareFeatures;
+    private IAtk atk;
+
+    private bool bootSound;
 
     public GeneralViewModel(
         ITextResources textResources,
-        IImageResources imageResources, 
+        IImageResources imageResources,
         IConfig config,
         IHardwareService hardwareService)
         : base(
@@ -51,11 +55,14 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         }
 
         hardwareFeatures = hardwareService.ResolveNotNull<IHardwareFeatures>();
+        atk = hardwareService.ResolveNotNull<IAtk>();
     }
 
     public bool IsOptimizationInfoVisible => hardwareFeatures.OptimizationService;
 
     public bool VariBrightControlEnabled => hardwareFeatures.AmdIntegratedGpu;
+
+    public bool BootSoundControlEnabled => hardwareFeatures.BootSound;
 
     public string OptimizationPageUrl => TextResources["Links.Optimization"];
 
@@ -83,6 +90,12 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         set => Config.Common.DisableVariBright = value;
     }
 
+    public bool BootSound
+    {
+        get => bootSound;
+        set => atk.SetBootSound(value ? DeviceState.Enabled : DeviceState.Disabled);
+    }
+
     public void Dispose()
     {
         OnDeactivated();
@@ -95,6 +108,15 @@ public class GeneralViewModel : ConfigViewModelBase, IDisposable
         Config.Common.PropertyChanged
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(OnPropertyChanged)
+            .DisposeWith(disposable);
+
+        atk.BootSound
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(x =>
+            {
+                bootSound = x == DeviceState.Enabled;
+                OnPropertyChanged(nameof(BootSound));
+            })
             .DisposeWith(disposable);
 
         OnPropertyChanged(null);

@@ -37,7 +37,8 @@
             "RunAtStartup": "Run at logon",
             "ControlDisplayRefreshRate": "Control display refresh rate",
             "ConfirmGpuModeChange": "Confirm GPU change",
-            "DisableVariBright": "Disable Vari-Bright"
+            "DisableVariBright": "Disable Vari-Bright",
+            "BootSound": "Device Boot Sound"
         },
         "Notifications": {
             "Title": "Notifications",

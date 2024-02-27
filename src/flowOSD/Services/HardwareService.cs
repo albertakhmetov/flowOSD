@@ -227,6 +227,8 @@ sealed class HardwareService : IDisposable, IHardwareService, IHardwareFeatures
 
     public bool AmdIntegratedGpu => amd.IsSupported;
 
+    public bool BootSound => atk.BootSoundSupported;
+
     public void Dispose()
     {
         if (disposable != null)

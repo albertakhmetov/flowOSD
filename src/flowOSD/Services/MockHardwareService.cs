@@ -104,6 +104,8 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
 
     public bool AmdIntegratedGpu => true;
 
+    public bool BootSound => true;
+
     public T? Resolve<T>() where T : class
     {
         return register.ContainsKey(typeof(T)) ? (T)register[typeof(T)] : null;
@@ -118,6 +120,7 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
     {
         private BehaviorSubject<PerformanceMode> performanceMode;
         private BehaviorSubject<GpuMode> gpuMode;
+        private readonly BehaviorSubject<DeviceState> bootSoundSubject;
 
         public readonly BehaviorSubject<int> cpu, cpuFanSpeed, gpuFanSpeed;
         public readonly BehaviorSubject<TabletMode> tabletMode;
@@ -134,6 +137,7 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
 
             tabletMode = new BehaviorSubject<TabletMode>(Core.Hardware.TabletMode.Notebook);
             charger = new BehaviorSubject<ChargerTypes>(ChargerTypes.Connected);
+            bootSoundSubject = new BehaviorSubject<DeviceState>(DeviceState.Enabled);
 
             PerformanceMode = performanceMode.AsObservable();
             GpuMode = gpuMode.AsObservable();
@@ -142,6 +146,8 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
             GpuFanSpeed = gpuFanSpeed.AsObservable();
             TabletMode = tabletMode.AsObservable();
             Charger = charger.AsObservable();
+
+            BootSound = bootSoundSubject.AsObservable();
         }
 
         public IObservable<PerformanceMode> PerformanceMode { get; }
@@ -157,6 +163,8 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
         public IObservable<TabletMode> TabletMode { get; }
 
         public IObservable<ChargerTypes> Charger { get; }
+
+        public IObservable<DeviceState> BootSound { get; }
 
         public uint MinBatteryChargeLimit { get; set; }
 
@@ -219,6 +227,12 @@ internal class MockHardwareService : IHardwareService, IHardwareFeatures
         public bool SetPerformanceMode(PerformanceMode performanceMode)
         {
             this.performanceMode.OnNext(performanceMode);
+            return true;
+        }
+
+        public bool SetBootSound(DeviceState state)
+        {
+            bootSoundSubject.OnNext(state);
             return true;
         }
     }

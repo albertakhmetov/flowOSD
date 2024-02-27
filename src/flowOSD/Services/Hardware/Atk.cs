@@ -57,6 +57,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     private const uint CPU_TEMPERATURE = 0x00120094;
     private const uint GPU_TEMPERATURE = 0x00120097;
 
+    private const uint DEVID_BOOT_SOUND = 0x00130022;
+
     private const uint DEVID_BATTERY_LIMIT = 0x00120057;
 
     private const uint DEVID_CHARGER = 0x0012006c;
@@ -87,6 +89,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     private readonly BehaviorSubject<TabletMode> tabletModeSubject;
     private readonly BehaviorSubject<ChargerTypes> chargerSubject;
     private Subject<AtkKey> keyPressedSubject;
+    private readonly BehaviorSubject<DeviceState> bootSoundSubject;
 
     private SafeFileHandle handle;
     private ManagementEventWatcher? watcher;
@@ -127,6 +130,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         ChargerSupported = Get(DEVID_CHARGER, out var charger);
         ChargeLimitSupported = Get(DEVID_BATTERY_LIMIT, out _);
         CpuPowerLimitSupported = (Get(PPT_APU, out _) && Get(PPT_CPU, out _)) || Get(PPT_CPUB0, out _);
+        BootSoundSupported = Get(DEVID_BOOT_SOUND, out var bootSoundState);
 
         performanceModeSubject = new BehaviorSubject<PerformanceMode>(performanceMode ?? Core.Hardware.PerformanceMode.Performance);
         gpuModeSubject = new BehaviorSubject<GpuMode>((GpuMode)gpuMode);
@@ -136,6 +140,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         tabletModeSubject = new BehaviorSubject<TabletMode>((TabletMode)tabletMode);
         chargerSubject = new BehaviorSubject<ChargerTypes>(GetChargerTypes(charger));
         keyPressedSubject = new Subject<AtkKey>();
+        bootSoundSubject = new BehaviorSubject<DeviceState>(bootSoundState == 1 ? DeviceState.Enabled : DeviceState.Disabled);
 
         PerformanceMode = performanceModeSubject.AsObservable();
         GpuMode = gpuModeSubject.AsObservable();
@@ -145,6 +150,7 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
         TabletMode = tabletModeSubject.AsObservable();
         Charger = chargerSubject.AsObservable();
         KeyPressed = keyPressedSubject.AsObservable();
+        BootSound = bootSoundSubject.AsObservable();
 
         SetPerformanceMode(performanceMode ?? Core.Hardware.PerformanceMode.Performance);
 
@@ -197,6 +203,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
 
     public bool CpuPowerLimitSupported { get; }
 
+    public bool BootSoundSupported { get; }
+
     public IObservable<PerformanceMode> PerformanceMode { get; }
 
     public IObservable<GpuMode> GpuMode { get; }
@@ -212,6 +220,8 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
     public IObservable<ChargerTypes> Charger { get; }
 
     public IObservable<AtkKey> KeyPressed { get; }
+
+    public IObservable<DeviceState> BootSound { get; }
 
     IObservable<uint> IKeyboard.Activity { get; } = Observable.Empty<uint>();
 
@@ -329,6 +339,18 @@ sealed partial class Atk : IDisposable, IAtk, IKeyboard
                 gpuModeSubject.OnNext(gpuMode);
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public bool SetBootSound(DeviceState state)
+    {
+        if (Set(DEVID_BOOT_SOUND, (uint)(state == DeviceState.Disabled ? 0 : 1), out var buffer) && IsOk(buffer))
+        {
+            bootSoundSubject.OnNext(state);
+
+            return true;
         }
 
         return false;

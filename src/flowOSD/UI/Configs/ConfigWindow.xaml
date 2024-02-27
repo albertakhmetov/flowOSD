@@ -221,6 +221,15 @@
                                 Header="{Binding TextResources[Config.General.DisableVariBright], Mode=OneTime}"
                                 IsOn="{Binding DisableVariBright, Mode=TwoWay}" />
                         </Border>
+                        <Border 
+                            Style="{StaticResource CxConfigBorderStyle}"
+                            Visibility="{Binding BootSoundControlEnabled, Converter={StaticResource VisibilityConverter}}">
+
+                            <ToggleSwitch 
+                                HorizontalAlignment="Stretch"
+                                Header="{Binding TextResources[Config.General.BootSound], Mode=OneTime}"
+                                IsOn="{Binding BootSound, Mode=TwoWay}" />
+                        </Border>
                     </StackPanel>
 
                     <!-- Notifications -->

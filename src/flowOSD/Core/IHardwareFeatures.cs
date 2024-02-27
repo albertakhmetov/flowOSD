@@ -21,23 +21,25 @@ namespace flowOSD.Core;
 
 public interface IHardwareFeatures
 {
-    public bool OptimizationService { get; }
+    bool OptimizationService { get; }
 
-    public bool CpuTemperature { get; }
+    bool CpuTemperature { get; }
 
-    public bool CpuFanSpeed { get; }
+    bool CpuFanSpeed { get; }
 
-    public bool GpuFanSpeed { get; }
+    bool GpuFanSpeed { get; }
 
-    public bool PerformanceSwitch { get; }
+    bool PerformanceSwitch { get; }
 
-    public bool GpuSwitch { get; }
+    bool GpuSwitch { get; }
 
-    public bool Charger { get; }
+    bool Charger { get; }
 
-    public bool ChargeLimit { get; }
+    bool ChargeLimit { get; }
 
-    public bool CpuPowerLimit { get; }
+    bool CpuPowerLimit { get; }
 
-    public bool AmdIntegratedGpu { get; }
+    bool AmdIntegratedGpu { get; }
+
+    bool BootSound { get; }
 }

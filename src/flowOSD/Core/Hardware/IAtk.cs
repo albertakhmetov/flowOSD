@@ -35,6 +35,8 @@ public interface IAtk
 
     IObservable<ChargerTypes> Charger { get; }
 
+    IObservable<DeviceState> BootSound { get; }
+
     uint MinBatteryChargeLimit { get; }
 
     uint MaxBatteryChargeLimit { get; }
@@ -60,6 +62,8 @@ public interface IAtk
     bool SetGpuMode(GpuMode gpuMode);
 
     bool SetFanCurve(FanType fanType, IList<FanDataPoint> dataPoints);
+
+    bool SetBootSound(DeviceState state);
 
     IList<FanDataPoint> GetFanCurve(FanType fanType, PerformanceMode performanceMode);
 }
