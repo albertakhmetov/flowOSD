@@ -1,4 +1,4 @@
-/*  Copyright © 2021-2023, Albert Akhmetov <akhmetov@live.com>   
+/*  Copyright © 2021-2024, Albert Akhmetov <akhmetov@live.com>   
  *
  *  This file is part of flowOSD.
  *
