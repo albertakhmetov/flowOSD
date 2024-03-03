@@ -194,8 +194,6 @@ sealed partial class NotifyIconService : IDisposable
             return;
         }
 
-        Trace.WriteLine(lParam.Low());
-
         switch (lParam.Low())
         {
             case WM_LBUTTONUP:
