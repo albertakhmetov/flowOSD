@@ -94,6 +94,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         GpuCommand = commandService.ResolveNotNull<GpuCommand>();
         TouchPadCommand = commandService.ResolveNotNull<TouchPadCommand>();
         NotebookModeCommand = commandService.ResolveNotNull<NotebookModeCommand>();
+        AwakeCommand = commandService.ResolveNotNull<AwakeCommand>();
 
         ConfigCommand = commandService.ResolveNotNull<ConfigCommand>();
     }
@@ -231,6 +232,8 @@ public class MainViewModel : ViewModelBase, IDisposable
     public CommandBase TouchPadCommand { get; }
 
     public CommandBase NotebookModeCommand { get; }
+
+    public CommandBase AwakeCommand { get; }
 
     public CommandBase ConfigCommand { get; }
 

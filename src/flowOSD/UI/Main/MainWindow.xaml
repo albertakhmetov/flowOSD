@@ -232,6 +232,23 @@
                 Text="{Binding TextResources[Main.NotebookMode], Mode=OneTime}" 
                 Style="{StaticResource LabelStyle}"/>
 
+            <controls:CxToggleButton
+                Grid.Row="4" 
+                Grid.Column="1" 
+                Style="{StaticResource ButtonStyle}"                          
+                IsChecked="{Binding AwakeCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding AwakeCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding ImageResources[Common.Awake]}"/>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="5" 
+                Grid.Column="1" 
+                Text="{Binding TextResources[Main.AwakeMode], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
         </Grid>
 
         <Grid Grid.Row="1">

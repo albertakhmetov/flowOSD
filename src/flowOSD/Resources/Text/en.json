@@ -25,7 +25,8 @@
         "GpuFanSpeed": "Gpu",
         "BatteryStatus": "Battery status",
         "BatteryRemaining": "Remaining",
-        "NotebookMode": "Notebook Mode"
+        "NotebookMode": "Notebook Mode",
+        "AwakeMode": "Awake Mode"
     },
     "Config": {
         "Title": "Settings",
@@ -249,6 +250,9 @@
         },
         "DisplayOff": {
             "Description": "Turn Off Display"
+        },
+        "Awake": {
+            "Description": "Keep the computer awake"
         }
     }
 }

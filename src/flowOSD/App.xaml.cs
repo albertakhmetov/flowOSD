@@ -63,6 +63,7 @@ public partial class App : Application
     private IHardwareService hardwareService;
     private CommandService commandService;
     private HotKeysService hotKeyService;
+    private AwakeService awakeService;
 
     private OsdNotificationService osdNotificationService;
 
@@ -94,11 +95,13 @@ public partial class App : Application
         textResources = new TextResources();
         imageResources = new ImageResources();
 
+
         InitializeComponent();
 
         try
         {
             disposable = new CompositeDisposable();
+            awakeService = new AwakeService().DisposeWith(disposable);
 
             serviceWatcher = new ServiceWatcher().DisposeWith(disposable);
 
@@ -155,6 +158,7 @@ public partial class App : Application
                 systemEvents,
                 updateService,
                 osd,
+                awakeService,
                 notificationService,
                 elevatedService,
                 messageQueue).DisposeWith(disposable);

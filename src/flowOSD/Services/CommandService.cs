@@ -37,6 +37,7 @@ sealed class CommandService : ICommandService, IDisposable
     private IKeysSender keysSender;
     private IUpdateService updateService;
     private INotificationService notificationService;
+    private IAwakeService awakeService;
     private IElevatedService elevatedService;
     private IMessageQueue messageQueue;
 
@@ -51,6 +52,7 @@ sealed class CommandService : ICommandService, IDisposable
         ISystemEvents systemEvents,
         IUpdateService updateService,
         IOsd osd,
+        IAwakeService awakeService,
         INotificationService notificationService,
         IElevatedService elevatedService,
         IMessageQueue messageQueue)
@@ -61,6 +63,7 @@ sealed class CommandService : ICommandService, IDisposable
         this.keysSender = keysSender ?? throw new ArgumentNullException(nameof(keysSender));
         this.updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
         this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+        this.awakeService = awakeService ?? throw new ArgumentNullException(nameof(awakeService));
         this.elevatedService = elevatedService ?? throw new ArgumentNullException(nameof(elevatedService));
         this.messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
 
@@ -70,34 +73,34 @@ sealed class CommandService : ICommandService, IDisposable
             hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new PerformanceCommand(
             textResources,
-            imageResources, 
+            imageResources,
             config,
             hardwareService.ResolveNotNull<IAtk>(),
             hardwareService.ResolveNotNull<IPowerManagement>(),
             hardwareService.ResolveNotNull<IPerformanceService>()));
         Register(() => new PowerModeCommand(
             textResources,
-            imageResources, 
+            imageResources,
             hardwareService.ResolveNotNull<IPowerManagement>()));
         Register(() => new GpuCommand(
             textResources,
-            imageResources, 
-            config, 
-            hardwareService.ResolveNotNull<IAtk>(), 
+            imageResources,
+            config,
+            hardwareService.ResolveNotNull<IAtk>(),
             notificationService));
         Register(() => new TouchPadCommand(
             textResources,
-            imageResources, 
+            imageResources,
             hardwareService.ResolveNotNull<ITouchPad>()));
         Register(() => new MicrophoneCommand(
             textResources,
-            imageResources, 
+            imageResources,
             config,
             osd,
             hardwareService.ResolveNotNull<IMicrophone>()));
         Register(() => new DisplayRefreshRateCommand(
             textResources,
-            imageResources, 
+            imageResources,
             hardwareService.ResolveNotNull<IPowerManagement>(),
             hardwareService.ResolveNotNull<IDisplay>(),
             config.Common));
@@ -115,56 +118,61 @@ sealed class CommandService : ICommandService, IDisposable
 
         Register(() => new ConfigCommand(
             textResources,
-            imageResources, 
-            config, 
-            systemEvents, 
+            imageResources,
+            config,
+            systemEvents,
             this,
-            hardwareService, 
+            hardwareService,
             updateService));
         Register(() => new MainUICommand(
             textResources,
-            imageResources, 
-            config, 
-            systemEvents, 
-            this, 
+            imageResources,
+            config,
+            systemEvents,
+            this,
             hardwareService,
             elevatedService));
         Register(() => new NotifyMenuCommand(
             textResources,
-            imageResources, 
-            config, 
-            systemEvents, 
+            imageResources,
+            config,
+            systemEvents,
             this));
         Register(() => new UpdateCommand(
             textResources,
-            imageResources, 
+            imageResources,
             updateService));
 
         Register(() => new DisplayBrightnessCommand(
             textResources,
-            imageResources, 
-            config, 
+            imageResources,
+            config,
             osd,
             hardwareService.ResolveNotNull<IDisplayBrightness>()));
         Register(() => new KeyboardBacklightCommand(
             textResources,
-            imageResources, 
-            config, 
+            imageResources,
+            config,
             osd,
             hardwareService));
 
         Register(() => new NotebookModeCommand(
             textResources,
-            imageResources, 
+            imageResources,
             config,
             hardwareService.ResolveNotNull<IAtk>(),
-            hardwareService.ResolveNotNull<INotebookModeService>(), 
+            hardwareService.ResolveNotNull<INotebookModeService>(),
             elevatedService));
 
         Register(() => new DisplayOffCommand(
             textResources,
             imageResources,
             messageQueue));
+
+        Register(() => new AwakeCommand(
+            textResources,
+            imageResources,
+            awakeService));
     }
 
     public void Dispose()

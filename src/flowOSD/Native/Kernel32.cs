@@ -101,6 +101,15 @@ static class Kernel32
         public int Rate;
     }
 
+    public enum EXECUTION_STATE : uint
+    {
+        ES_SYSTEM_REQUIRED = 0x00000001,
+        ES_DISPLAY_REQUIRED = 0x00000002,
+        ES_USER_PRESENT = 0x00000004,
+        ES_AWAYMODE_REQUIRED = 0x00000040,
+        ES_CONTINUOUS = 0x80000000
+    }
+
     [DllImport(nameof(Kernel32), SetLastError = true)]
     public static extern uint GetTickCount();
 
@@ -172,4 +181,8 @@ static class Kernel32
     public static extern Int32 WaitForSingleObject(
         IntPtr Handle,
         Int32 Wait);
+
+    [DllImport(nameof(Kernel32), SetLastError = true)]
+    public static extern uint SetThreadExecutionState(EXECUTION_STATE esFlags);
+
 }

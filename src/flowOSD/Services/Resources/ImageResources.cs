@@ -59,6 +59,7 @@ internal class ImageResources : TextResources, IImageResources
         resources["Common.Temperature"] = "\ue9ca";
         resources["Common.Settings"] = "\ue713";
         resources["Common.Locked"] = "\uF809";
+        resources["Common.Awake"] = "\uEA8F";
 
         resources["Hardware.Battery"] = "\uF5FC";
         resources["Hardware.Tablet"] = "\uE70A";
