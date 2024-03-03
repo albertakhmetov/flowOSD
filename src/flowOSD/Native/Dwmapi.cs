@@ -35,9 +35,10 @@ static class Dwmapi
         var value = GCHandle.Alloc(isDark, GCHandleType.Pinned);
         var result = DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, value.AddrOfPinnedObject(), sizeof(uint));
         value.Free();
+
         if (result != 0)
         {
-            throw Marshal.GetExceptionForHR(result);
+            throw Marshal.GetExceptionForHR(result) ?? throw new ApplicationException("Can't switch dark mode setting");
         }
     }
 
@@ -53,7 +54,7 @@ static class Dwmapi
         value.Free();
         if (result != 0)
         {
-            throw Marshal.GetExceptionForHR(result);
+            throw Marshal.GetExceptionForHR(result) ?? throw new ApplicationException("Can't set window corner setting");
         }
 
     }

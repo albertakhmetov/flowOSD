@@ -418,8 +418,6 @@ static class User32
 
     public static void ShowAndActivate(Window window)
     {
-        const int SW_SHOW = 1;
-
         var handle = window.GetHandle();
 
         var currentlyFocusedWindowProcessId = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
