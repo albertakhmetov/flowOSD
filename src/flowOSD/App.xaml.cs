@@ -147,7 +147,8 @@ public partial class App : Application
                 imageResources,
                 configService,
                 osd,
-                hardwareService).DisposeWith(disposable);
+                hardwareService,
+                awakeService).DisposeWith(disposable);
 
             commandService = new CommandService(
                 textResources,

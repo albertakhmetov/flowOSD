@@ -51,7 +51,8 @@
             "DisplayRefreshRate": "Display refresh rate notifications",
             "Mic": "Microphone status notifications",
             "Gpu": "dGPU notifications",
-            "NotebookMode": "Notebook Mode notifications"
+            "NotebookMode": "Notebook Mode notifications",
+            "AwakeMode": "Awake Mode notifications"
         },
         "Keyboard": {
             "Title": "Keyboard",
@@ -171,7 +172,10 @@
         "HighRefreshRate": "High Refresh Rate",
         "Gpu": "dGPU",
         "TouchPad": "Touchpad",
-        "NotebookMode": "Notebook Mode"
+        "NotebookModeOn": "Notebook Mode is on",
+        "NotebookModeOff": "Notebook Mode is off",
+        "AwakeModeOn": "Awake Mode is on",
+        "AwakeModeOff": "Awake Mode is off"
     },
     "Update": {
         "CheckForUpdate": "Check for update by clicking 'Check for update'",

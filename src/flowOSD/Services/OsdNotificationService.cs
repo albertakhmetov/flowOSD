@@ -55,6 +55,7 @@ sealed class OsdNotificationService : IDisposable
     private IBattery battery;
     private IPerformanceService performanceService;
     private INotebookModeService notebookModeService;
+    private IAwakeService awakeService;
 
     private IHardwareFeatures hardwareFeatures;
 
@@ -63,12 +64,14 @@ sealed class OsdNotificationService : IDisposable
         IImageResources imageResources,
         IConfig config,
         IOsd osd,
-        IHardwareService hardwareService)
+        IHardwareService hardwareService,
+        IAwakeService awakeService)
     {
         this.textResources = textResources ?? throw new ArgumentNullException(nameof(textResources));
         this.imageResources = imageResources ?? throw new ArgumentNullException(nameof(imageResources));
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.osd = osd ?? throw new ArgumentNullException(nameof(osd));
+        this.awakeService = awakeService ?? throw new ArgumentNullException(nameof(awakeService));
 
         if (hardwareService == null)
         {
@@ -183,6 +186,14 @@ sealed class OsdNotificationService : IDisposable
             .DistinctUntilChanged()
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(ShowNotebookModeNotification)
+            .DisposeWith(disposable);
+
+        awakeService.State
+            .Skip(1)
+            .Throttle(TimeSpan.FromMilliseconds(50))
+            .DistinctUntilChanged()
+            .ObserveOn(SynchronizationContext.Current!)
+            .Subscribe(ShowAwakeModeNotification)
             .DisposeWith(disposable);
     }
 
@@ -348,7 +359,19 @@ sealed class OsdNotificationService : IDisposable
         }
 
         osd.Show(new OsdMessage(
-            state == DeviceState.Enabled ? "Notebook Mode is on" : "Notebook Mode is off",
-            imageResources["Hardware.Notebook"]));
+            state == DeviceState.Enabled ? textResources["Notifications.NotebookModeOn"] : textResources["Notifications.NotebookModeOff"],
+            imageResources["Notifications.NotebookMode"]));
+    }
+
+    private void ShowAwakeModeNotification(DeviceState state)
+    {
+        if (!config.Notifications[NotificationType.AwakeMode])
+        {
+            return;
+        }
+
+        osd.Show(new OsdMessage(
+            state == DeviceState.Enabled ? textResources["Notifications.AwakeModeOn"] : textResources["Notifications.AwakeModeOff"],
+            imageResources["Notifications.AwakeMode"]));
     }
 }

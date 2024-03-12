@@ -30,4 +30,5 @@ public enum NotificationType
     Mic,
     Gpu,
     NotebookMode,
+    AwakeMode,
 }

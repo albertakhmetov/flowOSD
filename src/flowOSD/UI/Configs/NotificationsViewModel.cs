@@ -96,6 +96,12 @@ public class NotificationsViewModel : ConfigViewModelBase, IDisposable
         set => Config.Notifications[NotificationType.NotebookMode] = value;
     }
 
+    public bool AwakeMode
+    {
+        get => Config.Notifications[NotificationType.AwakeMode];
+        set => Config.Notifications[NotificationType.AwakeMode] = value;
+    }
+
     public void Dispose()
     {
         OnDeactivated();

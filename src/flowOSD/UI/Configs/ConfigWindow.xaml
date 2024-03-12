@@ -345,6 +345,18 @@
                                 </ToggleSwitch.Header>
                             </ToggleSwitch>
                         </Border>
+                        <Border Style="{StaticResource CxConfigBorderStyle}">
+                            <ToggleSwitch HorizontalAlignment="Stretch" IsOn="{Binding AwakeMode, Mode=TwoWay}">
+                                <ToggleSwitch.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <FontIcon 
+                                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                            Glyph="{Binding ImageResources[Notifications.AwakeMode], Mode=OneTime}"/>
+                                        <TextBlock Text="{Binding TextResources[Config.Notifications.AwakeMode], Mode=OneTime}"/>
+                                    </StackPanel>
+                                </ToggleSwitch.Header>
+                            </ToggleSwitch>
+                        </Border>
                     </StackPanel>
 
                     <!-- Keyboard -->

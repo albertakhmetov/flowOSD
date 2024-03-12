@@ -97,5 +97,6 @@ internal class ImageResources : TextResources, IImageResources
         resources["Notifications.Mic"] = this["Hardware.Mic"];
         resources["Notifications.Gpu"] = this["Hardware.Gpu"];
         resources["Notifications.NotebookMode"] = this["Hardware.Notebook"];
+        resources["Notifications.AwakeMode"] = this["Common.Awake"];
     }
 }
