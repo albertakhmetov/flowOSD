@@ -4,7 +4,7 @@
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-AppCopyright=© 2021-2023, Albert Akhmetov
+AppCopyright=© 2021-2024, Albert Akhmetov
 WizardStyle=modern
 DefaultDirName={autopf}\{#AppName}
 UninstallDisplayIcon={app}\flowOSD.exe
