@@ -1,0 +1,159 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x64</Platforms>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>		
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseWinUI>true</UseWinUI>
+		<EnableMsixTooling>true</EnableMsixTooling>
+		<WindowsPackageType>None</WindowsPackageType>
+		<WindowsAppSdkSelfContained>true</WindowsAppSdkSelfContained>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<Copyright>© 2021-2024, Albert Akhmetov</Copyright>
+		<Authors>Albert Akhmetov</Authors>
+		<Product>flowOSD</Product>
+		<Version>3.4.0</Version>
+		<Platforms>x64</Platforms>
+		<PackageIcon></PackageIcon>
+		<PackageIconUrl />
+		<ApplicationIcon>Resources\app.ico</ApplicationIcon>
+		<Description>flowOSD is an open-source application to control hardware and show OSD messages on ASUS ROG Flow x13 notebooks. Licensed under GPL-3.0 license.</Description>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<OutputPath>.\bin\$(Configuration)\</OutputPath>
+	  	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<LangVersion>12</LangVersion>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<PlatformTarget>x64</PlatformTarget>
+		<Optimize>False</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<PlatformTarget>x64</PlatformTarget>
+		<Optimize>True</Optimize>
+	    <DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240227000" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Management" Version="8.0.0" />
+		<PackageReference Include="System.Reactive" Version="6.0.0" />
+		<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+	</ItemGroup> 
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\**\*.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="UI\NotifyMenu\**" />
+	  <Compile Remove="_UI\**" />
+	  <EmbeddedResource Remove="UI\NotifyMenu\**" />
+	  <EmbeddedResource Remove="_UI\**" />
+	  <None Remove="UI\NotifyMenu\**" />
+	  <None Remove="_UI\**" />
+	  <Page Remove="UI\NotifyMenu\**" />
+	  <Page Remove="_UI\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Extensions\Drawing.cs" />
+	  <Compile Remove="Extensions\Forms.cs" />
+	  <Compile Remove="_App.cs" />
+	  <Compile Remove="_Program.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Remove="App.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="App.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
+	  <Page Update="UI\Styles\CxSplitButton.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\Styles\CxProgressBar.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\OsdWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\Styles\CxConfig.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\Styles\CxToggleSwitch.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\Config\HotKeysPage.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="UI\Config\KeyboardPage.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="UI\Config\NotificationsPage.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="UI\Config\GeneralPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\ConfigWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\NotifyMenuWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="UI\MainWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PRIResource Remove="_UI\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="resources\text\en.json" />
+	  <None Remove="UI\ConfigWindow.xaml" />
+	  <None Remove="UI\MainWindow.xaml" />
+	  <None Remove="UI\NotifyMenuWindow.xaml" />
+	  <None Remove="UI\OsdWindow.xaml" />
+	  <None Remove="UI\Styles\CxConfig.xaml" />
+	  <None Remove="UI\Styles\CxProgressBar.xaml" />
+	  <None Remove="UI\Styles\CxSplitButton.xaml" />
+	  <None Remove="UI\Styles\CxToggleSwitch.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PRIResource Remove="UI\NotifyMenu\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\LICENSE" Link="LICENSE">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Text\" />
+	</ItemGroup>
+</Project>

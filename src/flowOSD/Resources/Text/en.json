@@ -1,0 +1,262 @@
+{
+    "PerformanceMode": {
+        "Performance": "Performance",
+        "Silent": "Silent",
+        "Turbo": "Turbo"
+    },
+    "PowerMode": {
+        "BatterySaver": "Battery Saver is on",
+        "BestPowerEfficiency": "Power Efficiency",
+        "Balanced": "Balanced",
+        "BestPerformance": "Performance"
+    },
+    "Charger": {
+        "Battery": "Battery",
+        "Connected": "Plugged In",
+        "LowPower": "Low Power Charger"
+    },
+    "Main": {
+        "CpuBoost": "CPU Boost",
+        "HighRefreshRate": "High Refresh Rate",
+        "Gpu": "dGPU",
+        "TouchPad": "Touchpad",
+        "ShowApp": "Show {0}",
+        "CpuFanSpeed": "Cpu",
+        "GpuFanSpeed": "Gpu",
+        "BatteryStatus": "Battery status",
+        "BatteryRemaining": "Remaining",
+        "NotebookMode": "Notebook Mode",
+        "AwakeMode": "Awake Mode"
+    },
+    "Config": {
+        "Title": "Settings",
+        "General": {
+            "Title": "General",
+            "OptimizationTitle": "Limited functionality",
+            "OptimizationMessage": "ASUS Optimization service is running. Some functionality is disabled. Turn off ASUS Optimization service to enable it.",
+            "OptimizationMore": "View details",
+            "RunAtStartup": "Run at logon",
+            "ControlDisplayRefreshRate": "Control display refresh rate",
+            "ConfirmGpuModeChange": "Confirm GPU change",
+            "DisableVariBright": "Disable Vari-Bright",
+            "BootSound": "Device Boot Sound"
+        },
+        "Notifications": {
+            "Title": "Notifications",
+            "PerformanceMode": "Performance mode notifications",
+            "PowerMode": "Power mode notifications",
+            "PowerSource": "Power source notifications",
+            "Boost": "CPU boost mode notifications",
+            "TouchPad": "TouchPad state notifications",
+            "DisplayRefreshRate": "Display refresh rate notifications",
+            "Mic": "Microphone status notifications",
+            "Gpu": "dGPU notifications",
+            "NotebookMode": "Notebook Mode notifications",
+            "AwakeMode": "Awake Mode notifications"
+        },
+        "Keyboard": {
+            "Title": "Keyboard",
+            "BacklightTimeout": "Backlight timeout",
+            "BacklightWithDisplay": "Turn off backlight if laptop display is off",
+            "HotKeys": "HotKeys",
+            "HotKeyAction": "Action",
+            "Reset": "Reset to defaults",
+            "ResetConfirmation": "All hotkeys will be reset to default. Do you want to continue?"
+        },
+        "Monitoring": {
+            "Title": "Monitoring",
+            "ShowBatteryChargeRate": "Show battery charge rate",
+            "ShowCpuTemperature": "Show CPU temperature",
+            "ShowFanSpeed": "Show Fan Speeds"
+        },
+        "Performance": {
+            "Title": "Performance",
+            "PowerLimits": "Power Limits",
+            "NoProfileTitle": "Performance profiles",
+            "NoProfileMessage": "Create a custom profile to configure CPU power limit and fan curves.",
+            "UserProfileName": "User Profile",
+            "NewProfileToolTip": "Create a new profile",
+            "RenameProfileToolTip": "Rename profile",
+            "RemoveProfileToolTip": "Remove profile",
+            "NewProfileNamePlaceholder": "Enter a new profile name",
+            "RemoveProfileConfirmation": "Remove the current profile?",
+            "CreateProfile": "Create Profile",
+            "RenameProfile": "Rename Profile",
+            "RemoveProfile": "Remove Profile",
+            "BasePerformanceMode": "Base Performance Mode",
+            "Cpu": "Cpu",
+            "CpuFanCurve": "CPU Fan Curve",
+            "GpuFanCurve": "GPU Fan Curve",
+            "FanCurveErrorTitle": "Fan Curve Error",
+            "FanCurveErrorMessage": "Fan Curve can't be empty line. Also is recommended to set at least 50% fan speed after 80\u2103 to avoid throttling.",
+            "FanCurveWarningMessage": "Custom Fan Curves are working only when dGPU is ON, otherwise default Fan Curves are applied.",
+            "FanCurveWarningMore": "Learn more",
+            "FanCurves": "Fan Curves",
+            "UseCustomFanCurves": "Use Custom Fan Curves"
+        },
+        "Tablet": {
+            "Title": "Tablet",
+            "DisableTouchPadInTabletMode": "Disable TouchPad in tablet mode",
+            "Profile": "Performance profile in tablet mode",
+            "TabletWithHighDisplayRefreshRate": "Use high display refresh rate in tablet mode"
+        },
+        "Battery": {
+            "Title": "Battery",
+            "PluggedIn": "Plugged-in",
+            "Critical": "Critical",
+            "Charging": "Charging",
+            "Discharging": "Discharging",
+            "Name": "Name",
+            "ManufactureName": "Manufacture Name",
+            "Capacity": "Capacity",
+            "DesignedCapacity": "Designed Capacity",
+            "FullChargedCapacity": "Full Charged Capacity",
+            "WearPercentage": "Wear Percentage",
+            "EstimatedTime": "Estimated Time",
+            "BatteryChargeLimit": "Use Battery Charge Limit",
+            "BatteryChargeLimitDescription": "The battery charge will be limited by"
+        },
+        "About": {
+            "Title": "About",
+            "HomePage": "Home page",
+            "License": "License",
+            "Version": "Version",
+            "Runtime": "Runtime",
+            "Device": "Device",
+            "Update": "Update",
+            "CheckForUpdates": "Check for updates at startup"
+        }
+    },
+    "Errors": {
+        "Title": "Error",
+        "CriticalTitle": "Critical Error",
+        "Unhandled": "Unhandled application exception",
+        "Initialization": "An exception has occured during initialization",
+        "GpuToggleUI": "Error is occurred while toggling GPU (UI).",
+        "TouchPadToggleUI": "Error is occurred while toggling TouchPad state (UI).",
+        "BoostToggleUI": "Error is occurred while toggling CPU boost mode (UI).",
+        "DisplayRefreshRateToggleUI": "Error is occurred while toggling display refresh rate (UI).",
+        "MicToggle": "Error is occurred while toggling microphone state.",
+        "DisplayRefreshRateIsNotSupported": "Selected refresh rate ({0}) isn't supported.",
+        "RestartIsRequired": "Restart is required.",
+        "CanNotChangeDisplayRefreshRate": "Can't change display refresh rate. Error code: {0:X}.",
+        "CanNotConnectToBattery": "Can't connect to battery device.",
+        "CanNotConnectToAcpi": "Can't connect to ACPI.",
+        "CanNotFoundAsusOptimizationKey": "Registry Key for ASUS Optimization was not found.",
+        "CanNotReadAsusOptimizationBacklight": "Can't read the keyboard backlight value from Registry.",
+        "ConfigIsCorrupted": "Config file is corrupted",
+        "CanNotWriteStartupKey": "Can't write to Windows registry",
+        "CanNotRetriveAppPath": "Can't retrieve app exe path",
+        "ProductNameIsNotSet": "Product Name isn't set",
+        "ProductVersionIsNotSet": "Product Version isn't set",
+        "CanNotConnectToHid": "Can't connect to HID",
+        "CanNotResolve": "Can't resolve {0}"
+    },
+    "Warnings": {
+        "Title": "Warning",
+        "NotebookMode" : {
+            "Disable": "Disable Notebook Mode",
+            "DisableSlate": "Disable Touch UI",
+            "Title": "Notebook Mode",
+            "Text": "Notebook Mode is turned on, but UI is optimized to touch input."
+        }
+    },
+    "Confirmations": {
+        "Title": "Confirmation",
+        "NewVersion": "New version is available. Show details?"
+    },
+    "Notifications": {
+        "MicOn": "On air",
+        "MicOff": "Muted",
+        "CpuBoost": "CPU Boost",
+        "HighRefreshRate": "High Refresh Rate",
+        "Gpu": "dGPU",
+        "TouchPad": "Touchpad",
+        "NotebookModeOn": "Notebook Mode is on",
+        "NotebookModeOff": "Notebook Mode is off",
+        "AwakeModeOn": "Awake Mode is on",
+        "AwakeModeOff": "Awake Mode is off"
+    },
+    "Update": {
+        "CheckForUpdate": "Check for update by clicking 'Check for update'",
+        "CheckingForUpdate": "Checking for update...",
+        "Updated": "The latest version is installed",
+        "NewVersion": "New version is available",
+        "Downloading": "Update is downloading...",
+        "ReadyToInstall": "Update is downloaded and ready to install",
+        "ViewReleaseNotes": "View Release Notes"
+    },
+    "Commands": {
+        "Gpu": {
+            "TurnOffConfirmation": "Do you want to turn off dGPU?",
+            "TurnOnConfirmation": "Do you want to turn on dGPU?",
+            "Disable": "Disable dGPU",
+            "Enable": "Enable dGPU",
+            "Description": "Toggle dGPU"
+        },
+        "TouchPad": {
+            "Disable": "Disable TouchPad",
+            "Enable": "Enable TouchPad",
+            "Description": "Toggle TouchPad"
+        },
+        "Boost": {
+            "Disable": "Disable Boost",
+            "Enable": "Enable Boost",
+            "Description": "Toggle CPU Boost Mode"
+        },
+        "Suspend": {
+            "Hibernate": "Hibernate",
+            "Sleep": "Sleep",
+            "Description": "Suspend"
+        },
+        "PowerMode": {
+            "Description": "Toggle Power Mode"
+        },
+        "Performance": {
+            "Description": "Toggle Performance Mode"
+        },
+        "Config": {
+            "Description": "Settings..."
+        },
+        "DisplayBrightness": {
+            "Description": "Display Brightness",
+            "Up": "Up",
+            "Down": "Down"
+        },
+        "DisplayRefreshRate": {
+            "Description": "Toggle High Refresh Rate",
+            "Disable": "Disable High Refresh Rate",
+            "Enable": "Enable High Refresh Rate"
+        },
+        "Exit": {
+            "Description": "Exit"
+        },
+        "Restart": {
+            "Description": "Restart",
+            "ErrorText": "Something went wrong. Please restart the app manually"
+        },
+        "KeyboardBacklight": {
+            "Description": "Keyboard Backlight",
+            "Up": "Up",
+            "Down": "Down"
+        },
+        "Microphone": {
+            "Description": "Toggle Microphone"
+        },
+        "Update": {
+            "CheckForUpdate": "Check for update",
+            "DownloadUpdate": "Download update",
+            "CancelDownload": "Cancel",
+            "Install": "Install update"
+        },
+        "NotebookMode": {
+            "Description": "Toggle Notebook Mode"
+        },
+        "DisplayOff": {
+            "Description": "Turn Off Display"
+        },
+        "Awake": {
+            "Description": "Keep the computer awake"
+        }
+    }
+}

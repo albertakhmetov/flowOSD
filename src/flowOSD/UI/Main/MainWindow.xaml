@@ -1,0 +1,369 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Window
+    x:Class="flowOSD.UI.Main.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:flowOSD.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:flowOSD.UI.Converters"
+    xmlns:hardware="using:flowOSD.Core.Hardware"
+    xmlns:resources="using:flowOSD.Core.Resources"
+    mc:Ignorable="d">
+
+    <Grid Margin="10" Background="Transparent">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="../Styles/CxSplitButton.xaml"/>
+                    <ResourceDictionary>
+                        <converters:VisibilityConverter x:Key="VisibilityConverter"/>
+
+                        <Style x:Name="ButtonStyle" TargetType="ButtonBase">
+                            <Style.Setters>
+                                <Setter Property="MinHeight" Value="45"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
+                                <Setter Property="Margin" Value="8,8"/>
+                            </Style.Setters>
+                        </Style>
+
+                        <Style x:Name="SplitButtonStyle" TargetType="SplitButton" BasedOn="{StaticResource CxSplitButtonStyle}">
+                            <Style.Setters>
+                                <Setter Property="MinHeight" Value="45"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}"/>
+                                <Setter Property="Margin" Value="8,8"/>
+                            </Style.Setters>
+                        </Style>
+
+                        <Style x:Name="LabelStyle" TargetType="TextBlock">
+                            <Style.Setters>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="4, 4, 4, 16"/>
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="12"/>
+                            </Style.Setters>
+                        </Style>
+                    </ResourceDictionary>
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </Grid.Resources>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <controls:CxToggleButton 
+                Grid.Row="0" 
+                Grid.Column="0" 
+                Style="{StaticResource ButtonStyle}"
+                IsChecked="{Binding BoostCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding BoostCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding ImageResources[Hardware.Cpu], Mode=OneTime}"/>
+            </controls:CxToggleButton>
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0" 
+                Text="{Binding TextResources[Main.CpuBoost], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <DropDownButton 
+                Style="{StaticResource ButtonStyle}" 
+                Grid.Row="0" 
+                Grid.Column="1">
+
+                <FontIcon                     
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding PerformanceProfileImage, Mode=OneWay}"/>
+
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom" x:Name="performanceProfilesMenu"/>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+            <TextBlock 
+                Grid.Row="1" 
+                Grid.Column="1" 
+                Text="{Binding PerformanceProfileText, Mode=OneWay}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <DropDownButton 
+                Grid.Row="0" 
+                Grid.Column="2" 
+                Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}, ConverterParameter='!'}"
+                Style="{StaticResource ButtonStyle}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding PowerModeImage, Mode=OneWay}"/>
+
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom" x:Name="powerModesMenu"/>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+
+            <TextBlock 
+                Grid.Row="1" 
+                Grid.Column="2" 
+                Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}, ConverterParameter='!'}"
+                Text="{Binding PowerModeText, Mode=OneWay}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <Button 
+                Style="{StaticResource ButtonStyle}"
+                IsEnabled="False"
+                Grid.Row="0" 
+                Grid.Column="2" 
+                Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding ImageResources[PowerMode.BatterySaver], Mode=OneTime}"/>
+            </Button>
+
+            <TextBlock 
+                Grid.Row="1" 
+                Grid.Column="2" 
+                Text="{Binding TextResources[PowerMode.BatterySaver], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"
+                Visibility="{Binding IsBatterySaver, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
+
+            <controls:CxToggleButton 
+                Grid.Row="2" 
+                Grid.Column="0" 
+                Style="{StaticResource ButtonStyle}"
+                IsChecked="{Binding DisplayRefreshRateCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding DisplayRefreshRateCommand, Mode=OneTime}">
+                <Grid>
+                    <FontIcon 
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                        Glyph="{Binding ImageResources[Hardware.Screen], Mode=OneTime}"/>
+
+                    <FontIcon
+                        Visibility="{Binding ControlDisplayRefreshRate, Converter={StaticResource VisibilityConverter}}"
+                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                        Margin="5,5,0,0"
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                        Glyph="{Binding ImageResources[Common.Locked], Mode=OneTime}"/>
+                </Grid>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="3" 
+                Grid.Column="0" 
+                Text="{Binding TextResources[Main.HighRefreshRate], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <controls:CxToggleButton 
+                Grid.Row="2" 
+                Grid.Column="1" 
+                Style="{StaticResource ButtonStyle}"
+                IsChecked="{Binding GpuCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding GpuCommand, Mode=OneTime}">
+
+                <FontIcon
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding ImageResources[Hardware.Gpu], Mode=OneTime}"/>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="3" 
+                Grid.Column="1" 
+                Text="{Binding TextResources[Main.Gpu], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <controls:CxToggleButton
+                Grid.Row="2" 
+                Grid.Column="2" 
+                Style="{StaticResource ButtonStyle}"                          
+                IsChecked="{Binding TouchPadCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding TouchPadCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding ImageResources[Hardware.TouchPad], Mode=OneTime}"/>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="3" 
+                Grid.Column="2" 
+                Text="{Binding TextResources[Main.TouchPad], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <controls:CxToggleButton
+                Grid.Row="4" 
+                Grid.Column="0" 
+                Style="{StaticResource ButtonStyle}"                          
+                IsChecked="{Binding NotebookModeCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding NotebookModeCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding NotebookModeImage}"/>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="5" 
+                Grid.Column="0" 
+                Text="{Binding TextResources[Main.NotebookMode], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
+            <controls:CxToggleButton
+                Grid.Row="4" 
+                Grid.Column="1" 
+                Style="{StaticResource ButtonStyle}"                          
+                IsChecked="{Binding AwakeCommand.IsChecked, Mode=OneWay}"
+                Command="{Binding AwakeCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}" 
+                    Glyph="{Binding ImageResources[Common.Awake]}"/>
+            </controls:CxToggleButton>
+            <TextBlock 
+                Grid.Row="5" 
+                Grid.Column="1" 
+                Text="{Binding TextResources[Main.AwakeMode], Mode=OneTime}" 
+                Style="{StaticResource LabelStyle}"/>
+
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="FontIcon">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="Margin" Value="10,5,5,5"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="11"/>
+                        <Setter Property="Margin" Value="0,5,0,5"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <StackPanel                   
+                    Orientation="Horizontal"                    
+                    Visibility="{Binding ShowBatteryChargeRate, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+
+                    <ToolTipService.ToolTip>
+                        <ToolTip Opened="BatteryToolTip_Opened"/>
+                    </ToolTipService.ToolTip>
+
+                    <Grid>
+                        <FontIcon 
+                            Glyph="{Binding BatteryImage}"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+
+                        <FontIcon 
+                            Visibility="{Binding IsLowPower, Converter={StaticResource VisibilityConverter}}"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            Margin="0,0,-5,-5"
+                            Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                            Glyph="&#xEA82;"/>
+
+                        <FontIcon 
+                            Visibility="{Binding IsLowPower, Converter={StaticResource VisibilityConverter}}"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            Margin="0,0,-5,-5"
+                            Foreground="{ThemeResource SystemFillColorCautionBackgroundBrush}" 
+                            Glyph="&#xEA84;"/>
+                    </Grid>
+
+                    <TextBlock
+                        Visibility="{Binding Rate, Converter={StaticResource VisibilityConverter}}">
+                        
+                        <Run Text="{Binding Rate}"/>
+                        <Run Text="W"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel 
+                    Orientation="Horizontal"                    
+                    Visibility="{Binding ShowCpuTemperature, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+
+                    <FontIcon 
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Glyph="{Binding ImageResources[Common.Temperature], Mode=OneTime}"/>
+                    <TextBlock>
+                        <Run Text="{Binding CpuTemperature}"/>
+                        <Run Text="&#x2103;"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel 
+                    Orientation="Horizontal"                    
+                    Visibility="{Binding ShowFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+
+                    <ToolTipService.ToolTip>
+                        <ToolTip Opened="FanSpeedToolTip_Opened"/>
+                    </ToolTipService.ToolTip>
+
+                    <FontIcon 
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Glyph="{Binding ImageResources[Common.Diagnostic], Mode=OneTime}"/>
+
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <ProgressBar 
+                            Margin="0,2"
+                            Width="40"
+                            Visibility="{Binding ShowCpuFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                            Value="{Binding CpuFanSpeed}"/>
+                        <ProgressBar 
+                            Margin="0,2"
+                            Width="40"
+                            Visibility="{Binding ShowGpuFanSpeed, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                            Value="{Binding GpuFanSpeed}"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Button 
+                Grid.Column="1"
+                Width="40"
+                Height="40"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                Command="{Binding ConfigCommand, Mode=OneTime}">
+
+                <FontIcon 
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    FontSize="16"
+                    Glyph="{Binding ImageResources[Common.Settings], Mode=OneTime}"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

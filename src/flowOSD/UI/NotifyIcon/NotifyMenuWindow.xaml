@@ -1,0 +1,60 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Window
+    x:Class="flowOSD.UI.NotifyIcon.NotifyMenuWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:flowOSD.UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Width="Auto" Height="Auto" Padding="3" Background="Transparent">       
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <MenuFlyoutItem 
+            Grid.Row="0" 
+            Text="{Binding MainUICommand.Text, Mode=OneWay}"
+            Command="{Binding MainUICommand}" 
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutSeparator 
+            Grid.Row="1" 
+            IsTabStop="False"/>
+        <MenuFlyoutItem 
+            Grid.Row="2" 
+            Text="{Binding ConfigCommand.Text, Mode=OneWay}" 
+            Command="{Binding ConfigCommand, Mode=OneTime}" 
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutItem
+            Grid.Row="3"
+            Text="{Binding TextResources[Commands.Update.CheckForUpdate], Mode=OneTime}"
+            Command="{Binding ConfigCommand, Mode=OneTime}"
+            CommandParameter="AboutViewModel"
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutSeparator Grid.Row="4" IsTabStop="False"/>
+        <MenuFlyoutItem
+            Grid.Row="5"
+            Text="{Binding RestartAppCommand.Text}"
+            Command="{Binding RestartAppCommand, Mode=OneTime}"
+            Click="OnMenuFlyoutItemClick"/>
+        <MenuFlyoutSeparator Grid.Row="6" IsTabStop="False"/>
+        <MenuFlyoutItem 
+            Grid.Row="7" 
+            Text="{Binding ExitCommand.Text, Mode=OneWay}" 
+            Command="{Binding ExitCommand, Mode=OneTime}" 
+            Click="OnMenuFlyoutItemClick"/>
+    </Grid>
+</Window>
