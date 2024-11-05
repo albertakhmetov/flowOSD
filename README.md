@@ -2,7 +2,7 @@
 
 [Download the latest version here](https://github.com/albertakhmetov/flowOSD/releases/download/v3.4.0/flowOSD-3.4.0.exe)
 
-![Screenshot 2024-11-05 230954](https://github.com/user-attachments/assets/95d6de63-fa5d-4235-ba36-4d936c9a90cb)
+<img width="500" alt="main" src="./.www/main.png"/>
 
 ## Disclaimer
 
